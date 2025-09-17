@@ -1,0 +1,103 @@
+---
+title: "Tutorial 7 Lesson 1"
+author: "Lucia Vilallonga"
+date: "9/17/2025"
+output: html_document
+---
+
+echo=FALSE ?
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+
+# Exercise 0: Load data
+Load the "icecream.csv" data file into a DataFrame object.
+```{r}
+```
+
+Solution:
+```{r}
+icecream <- read.csv("icecream.csv")
+```
+
+
+# Exercise 1: Variable Exploration
+Plot the relationships between the following variables: 
+(a) ice cream consumption vs outside temperature
+```{r}
+```
+
+(b) ice cream consumption vs ice cream price, colored by outside temperature
+```{r}
+```
+
+(c) ice cream consumption vs consumer income, colored by outside temperature
+```{r}
+```
+
+Solution:
+```{r}
+ggplot(data=icecream, aes(y=cons, x=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
+  geom_point()
+```
+
+
+# Exercise 2: How would you describe the relationship between each of the variables above? 
+You can use terms like 'positive/negative/no relationship,' 'strong/weak/no correlation,' 'linear/nonlinear,' and anything else you think describes the data.
+
+Solution: ***TODO: write***
+(a) 
+(b)
+(c)
+
+
+# Exercise 3: Writing the model
+Write by hand a linear model for this problem, with the variables
+explored above. Use beta's as needed for the model parameters, and state 
+clearly which variables you're using and how you're naming them.
+
+Solution: ***TODO: write***
+
+
+# Exercise 4: Implement the model in R with lm()
+```{r}
+```
+
+Solution:
+```{r}
+m1 <- lm(data=icecream, cons ~ income + price + temp)
+summary(m1)
+```
+
+
+# Exercise 5: ***TODO: write, like Exercise 4 in IMS supp***
+
+
+# Exercise 6: Add interaction terms
+Implement a new model with interaction between income and price.
+```{r}
+```
+
+Solution:
+```{r}
+m2 <- lm(data=icecream, cons ~ income + price + temp + income:price)
+summary(m2)
+```
+
+
+# Exercise 7: Write the interactions model above
+
+Solution: ***TODO: write***
+
+
+# Exercise 8: ***TODO: write, like Exercise 6 in IMS supp***
+
+
