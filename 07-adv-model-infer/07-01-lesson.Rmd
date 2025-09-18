@@ -1,13 +1,11 @@
 ---
 title: "Tutorial 7 Lesson 1"
-author: "Lucia Vilallonga"
-date: "9/17/2025"
 output: html_document
 ---
 
 echo=FALSE ?
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE)  # TODO: double-check what this does
 library(ggplot2)
 ```
 
