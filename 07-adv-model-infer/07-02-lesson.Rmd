@@ -9,10 +9,10 @@ library(ggplot2)
 
 # Simulate some data (if include=FALSE does what I think, then this won't show)
 x <- runif(n=100, min=0, max=10)
-epsilon1 <- rnorm(n=20, mean=0, sd=0.01)
-epsilon2 <- rnorm(n=80, mean=0, sd=5)
-epsilon <- c(epsilon1, epsilon2)
-y <- 2*x**2 + epsilon 
+#epsilon1 <- rnorm(n=20, mean=0, sd=0.01)
+#epsilon2 <- rnorm(n=80, mean=0, sd=5)
+epsilon <- rnorm(n=100, mean=0, sd=1) #c(epsilon1, epsilon2)
+y <- 2*x**2 + epsilon*((1+x**2)) 
 
 data <- data.frame(x,y)
 # TODO: help with generating data that looks like IMS nonlinear supp (left)
@@ -52,7 +52,7 @@ y looks very right skewed.
 
 Solution:
 ```{r}
-data$y_ = log(data$y)
+data$y_ = sqrt(data$y)
 
 ggplot(data=data, aes(x=x, y=y_)) +
   geom_point()
@@ -84,3 +84,5 @@ ggplot(data=data, aes(x=x, y=y)) +
   #geom_abline(intercept=model$coefficients[[1]], slope=model$coefficients[[2]])
   #geom_scatter(data=fitted, aes(x=x, y=y_fitted))
 ```
+
+

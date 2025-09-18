@@ -78,6 +78,9 @@ summary(m1)
 
 # Exercise 5: ***TODO: write, like Exercise 4 in IMS supp***
 
+# Here's how to add an interaction term in R syntax; try it with the variables you think are correlated here
+#
+#
 
 # Exercise 6: Add interaction terms
 Implement a new model with interaction between income and price.
@@ -96,6 +99,10 @@ summary(m2)
 Solution: ***TODO: write***
 
 
+# TODO: add exercises for comparing fit of the two models (residuals, (adj)R^2, etc)
+
 # Exercise 8: ***TODO: write, like Exercise 6 in IMS supp***
 
+
+# TODO: import learnr and try to build website version of this activity
 
