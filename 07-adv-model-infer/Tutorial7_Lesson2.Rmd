@@ -204,3 +204,5 @@ ggplot(data=data, aes(x=x, y=y)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~poly(x,2), se=FALSE)
 ```
+
+Note: after transforming the data, you will need to take care when interpreting the coefficients of the model. As we showed, we cannot describe changes in $y$ as linear with respect to changes in $x$. Instead, in this specific case the change in $y$ is *quadratic* with changes in $x$. 
