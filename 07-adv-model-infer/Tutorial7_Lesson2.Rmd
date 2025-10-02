@@ -1,0 +1,206 @@
+---
+title: "Lesson 2: Nonlinear Regression"
+#subtitle: "Lesson 2: Nonlinear Regression"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+# Lesson 2: Nonlinear Regression
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+devtools::install_github("rundel/learnrhash")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+In this lesson, we'll learn how to model data that may not be linear. 
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)  # TODO: double-check what this does
+library(ggplot2)
+
+# Simulate some data (if include=FALSE does what I think, then this won't show)
+x <- runif(n=100, min=0, max=10)
+epsilon <- rnorm(n=100, mean=0, sd=1)
+y <- 2*x**2 + epsilon*((1+x**2))
+
+data <- data.frame(x,y)
+head(data)
+```
+
+## Exercise 1
+
+Let's examine the data. First, generate a scatterplot of x and y.
+```{r ex1, exercise=TRUE}
+ggplot(data=data, aes(x=_____, y=_____)) +
+  geom_point()
+```
+
+```{r ex1-solution}
+ggplot(data=data, aes(x=x, y=y)) +
+  geom_point()
+```
+
+```{r mc1}
+question("Is the relationship between x and y linear?",
+         answer("Yes"),
+         answer("No", correct=TRUE),
+         answer("Not sure"))
+```
+
+Now let's look at the histograms of x and y, below. Notice that x looks more or
+less uniformly distributed, but y is highly skewed. This is another clue that 
+the relationship between the variables is not linear.
+
+```{r}
+ggplot(data=data, aes(x=x)) +
+  geom_histogram()
+
+ggplot(data=data, aes(x=y)) +
+  geom_histogram()
+```
+
+
+# Exercise 2
+Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship
+between x and y_.
+```{r ex2, exercise=TRUE}
+data$y_ <- _____
+
+ggplot(data=data, aes(x=_____, y=_____)) +
+  geom_point()
+```
+
+```{r ex2-solution}
+data$y_ = sqrt(data$y)
+
+ggplot(data=data, aes(x=x, y=y_)) +
+  geom_point()
+```
+
+Does the relationship between x and y_ look linear?
+```{r mc2}
+question("Is the relationship between x and y linear?",
+         answer("Yes", correct=TRUE),
+         answer("No"),
+         answer("Not sure"))
+```
+
+
+# Exercise 3
+Now, fit a linear model for x and y_. 
+
+```{r ex3, exercise=TRUE}
+model <- lm(______)
+summary(model)
+```
+
+```{r ex3-solution}
+model <- lm(data=data, y_ ~ x)
+summary(model)
+```
+
+
+# Exercise 4
+Now we need to back-transform the data in order to plot the best-fit line on
+the original (non-transformed) domain of y. 
+
+$y* = 0.557 + 1.268x + residuals$
+
+$\sqrt{y}= 0.557 + 1.268x + residuals$
+
+$y = (0.557 + 1.268x + residuals)^2$
+
+The model on the last line is shown below.
+
+```{r}
+ggplot(data=data, aes(x=x, y=y)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~poly(x,2), se=FALSE)
+```
