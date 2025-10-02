@@ -171,19 +171,6 @@ m1 <- ____
 summary(m1)
 ```
 
-
-***FIXME: below hints don't render with comments, but without comments they throw a parsing error***
-
-```{r ex2-hint1}
-# Use the lm() command with the data you loaded:
-m1 <- lm(data=icecream, ____)
-```
-
-```{r ex2-hint2}
-# `cons` is the dependent (response) variable, denoted by Y ~
-m1 <- lm(data=icecream, cons ~ ____)
-```
-
 ```{r ex2-solution}
 # Add the independent variables (covariates) after the ~ and separated by +
 m1 <- lm(data=icecream, cons ~ temp + price + income)
