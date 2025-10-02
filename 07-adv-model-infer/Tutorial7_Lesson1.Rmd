@@ -161,9 +161,9 @@ We can see that ice cream consumption and temperature have a positive and somewh
 
 First, let's write a model for the data: if $y$ is consumption, then with the variables we explored above the model can be expressed as
 
-$\hat{y_i} = \beta_0 + \beta_{\rm temp}x_{i,\rm temp} + \beta_{i,\rm price}x_{i,\rm price} + \beta_{i,\rm income}x_{\rm income} + \epsilon_i$
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + residuals$
 
-with residuals $\epsilon_i$. Now, fit this model below:
+Now, fit this model below:
 
 ```{r ex2, exercise = TRUE}
 m1 <- ____
@@ -196,7 +196,7 @@ summary(m1)
 
 Now we will try adding "interaction terms," which account for the effect of two covariates that may depend on each other. We can add these terms to the model as follows:
 
-$\hat{y_i} = \beta_0 + \beta_{\rm temp}x_{i,\rm temp} + \beta_{\rm price}x_{i,\rm price} + \beta_{\rm income}x_{i,\rm income} + \beta_{\rm price:income}x_{i,\rm price}x_{i,\rm income} + \epsilon_i$
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + \beta_{\rm price:income}x_{\rm price}x_{\rm income} + residuals$
 
 In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`. Try it with the icecream data below:
 
