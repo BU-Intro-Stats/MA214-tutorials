@@ -1,0 +1,276 @@
+---
+title: "Lesson 1: Interactions"
+#subtitle: "Lesson 1: Interactions"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+# Lesson 1: Interactions
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+devtools::install_github("rundel/learnrhash")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+
+In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables are highly inter-correlated. 
+
+## Exercise 1
+
+First, load the `icecream.csv` data file into a DataFrame variable and create scatterplots to examine the relationships between the varables. In this analysis, we are interested in determining what factors influence ice cream consumption from an ice cream truck with a route that travels across different neighborhoods. 
+
+```{r ex1, exercise = TRUE}
+# Load data
+icecream <- _______("icecream.csv")
+
+# View some of the variables
+head(icecream)
+
+# Plot ice cream consumption vs outside temperature
+ggplot(data=icecream, aes(y=_______, x=_______)) +
+  geom_point()
+
+# Plot ice cream consumption vs ice cream price, colored by outside temperature
+ggplot(data=icecream, aes(y=_______, x=_______, col=temp)) +
+  geom_point()
+
+# Plot ice cream consumption vs consumer income, colored by price
+ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
+  geom_point()
+```
+
+```{r ex1-hint-1}
+# Try the following command for loading the csv file:
+read.csv("icecream.csv")
+```
+
+```{r ex1-solution}
+# Solution
+icecream <- read.csv("icecream.csv")
+
+ggplot(data=icecream, aes(y=cons, x=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
+  geom_point()
+```
+
+
+```{r mc1}
+question("What is the relationship between ice cream consumption and temperature?",
+         answer("Positive and somewhat linear", correct=TRUE),
+         answer("Positive and strongly linear"),
+         answer("Negative and non-linear"),
+         answer("There is no correlation"))
+```
+
+
+## Exercise 2
+
+We can see that ice cream consumption and temperature have a positive and somewhat linear relationship; that is, when temperature increases, we observe that consumption is also likely to increase. But, we have two other variables in the dataset: (ice cream) price and (consumer) income. Could these two variables be inter-related?
+
+First, let's write a model for the data: if $y$ is consumption, then with the variables we explored above the model can be expressed as
+
+$\hat{y_i} = \beta_0 + \beta_{\rm temp}x_{i,\rm temp} + \beta_{i,\rm price}x_{i,\rm price} + \beta_{i,\rm income}x_{\rm income} + \epsilon_i$
+
+with residuals $\epsilon_i$. Now, fit this model below:
+
+```{r ex2, exercise = TRUE}
+m1 <- ____
+
+summary(m1)
+```
+
+
+***FIXME: below hints don't render with comments, but without comments they throw a parsing error***
+
+```{r ex2-hint1}
+# Use the lm() command with the data you loaded:
+m1 <- lm(data=icecream, ____)
+```
+
+```{r ex2-hint2}
+# `cons` is the dependent (response) variable, denoted by Y ~
+m1 <- lm(data=icecream, cons ~ ____)
+```
+
+```{r ex2-solution}
+# Add the independent variables (covariates) after the ~ and separated by +
+m1 <- lm(data=icecream, cons ~ temp + price + income)
+
+summary(m1)
+```
+
+
+## Exercise 3
+
+Now we will try adding "interaction terms," which account for the effect of two covariates that may depend on each other. We can add these terms to the model as follows:
+
+$\hat{y_i} = \beta_0 + \beta_{\rm temp}x_{i,\rm temp} + \beta_{\rm price}x_{i,\rm price} + \beta_{\rm income}x_{i,\rm income} + \beta_{\rm price:income}x_{i,\rm price}x_{i,\rm income} + \epsilon_i$
+
+In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`. Try it with the icecream data below:
+
+```{r ex3, exercise = TRUE}
+m2 <- ____
+
+summary(m2)
+```
+
+```{r ex3-solution}
+# Add the independent variables (covariates) after the ~ and separated by +
+m2 <- lm(data=icecream, cons ~ temp + price + income + price:income)
+
+summary(m2)
+```
+
+
+## Exercise 4 
+
+```{r, echo=FALSE}
+tab <- matrix(c(0.719, 0.687, 0.037, 0.759, 0.721, 0.035), ncol=3, byrow=TRUE)
+colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
+rownames(tab) <- c('m1', 'm2')
+tab <- as.table(tab)
+print(tab)
+```
+
+```{r mc2}
+question("Given the measures of model fit above, which model do you think fits the icecream consumption data better?",
+         answer("m1, linear model with no interactions"),
+         answer("m2, linear model with interaction between price and income", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Exercise 5
+Suppose we were to run an experiment where 24 bean plants are randomized into one of four groups:
+
+1. Each plant receives 1 teaspoon of water and 1 hour of sunlight each day.
+2. Each plant receives 4 tablespoons of water and 1 hour of sunlight each day.
+3. Each plant receives 1 teaspoon of water and 8 hours of sunlight each day.
+4. Each plant receives 4 tablespoons of water and 8 hours of sunlight each day.
+
+
+```{r mc3}
+question("Which group do you think will have the least plant growth?",
+         answer("Group 1"),
+         answer("Group 2", correct=TRUE),
+         answer("Group 3"),
+         answer("Group 4"))
+```
+
+```{r mc4}
+question("The most plant growth?",
+         answer("Group 1"),
+         answer("Group 2"),
+         answer("Group 3"),
+         answer("Group 4", correct=TRUE))
+```
+
+```{r mc5}
+question("Do you think the effects of the water and sunlight on plans are independent?",
+         answer("Yes", message="Consider two examples: a plant that receives very little water and a lot of sun will dry up, while one that receives a lot of water and very little sun will rot. Most plants need a balance of water and sunlight to grow properly."),
+         answer("No", correct=TRUE),
+         answer("Not sure", message="Consider two examples: a plant that receives very little water and a lot of sun will dry up, while one that receives a lot of water and very little sun will rot. Most plants need a balance of water and sunlight to grow properly."))
+```
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
