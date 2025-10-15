@@ -1,6 +1,5 @@
 ---
-title: "Lesson 2: Nonlinear Regression"
-#subtitle: "Lesson 2: Nonlinear Regression"
+title: "Advanced Inference: 2 - Nonlinear Regression"
 output:
   learnr::tutorial:
     progressive: true
@@ -8,10 +7,8 @@ output:
 runtime: shiny_prerendered
 ---
 
-# Lesson 2: Nonlinear Regression
-
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-devtools::install_github("rundel/learnrhash")
+#devtools::install_github("rundel/learnrhash")
 
 library(learnr)
 library(tidyverse)
@@ -99,13 +96,15 @@ hash_encoder_ui <- {
 }
 ```
 
-In this lesson, we'll learn how to model data that may not be linear. 
+## Welcome
+
+In this lesson, we'll learn how to model data that may not be linear. See the data table below:
 
 ```{r, echo=FALSE}
-knitr::opts_chunk$set(echo = TRUE)  # TODO: double-check what this does
+knitr::opts_chunk$set(echo = TRUE)  
 library(ggplot2)
 
-# Simulate some data (if include=FALSE does what I think, then this won't show)
+# Simulate some data 
 x <- runif(n=100, min=0, max=10)
 epsilon <- rnorm(n=100, mean=0, sd=1)
 y <- 2*x**2 + epsilon*((1+x**2))
@@ -114,29 +113,23 @@ data <- data.frame(x,y)
 head(data)
 ```
 
-## Exercise 1
+
+### Visualize data
 
 Let's examine the data. First, generate a scatterplot of x and y.
-```{r ex1, exercise=TRUE}
-ggplot(data=data, aes(x=_____, y=_____)) +
-  geom_point()
-```
-
-```{r ex1-solution}
+```{r}
 ggplot(data=data, aes(x=x, y=y)) +
   geom_point()
 ```
 
-```{r mc1}
+```{r mc1, echo=FALSE}
 question("Is the relationship between x and y linear?",
          answer("Yes"),
          answer("No", correct=TRUE),
          answer("Not sure"))
 ```
 
-Now let's look at the histograms of x and y, below. Notice that x looks more or
-less uniformly distributed, but y is highly skewed. This is another clue that 
-the relationship between the variables is not linear.
+Now let's look at the histograms of x and y, below. Notice that x looks more or less uniformly distributed, but y is highly skewed. This is another clue that the relationship between the variables is not linear.
 
 ```{r}
 ggplot(data=data, aes(x=x)) +
@@ -147,9 +140,9 @@ ggplot(data=data, aes(x=y)) +
 ```
 
 
-# Exercise 2
-Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship
-between x and y_.
+### Adding a transformation
+
+Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship between x and y_.
 ```{r ex2, exercise=TRUE}
 data$y_ <- _____
 
@@ -165,15 +158,16 @@ ggplot(data=data, aes(x=x, y=y_)) +
 ```
 
 Does the relationship between x and y_ look linear?
-```{r mc2}
-question("Is the relationship between x and y linear?",
+```{r mc2, echo=FALSE}
+question("Is the relationship between x and y_ linear?",
          answer("Yes", correct=TRUE),
          answer("No"),
          answer("Not sure"))
 ```
 
 
-# Exercise 3
+### Modeling the transformed data
+
 Now, fit a linear model for x and y_. 
 
 ```{r ex3, exercise=TRUE}
@@ -187,7 +181,8 @@ summary(model)
 ```
 
 
-# Exercise 4
+### Back-transformation
+
 Now we need to back-transform the data in order to plot the best-fit line on
 the original (non-transformed) domain of y. 
 
@@ -206,3 +201,95 @@ ggplot(data=data, aes(x=x, y=y)) +
 ```
 
 Note: after transforming the data, you will need to take care when interpreting the coefficients of the model. As we showed, we cannot describe changes in $y$ as linear with respect to changes in $x$. Instead, in this specific case the change in $y$ is *quadratic* with changes in $x$. 
+
+
+## Your turn!
+
+Now try repeating the same analysis on MLB salary data. Here's a preview of what the dataset, called `Hitters`,  looks like:
+
+```{r, echo=FALSE}
+library(ISLR2)
+data(Hitters)
+
+head(Hitters)
+```
+
+
+Create a scatterplot of players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat. Check the linearity of the data with the scatterplot.
+
+```{r ex4, exercise=TRUE}
+```
+
+```{r ex4-solution}
+ggplot(data=Hitters, aes(x=RBI, y=Salary)) +
+  geom_point()
+```
+
+
+### A Different Transformation
+
+So the Salaries are not linear, and you'll have to transform them again. Take another look at the scatterplot above.
+
+```{r mc3, echo=FALSE}
+question("What relationship does MLB players' salary and RBI seem to have?",
+         answer("Linear"),
+         answer("Exponential", correct=TRUE),
+         answer("Cubic"),
+         answer("Not sure"))
+```
+
+
+### Modeling Exponential Data
+
+Perform a log transformation on the Salary variable, and add it to the dataframe. Then use the transformed variable in a linear model as you did with the quadratic example above.
+
+```{r ex5, exercise=TRUE}
+Hitters$logSalary <- _____
+```
+
+```{r ex5-solution}
+Hitters$logSalary <- log(Hitters$Salary)
+```
+
+```{r mc4, echo=FALSE}
+question("What inverse operation will you need to perform on the model for the correct back-transformation?",
+         answer("(...)^2"),
+         answer("exp(...) or e^(...)", correct=TRUE),
+         answer("sqrt(...)"),
+         answer("1/(...)"))
+```
+
+
+### Back Transformation
+
+After back-transforming, your model will be:
+
+$y = e^{\beta_0 + \beta_1x_{RBI} + residuals}$
+
+
+### Interpretation
+
+Now on a log scale, `logSalary` appears linear with RBI:
+
+```{r, include=FALSE}
+Hitters$logSalary <- log(Hitters$Salary)
+```
+
+```{r}
+ggplot(data=Hitters, aes(x=RBI, y=logSalary)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
+```
+
+Note the difference in the scales on the y-axis compared to the first scatterplot you made, because now we're on a log scale. 
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
