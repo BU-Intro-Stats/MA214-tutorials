@@ -98,10 +98,10 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In this tutorial, you'll learn more about inference and prediction for regression models. Our main goal is to learn how to quantify uncertainty not just in our model parameters, but also in the inferences and predictions that we make with them. To start, let's review the workflow for estimating parameters. 
+In this tutorial, you'll learn more about inference and prediction for regression models. Our main goal is to learn how to quantify uncertainty not just in our model parameters, but also in the predictions that we make with them. To start, let's review the workflow for estimating parameters. 
 
 
-### Review: estimate parameters and quantify uncertainty
+### Review: estimate parameters
 
 Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance and air time. Then print a summary of the model results.
 
@@ -149,7 +149,7 @@ question("How would you interpret the model parameters above?",
 ```
 
 
-### Quantifying (un)certainty
+### Review: quantifying (un)certainty
 
 As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.1269$ minutes is a point estimate based on a sample of $n=100$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
 
@@ -204,7 +204,7 @@ But we know this model is based on our sample of 100 flights, and that the estim
 
 Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$ - but it is still random, and thus, uncertain. 
 
-So, our flight from NYC to BOS may take *about* 42.39 minutes, plus or minus some error term. We'll need to adapt our tools to handle the uncertainty we have about this error term - more on that below.
+So, our flight from NYC to BOS may take *about* 42.39 minutes, plus or minus some error term. We'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
 
 
 ## Simulation
@@ -213,11 +213,11 @@ So, our flight from NYC to BOS may take *about* 42.39 minutes, plus or minus som
 
 In this simulation, we'll use bootstrapping to take a closer look at sample variation (introduced above). The model you generated for flight distance vs air time, $y = 18.66 + 0.1269x + residuals$, was based on a sample of $n=100$ flights. If you had a slightly different sample, then the model would be different too. 
 
-Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
+Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
 
-
+First, we'll need to write a function that generates our boostrapped samples and their corresponding linear models:
 ```{r}
-boots <- function(data, n=15000) {
+boots <- function(data=nycflights, n=15000) {
   # Generate n bootstrapped samples
   bsample <- data %>% sample_n(size=n, replace=TRUE)
   
@@ -225,11 +225,59 @@ boots <- function(data, n=15000) {
   bmodel <- lm(data=bsample, air_time ~ distance)
   
   # Grab the coefficients from the model
-  binter <- bmodel$coefficients[["(Intercept)"]]
-  bslope <- bmodel$coefficients[["distance"]]
+  bIntercept <- bmodel$coefficients[["(Intercept)"]]
+  bSlope <- bmodel$coefficients[["distance"]]
   
-  # TODO: how to plot diff models?
-  # TODO: need SEs as well
-  # TODO: error distribution = epsilon dist, Gaussian w sigma^2 hat
+  # TODO: compute SE of slope as well (formula in stat_more_inf)
+  # TODO: sample from error distribution = epsilon dist, Gaussian w sigma^2 hat
+  return(list(bIntercept, bSlope, ypred))
 }
+```
+
+Now let's write a function to generate predicted y values from those models:
+
+```{r}
+generate_y <- function(coeffs) {
+  x <- nycflights$distance
+  y <- nycflights$air_time
+  
+  pred_y <- data.frame()
+  
+  for(k in 1:ncol(coeffs)) {
+    y_pred <- coeffs[1,k] + coeffs[2,k]*x
+    line <- colnames(coeffs)[k]
+    
+    row <- data.frame(x=x, y=y, y_pred=y_pred, line=line)
+    pred_y <- rbind(pred_y, row)
+  }
+  
+  return(pred_y)
+}
+```
+
+```{r}
+K <- 3   # number of bootstrap simulations to run - and the number of models
+x <- nycflights$distance
+coeffs <- matrix(nrow=2, ncol=K, byrow=TRUE)
+rownames(coeffs) <- c("Intercept", "Slope") 
+colnames(coeffs) <- paste0("B-line", seq_len(ncol(coeffs)))
+
+for(k in 1:K) {
+  sim <- boots(n=250)
+  coeffs[1,k] <- sim[[1]]
+  coeffs[2,k] <- sim[[2]]
+}
+
+# Create a dataframe of model coefficients 
+coeffs <- data.frame(coeffs)
+
+# Generate predicted y values
+predicted <- generate_y(coeffs)
+
+# Plot
+ggplot(data=predicted, aes(x=x, y=y)) +
+  geom_point(color="black", alpha=0.6) +
+  geom_line(data=predicted, aes(x=x, y=y_pred, color=line))
+
+# TODO: plotted lines don't display well, maybe original dataset is too large - try n=40?
 ```
