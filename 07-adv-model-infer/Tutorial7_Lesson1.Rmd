@@ -11,7 +11,8 @@ runtime: shiny_prerendered
 # Lesson 1: Interactions
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-devtools::install_github("rundel/learnrhash")
+#devtools::install_github("rundel/learnrhash")
+devtools::install_git("git@github.com:rundel/learnrhash.git")
 
 library(learnr)
 library(tidyverse)
