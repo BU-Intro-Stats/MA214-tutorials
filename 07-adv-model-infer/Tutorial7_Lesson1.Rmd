@@ -1,6 +1,5 @@
 ---
-title: "Lesson 1: Interactions"
-#subtitle: "Lesson 1: Interactions"
+title: "Advanced Inference: 1 - Interactions"
 output:
   learnr::tutorial:
     progressive: true
@@ -8,17 +7,16 @@ output:
 runtime: shiny_prerendered
 ---
 
-# Lesson 1: Interactions
-
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
 #devtools::install_github("rundel/learnrhash")
-devtools::install_git("git@github.com:rundel/learnrhash.git")
+#devtools::install_git("git@github.com:rundel/learnrhash.git")
 
 library(learnr)
 library(tidyverse)
 library(openintro)
 library(grid)
 library(png)
+library(ggplot2)
 #library(emo)
 
 knitr::opts_chunk$set(echo = FALSE,
@@ -100,12 +98,90 @@ hash_encoder_ui <- {
 }
 ```
 
+## Welcome
 
-In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables are highly inter-correlated. 
+In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables interact with each other and the outcome of interest.
 
-## Exercise 1
+As a simple example, suppose we want to predict how much food cats will eat in a week. We have a sample of 16 pet cats, and have recorded their ages, weights, and body lengths, as well as how many grams of food they eat. Many of these variables are inter-correlated: kittens eat less than adult cats, and they are also smaller by weight and length. Similarly, many larger cats by length also weigh more (and eat more) than their shorter peers. In a situation like this, it's difficult to tease apart the relationships between the covariates and the outcome. We will learn how to address this below. 
 
-First, load the `icecream.csv` data file into a DataFrame variable and create scatterplots to examine the relationships between the varables. In this analysis, we are interested in determining what factors influence ice cream consumption from an ice cream truck with a route that travels across different neighborhoods. 
+
+### Example: demographic data
+
+An academic advisor wants to study the career outcomes of former students under her mentorship. She collects the following data on 16 recent graduates: 
+
+- `income` - annual income, in tens of thousands of USD
+- `experience` - years of work experience
+- `gender` - factor indicating gender 
+
+Here's what a scatterplot of the data looks like:
+
+```{r, echo=FALSE}
+inc <- c(43, 48, 52, 70, 61, 83, 96, 100,
+         36, 40, 39, 44, 46, 49, 50, 53) 
+exp <- c(1, 2, 4, 6, 5, 3, 8, 10,
+         1, 3, 2, 5, 8, 6, 7, 10)
+gen <- c("male", "male", "male", "male", "male", "male", "male", "male",
+         "female", "female", "female", "female", "female", "female", "female", 
+         "female")
+
+data <- data.frame(inc, exp, gen)
+colnames(data) <- c("income", "experience", "gender")
+
+ggplot(data=data, aes(y=income, x=experience, col=gender)) +
+  geom_point()
+```
+
+
+### Modeling the demographic data
+
+Let's fit a linear model to these data, using all the covariates we have. 
+
+```{r, include=TRUE}
+m1 <- lm(data=data, income ~ .)
+summary(m1)
+```
+
+
+### Adding interactions to our model
+
+In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. 
+
+```{r, include=TRUE}
+m2 <- lm(data=data, income ~ experience + gender + experience:gender)
+summary(m2)
+```
+
+
+### Assessing model fit
+
+```{r, echo=FALSE}
+ggplot(data=data, aes(x=experience, y=income)) +
+  geom_point(aes(col=gender)) +
+  geom_smooth(method='lm', se=FALSE) +
+  ggtitle('Linear model without interaction term')
+  
+tab <- matrix(c(0.733, 0.692, 11.1, 0.833, 0.791, 9.1), ncol=3, byrow=TRUE)
+colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
+rownames(tab) <- c('m1', 'm2')
+tab <- as.table(tab)
+print(tab)
+```
+
+We can see that the model that includes an interaction term performs better by the measures of goodness of fit that we know: the $R^2$ and adjusted $R^2$ are higher, and the SE's are lower. 
+
+
+## Your turn!
+
+### Data exploration
+
+Now we'll turn to a more interesting problem that does not have a categorical variable, but where our model can still benefit from including interactions. In this analysis, we are interested in determining what factors influence ice cream consumption from an ice cream truck with a route that travels across different neighborhoods. The variables are:
+
+- `cons` - ice cream consumption
+- `temp` - outdoor temperature
+- `income` - average neighborhood income
+- `price` - ice cream price
+
+To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the varables. 
 
 ```{r ex1, exercise = TRUE}
 # Load data
@@ -146,7 +222,6 @@ ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
   geom_point()
 ```
 
-
 ```{r mc1}
 question("What is the relationship between ice cream consumption and temperature?",
          answer("Positive and somewhat linear", correct=TRUE),
@@ -155,10 +230,9 @@ question("What is the relationship between ice cream consumption and temperature
          answer("There is no correlation"))
 ```
 
+### Modeling icecream consumption
 
-## Exercise 2
-
-We can see that ice cream consumption and temperature have a positive and somewhat linear relationship; that is, when temperature increases, we observe that consumption is also likely to increase. But, we have two other variables in the dataset: (ice cream) price and (consumer) income. Could these two variables be inter-related?
+We can see that ice cream consumption and temperature have a positive and somewhat linear relationship; that is, when temperature increases, we observe that consumption is also likely to increase. But, we have two other variables in the dataset: price and income. Could these two variables be inter-related?
 
 First, let's write a model for the data: if $y$ is consumption, then with the variables we explored above the model can be expressed as
 
@@ -180,13 +254,13 @@ summary(m1)
 ```
 
 
-## Exercise 3
+### Interactions between non-categorical variables
 
-Now we will try adding "interaction terms," which account for the effect of two covariates that may depend on each other. We can add these terms to the model as follows:
+Now add the interaction term corresponding to the written model below: 
 
 $y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + \beta_{\rm price:income}x_{\rm price}x_{\rm income} + residuals$
 
-In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`. Try it with the icecream data below:
+Note that all of these are continuous variables, not categorical. 
 
 ```{r ex3, exercise = TRUE}
 m2 <- ____
@@ -202,7 +276,7 @@ summary(m2)
 ```
 
 
-## Exercise 4 
+### Assessing model fit
 
 ```{r, echo=FALSE}
 tab <- matrix(c(0.719, 0.687, 0.037, 0.759, 0.721, 0.035), ncol=3, byrow=TRUE)
@@ -217,39 +291,6 @@ question("Given the measures of model fit above, which model do you think fits t
          answer("m1, linear model with no interactions"),
          answer("m2, linear model with interaction between price and income", correct=TRUE),
          answer("Not sure"))
-```
-
-
-## Exercise 5
-Suppose we were to run an experiment where 24 bean plants are randomized into one of four groups:
-
-1. Each plant receives 1 teaspoon of water and 1 hour of sunlight each day.
-2. Each plant receives 4 tablespoons of water and 1 hour of sunlight each day.
-3. Each plant receives 1 teaspoon of water and 8 hours of sunlight each day.
-4. Each plant receives 4 tablespoons of water and 8 hours of sunlight each day.
-
-
-```{r mc3}
-question("Which group do you think will have the least plant growth?",
-         answer("Group 1"),
-         answer("Group 2", correct=TRUE),
-         answer("Group 3"),
-         answer("Group 4"))
-```
-
-```{r mc4}
-question("The most plant growth?",
-         answer("Group 1"),
-         answer("Group 2"),
-         answer("Group 3"),
-         answer("Group 4", correct=TRUE))
-```
-
-```{r mc5}
-question("Do you think the effects of the water and sunlight on plans are independent?",
-         answer("Yes", message="Consider two examples: a plant that receives very little water and a lot of sun will dry up, while one that receives a lot of water and very little sun will rot. Most plants need a balance of water and sunlight to grow properly."),
-         answer("No", correct=TRUE),
-         answer("Not sure", message="Consider two examples: a plant that receives very little water and a lot of sun will dry up, while one that receives a lot of water and very little sun will rot. Most plants need a balance of water and sunlight to grow properly."))
 ```
 
 
