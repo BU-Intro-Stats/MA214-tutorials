@@ -106,12 +106,14 @@ In this tutorial, you'll learn more about inference and prediction for regressio
 Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance and air time. Then print a summary of the model results.
 
 ```{r, echo=FALSE}
-# Dataset is too big for our purposes, just take 100 samples and select the
+# Dataset is too big for our purposes, just take 40 samples and select the
 # two columns of interest
 nycflights <- nycflights %>% 
   select(distance, air_time) %>%
-  sample_n(size=40)
+  sample_n(size=40) 
 
+# Add some extra noise
+nycflights$air_time <- nycflights$air_time + rnorm(n=nrow(nycflights))
 head(nycflights)
 ```
 
@@ -151,7 +153,7 @@ question("How would you interpret the model parameters above?",
 
 ### Review: quantifying (un)certainty
 
-As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.1269$ minutes is a point estimate based on a sample of $n=100$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
+As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.1269$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
 
 ```{r ex2, exercise=TRUE}
 ```
@@ -202,9 +204,26 @@ $\hat{y} = 18.66 + (0.1269\times187) = 42.39$ minutes
 
 But we know this model is based on our sample of 100 flights, and that the estimate might be different if we had generated the model from a different sample (this is called sample variation). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
 
-Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$ - but it is still random, and thus, uncertain. 
+Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$. In the process of performing linear regression we estimate $\hat\sigma^2$, but there is still uncertainty inherent to the model.
 
-So, our flight from NYC to BOS may take *about* 42.39 minutes, plus or minus some error term. We'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
+For example, there are three rows in the dataset corresponding to a flight of distance 200 miles:
+
+```{r}
+subset(nycflights, distance == 200)
+```
+
+Let's plot these with our line:
+
+```{r}
+subset <- subset(nycflights, distance == 200)
+subset$yhat <- 18 + 0.12*(subset$distance)  # FIXME: these should be different values
+
+ggplot(data=subset, aes(x=distance)) +
+  geom_point(aes(y=air_time)) +
+  geom_line(aes(y=yhat))
+```
+
+So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
 
 
 ## Simulation Approach
@@ -220,13 +239,21 @@ Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we gen
 # https://infer.netlify.app/articles/infer#introduction
 library(infer)
 
-bSlopes <- nycflights |>
+# Generate fitted models from 1000 bootstrapped estimates:
+boots <- nycflights |>
   specify(air_time ~ distance) |>
+  hypothesize(null="independence") |>
   generate(reps=1000, type="bootstrap") |>
-  calculate(stat="slope")
+  fit()
 
-head(bSlopes)  # display the table of calculated slope values
-summarize(bSlopes, se=sd(stat))  # compute the SE
+head(boots)  # display the table of estimated parameters
+
+# Grab the parameters
+bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
+bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
+
+# TODO: calculate SE for each param and overall SE
+#summarize(boots, se=sd(stat))  # compute the SE
 ```
 
 Note how the slope SE here (0.00318) is higher than in our original model (0.00307). This is because, in using a bootstrap method, we have resampled the dataset and thus added some uncertainty to the estimates. 
