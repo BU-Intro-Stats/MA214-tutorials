@@ -99,7 +99,17 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In this tutorial, you'll learn about cross-validation, a set of methods for characterizing the ability of a given model to generalize to new data and perform well in practice. To start, let's go back to the academic advisor's career data from her former students:
+In this tutorial, you'll learn about cross-validation, a set of methods for characterizing the ability of a given model to generalize to new data and perform well in practice. 
+
+## Cross-validation on demographic data
+
+To start, let's go back to the academic advisor's career data from her former students. We have the following data on 16 recent graduates: 
+
+- `income` - annual income, in tens of thousands of USD
+- `experience` - years of work experience
+- `gender` - factor indicating gender 
+
+Here's what a scatterplot of the data looks like:
 
 ```{r, echo=FALSE}
 inc <- c(43, 48, 52, 70, 61, 83, 96, 100,
@@ -116,29 +126,43 @@ colnames(data) <- c("income", "experience", "gender")
 ggplot(data=data, aes(y=income, x=experience, col=gender)) +
   geom_point()
 ```
+###
 
-Recall that we fit two models to this dataset: one standard linear model for income vs expertise and gender, and one with an interaction term between experience and gender. Let's use cross-validaiton to test the performance of each model, and confirm our results from before that the model with interactions does best. 
+Recall that we fit two models to this dataset: one standard linear model for income vs expertise and gender, and one with an interaction term between experience and gender. Let's use cross-validation to test the performance of each model. Hopefully we should confirm our results from before that the model with interactions does best. 
 
-Now to perform cross-validation, we must take our original dataset of 16 graduates and randomly choose a subset of the samples to hold out. Since we have a fairly small dataset, let's use $k=1$ for the number of holdout samples. The cross-validation procedure goes like this:
+###
 
-1. From the full dataset $D$, randomly select $k$ sample(s) to set aside in a validation set $V$
+To perform cross-validation, we must take our original dataset of 16 graduates and choose a subset of the samples to hold out. Since we have a fairly small dataset, let's use $k=1$ for the number of holdout samples. The cross-validation procedure goes like this:
+
+1. From the full dataset $D$, select $k$ sample(s) to set aside in a validation set $V$
 2. Fit the models `m1` and `m2` on the set $D / V$ (D minus V)
 3. Make predictions on the sample(s) in $V$ and record the model performance
 4. Repeat steps 1-3 until every sample in $D$ has been used in the validation set
 
-For this analysis, we'll use the _cross-validation SSE_ to measure each model's performance. If $\hat y_{cv}$ is the prediction made by the model fit on the cross-validation set and $y$ is the true value, then the CV-SSE is given by $\text{CV-SSE} = \sum_{i=1}^n(\hat y_{cv,i} -y_i)^2$. 
+For this analysis, we'll use the _cross-validation SSE_ to measure each model's performance. If $\hat y_{cv}$ is the prediction made by the model fit on the cross-validation set and $y$ is the true value, then the CV-SSE is given by 
+
+$$\text{CV-SSE} = \sum_{i=1}^n(\hat y_{cv,i} -y_i)^2$$
+
+###
 
 Let's write a function to do this:
 
-```{r}
+```{r, echo=TRUE}
 crossVal <- function(data, k=1) {
   
-  for(fold in 1:k) {   # FIXME: not the correct iterations
+  # Number of repetitions
+  K <- nrow(data) / k
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  for(fold in 1:K) {   
     # Select the row 
-    val_idx <- sample(nrow(data), size=k, replace=FALSE) 
+    val_idx <- fold
     V <- data[c(val_idx),]          # Construct the validation set
     DminusV <- data[-c(val_idx),]   # Construct the training set
-    
+
     # Fit model 1 without interactions
     m1 <- lm(data=DminusV, income ~ experience + gender)
     
@@ -149,6 +173,330 @@ crossVal <- function(data, k=1) {
     m1_cvsse <- mean((m1$residuals)**2)
     m2_cvsse <- mean((m2$residuals)**2)
     
-    # TODO: create a table of results for the above
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
   }
+  return(results)
+}
+
+crossVal(data=data, k=1)
+```
+
+```{r mc1}
+question("Based on the CV-SSE, which model do you think performs better?",
+         answer("m1, the model without interactions"),
+         answer("m2, the model with interactions", correct=TRUE),
+         answer("They have about the same performance"),
+         answer("Not sure"))
+```
+
+
+## Your turn!
+
+We return to the ice cream consumption dataset from Lesson 7.1. Recall what the dataset looks like, for the variables
+
+- `cons` - ice cream consumption
+- `temp` - outdoor temperature
+- `income` - average neighborhood income
+- `price` - ice cream price
+
+```{r}
+icecream <- read.csv("icecream.csv")
+head(icecream)
+```
+
+Recall that we first fit a model without interactions, like so:
+
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + residuals$
+
+And then a model with an interaction term on the ice cream price and neighborhood income:
+
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + \beta_{\rm price:income}x_{\rm price}x_{\rm income} + residuals$
+
+This time we have a few more observations (30 instead of 16), so let's try performing cross-validation with $k=3$ points in our validation set $V$. 
+
+###
+
+```{r mc2}
+question("For the full dataset of 30 observations and k=3 in each validation set, what will be the size of our training set D minus V?",
+         answer("3"),
+         answer("10"),
+         answer("27", correct=TRUE),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc3}
+question("How many times will we repeat the cross-validation process until every point has been used for validation and for training?",
+         answer("3"),
+         answer("10", correct=TRUE),
+         answer("27"),
+         answer("Not sure"))
+```
+
+###
+
+### Cross-validation on the icecream data
+
+Modify the following function to perform cross-validation on the icecream data, with the no-interaction and interaction models we recalled above.
+
+```{r ex1, exercise=TRUE}
+crossValIce <- function(data, k) {
+  
+  # Number of repetitions (Hint: check the MC question above)
+  K <- _____
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  last_idx <- 1
+  
+  for(fold in 1:K) {   
+    # Select the row 
+    val_idx <- _____
+    
+    # Hint: if you're having trouble figuring out the line above, try 
+    # uncommenting this and playing with subsetting the indices
+    # print(val_idx)
+    #
+    # Hint: think about what indices you want in each fold:
+    # 1 2 3
+    # 4 5 6
+    # ...
+    # 28 29 30
+    # 
+    # Hint: try using last_idx
+    
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+
+    # Fit model 1 without interactions
+    m1 <- _____
+    
+    # Fit model 2 with interactions
+    m2 <- _____
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
+    
+    # Update the last index used in validation
+    last_idx <- last_idx + k
+  }
+  return(results)
+}
+```
+
+```{r ex1-hint-1}
+crossValIce <- function(data, k) {
+  
+  # Number of repetitions (Hint: check the MC question above)
+  K <- _____
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  last_idx <- 1
+  
+  for(fold in 1:K) {   
+    # Select the row 
+    val_idx <- _____
+    
+    # Hint: if you're having trouble figuring out the line above, try 
+    # uncommenting this and playing with subsetting the indices:
+    # print(val_idx)
+    
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+
+    # Fit model 1 without interactions
+    m1 <- _____
+    
+    # Fit model 2 with interactions
+    m2 <- _____
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
+    
+    # Update the last index used in validation
+    last_idx <- last_idx + k
+  }
+  return(results)
+}
+```
+
+```{r ex1-hint-2}
+crossValIce <- function(data, k) {
+  
+  # Number of repetitions (Hint: check the MC question above)
+  K <- _____
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  last_idx <- 1
+  
+  for(fold in 1:K) {   
+    # Select the row 
+    val_idx <- _____
+    
+    # Hint: if you're having trouble figuring out the line above, try 
+    # uncommenting this and playing with subsetting the indices
+    # print(val_idx)
+    #
+    # Hint: think about what indices you want in each fold:
+    # 1 2 3
+    # 4 5 6
+    # ...
+    # 28 29 30
+    
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+
+    # Fit model 1 without interactions
+    m1 <- _____
+    
+    # Fit model 2 with interactions
+    m2 <- _____
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
+    
+    # Update the last index used in validation
+    last_idx <- last_idx + k
+  }
+  return(results)
+}
+```
+
+```{r ex1-hint-3}
+crossValIce <- function(data, k) {
+  
+  # Number of repetitions (Hint: check the MC question above)
+  K <- _____
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  last_idx <- 1
+  
+  for(fold in 1:K) {   
+    # Select the row 
+    val_idx <- _____
+    
+    # Hint: if you're having trouble figuring out the line above, try 
+    # uncommenting this and playing with subsetting the indices
+    # print(val_idx)
+    #
+    # Hint: think about what indices you want in each fold:
+    # 1 2 3
+    # 4 5 6
+    # ...
+    # 28 29 30
+    # 
+    # Hint: try using last_idx
+    
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+
+    # Fit model 1 without interactions
+    m1 <- _____
+    
+    # Fit model 2 with interactions
+    m2 <- _____
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
+    
+    # Update the last index used in validation
+    last_idx <- last_idx + k
+  }
+  return(results)
+}
+```
+
+```{r ex1-solution}
+crossValIce <- function(data, k) {
+  
+  # Number of repetitions
+  K <- nrow(data) / k
+
+  # Matrix of results
+  results <- matrix(nrow=K, ncol=3)
+  colnames(results) <- c("fold", "m1-SSE", "m2-SSE")
+  
+  last_idx <- 1
+  
+  for(fold in 1:K) {   
+    # Select the row 
+    val_idx <- last_idx : (last_idx+k-1) 
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+
+    # Fit model 1 without interactions
+    m1 <- lm(data=icecream, cons ~ temp + price + income)
+    
+    # Fit model 2 with interactions
+    m2 <- lm(data=icecream, cons ~ temp + price + income + price:income)
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # Add the results to the dataframe
+    results[fold,] <- c(fold, m1_cvsse, m2_cvsse)
+    
+    # Update the last index used in validation
+    last_idx <- last_idx + k
+  }
+  return(results)
+}
+```
+
+Now run the function on the icecream data for $k=3$:
+
+```{r ex2, exercise=TRUE}
+```
+
+```{r ex2-solution}
+crossValIce(data=icecream, k=3)
+```
+
+```{r mc4}
+question("Based on the CV-SSE, which model do you think performs better on the icecream data?",
+         answer("m1, the model without interactions"),
+         answer("m2, the model with interactions", correct=TRUE),
+         answer("They have about the same performance"),
+         answer("Not sure"))
+```
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
 ```
