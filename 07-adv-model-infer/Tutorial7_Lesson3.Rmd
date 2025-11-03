@@ -110,7 +110,7 @@ Fit a linear model to the following dataset containing records of flights out of
 # two columns of interest
 nycflights <- nycflights %>% 
   select(distance, air_time) %>%
-  sample_n(size=100)
+  sample_n(size=40)
 
 head(nycflights)
 ```
@@ -207,7 +207,7 @@ Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = 
 So, our flight from NYC to BOS may take *about* 42.39 minutes, plus or minus some error term. We'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
 
 
-## Simulation
+## Simulation Approach
 
 ### 
 
@@ -215,11 +215,30 @@ In this simulation, we'll use bootstrapping to take a closer look at sample vari
 
 Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
 
+```{r}
+# using infer package, as in tutorial 5
+# https://infer.netlify.app/articles/infer#introduction
+library(infer)
+
+bSlopes <- nycflights |>
+  specify(air_time ~ distance) |>
+  generate(reps=1000, type="bootstrap") |>
+  calculate(stat="slope")
+
+head(bSlopes)  # display the table of calculated slope values
+summarize(bSlopes, se=sd(stat))  # compute the SE
+```
+
+Note how the slope SE here (0.00318) is higher than in our original model (0.00307). This is because, in using a bootstrap method, we have resampled the dataset and thus added some uncertainty to the estimates. 
+
+***TODO: talk thru this tutorial more***
+
+#### (From-scratch methods, don't seem to be working - delete from here down)
 First, we'll need to write a function that generates our boostrapped samples and their corresponding linear models:
 ```{r}
-boots <- function(data=nycflights, n=15000) {
+boots <- function(data=nycflights, n=1000) {
   # Generate n bootstrapped samples
-  bsample <- data %>% sample_n(size=n, replace=TRUE)
+  bsample <- data %>% sample_n(size=n, replace=TRUE)  # FIXME: not how bootstrap samples work
   
   # Create a model from the bootstrapped samples
   bmodel <- lm(data=bsample, air_time ~ distance)
@@ -228,9 +247,13 @@ boots <- function(data=nycflights, n=15000) {
   bIntercept <- bmodel$coefficients[["(Intercept)"]]
   bSlope <- bmodel$coefficients[["distance"]]
   
-  # TODO: compute SE of slope as well (formula in stat_more_inf)
-  # TODO: sample from error distribution = epsilon dist, Gaussian w sigma^2 hat
-  return(list(bIntercept, bSlope, ypred))
+  # Grab residual SE
+  bResidSE <- summary(bmodel)$sigma  #sd(bmodel$residuals)
+  
+  # Grab SE of just the slope parameter
+  bSlopeSE <- sqrt(diag(vcov(bmodel)))[["distance"]]
+  
+  return(list(bIntercept, bSlope, bResidSE, bSlopeSE))
 }
 ```
 
@@ -241,8 +264,10 @@ generate_y <- function(coeffs) {
   x <- nycflights$distance
   y <- nycflights$air_time
   
+  # Create an empty dataframe to hold the x, y, and y_pred values
   pred_y <- data.frame()
   
+  # Compute y_pred for each x, given the coefficients
   for(k in 1:ncol(coeffs)) {
     y_pred <- coeffs[1,k] + coeffs[2,k]*x
     line <- colnames(coeffs)[k]
@@ -256,7 +281,7 @@ generate_y <- function(coeffs) {
 ```
 
 ```{r}
-K <- 3   # number of bootstrap simulations to run - and the number of models
+K <- 7   # number of bootstrap simulations to run - and the number of models
 x <- nycflights$distance
 coeffs <- matrix(nrow=2, ncol=K, byrow=TRUE)
 rownames(coeffs) <- c("Intercept", "Slope") 
@@ -278,6 +303,97 @@ predicted <- generate_y(coeffs)
 ggplot(data=predicted, aes(x=x, y=y)) +
   geom_point(color="black", alpha=0.6) +
   geom_line(data=predicted, aes(x=x, y=y_pred, color=line))
+```
 
-# TODO: plotted lines don't display well, maybe original dataset is too large - try n=40?
+Note how each model is slightly different, and none fit the data exactly: we still have some error.
+
+
+## Extrapolation
+
+```{r, include=FALSE}
+# Simulate a dataset that makes extrapolation outside of a given range tricky
+x <- c(5,6,7,11,12,13,14)
+y <- c(8,12,11,21,23,26,25)
+observed <- data.frame(cbind(x,y))
+
+x <- c(3,3.5,4.5,15:20)
+y <- c(0,4,5,26,23,25,22,20,19)
+unobserved <- data.frame(cbind(x,y))
+```
+
+In this section, we'll look at the difference between _interpolation_ and _extrapolation_ in inference and prediction, and how to choose the correct approach. Below, you're given a dataframe called `observed` that contains all of the data you observe. How might you try to model these data?
+
+```{r, echo=FALSE}
+ggplot(data=observed, aes(x=x,y=y)) +
+  geom_point() +
+  xlim(c(0,20))
+```
+
+Let's try fitting a linear model, in particular to fill the gap in the neighborhood of x=10. We call this _interpolation_: making predictions based on observed data on new values that are still within the observed range.
+
+```{r}
+ggplot(data=observed, aes(x=x,y=y)) +
+  geom_point() +
+  geom_smooth(method='lm', se=FALSE) +
+  xlim(c(0,20))
+```
+
+```{r, include=FALSE}
+observed$observed <- rep(TRUE, nrow(observed))
+unobserved$observed <- rep(FALSE, nrow(unobserved))
+fullData <- rbind(observed, unobserved)
+```
+
+You're fairly confident that your model can predict the values around x=10, but what about x=0 or x=20? Since these values lie outside the observed range of your data, such a prediction task is called _extrapolation_. Say you make your extrapolations using the model based on observed data, and then new data comes in:
+
+```{r}
+ggplot(data=fullData, aes(x=x,y=y,color=observed)) +
+  geom_point() +
+  geom_smooth(data=observed, method='lm', formula=y~x, se=FALSE)
+```
+
+As you can see, the model based on observed data is not likely to extrapolate well if you want to predict values far outside the observed range. 
+
+
+## Your turn!
+
+First, we load the following dataset, which contains many observations of mammal size in different stages of the animals' lives. Note that the .csv file is tab-delimited. 
+
+```{r}
+mammals <- read.csv("sizeHistory.csv", sep="\t")
+head(mammals)
+```
+
+We will need to log-transform both the response and the independent variables in this dataset. If we want to model adult mass (`mass.g.`) vs newborn mass (`newborn.g.`), perform the log transformations below:
+
+```{r ex3, exercise=TRUE}
+mammals$logAdultMass <- _____
+
+mammals$logNewbornMass <- _____
+```
+
+```{r ex3-solution}
+mammals$logAdultMass <- log(mammals$mass.g.)
+mammals$logNewbornMass <- log(mammals$newborn.g.)
+```
+
+Create a scatterplot of the log-adult mass (`logAdultMass`) and newborn mass (`logNewbornMass`). 
+```{r ex4, exercise=TRUE}
+ggplot(data=____, aes(x=_____, y=_____)) +
+  _____
+```
+
+```{r ex4-solution}
+ggplot(data=mammals, aes(x=logNewbornMass, y=logAdultMass)) +
+  geom_point()
+```
+
+Now, let's try to predict the log-adult mass of mammals with the following log-newborn masses:
+
+- 0.1 (remember that this is a log scale - this newborn is very small!)
+- 12.0 (newborn mass around $e^12$ grams, near the maximum observed)
+- 20 (newborn mass around $e^20$ grams, well beyond the maximum observed)
+
+First, create a linear regression model for the data
+```{r ex5, exercise=TRUE}
 ```
