@@ -144,7 +144,7 @@ question("How would you interpret the model parameters above?",
          answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 12.69 minutes"),
          answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 0.1269 minutes.", correct=TRUE),
          answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 18.66 minutes."),
-         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 1.866 minutes.")
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 1.866 minutes."),
          answer("Not sure"))
 ```
 
@@ -156,19 +156,19 @@ As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) betwee
 ```{r ex2, exercise=TRUE}
 ```
 
-```{r ex2-hint}
+```{r ex2-hint1}
 # You have the point estimate, b1=0.1269, and the model summary gives you the
 # standard error for this estimate: SE = 0.002079
 ```
 
-```{r ex2-hint}
+```{r ex2-hint2}
 # You have the point estimate, b1=0.1269, and the model summary gives you the
 # standard error for this estimate: SE = 0.002079
 
 # Now for the degrees of freedom: you have n=100 samples, so df = n-2 = 98
 ```
 
-```{r ex2-hint}
+```{r ex2-hint3}
 # You have the point estimate, b1=0.1269, and the model summary gives you the
 # standard error for this estimate: SE = 0.002079
 
