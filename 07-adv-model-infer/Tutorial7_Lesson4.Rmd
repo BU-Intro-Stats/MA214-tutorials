@@ -1,0 +1,154 @@
+---
+title: "Advanced Inference: 4 - Cross-Validation"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+#devtools::install_github("rundel/learnrhash")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+library(ggplot2)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+## Welcome
+
+In this tutorial, you'll learn about cross-validation, a set of methods for characterizing the ability of a given model to generalize to new data and perform well in practice. To start, let's go back to the academic advisor's career data from her former students:
+
+```{r, echo=FALSE}
+inc <- c(43, 48, 52, 70, 61, 83, 96, 100,
+         36, 40, 39, 44, 46, 49, 50, 53) 
+exp <- c(1, 2, 4, 6, 5, 3, 8, 10,
+         1, 3, 2, 5, 8, 6, 7, 10)
+gen <- c("male", "male", "male", "male", "male", "male", "male", "male",
+         "female", "female", "female", "female", "female", "female", "female", 
+         "female")
+
+data <- data.frame(inc, exp, gen)
+colnames(data) <- c("income", "experience", "gender")
+
+ggplot(data=data, aes(y=income, x=experience, col=gender)) +
+  geom_point()
+```
+
+Recall that we fit two models to this dataset: one standard linear model for income vs expertise and gender, and one with an interaction term between experience and gender. Let's use cross-validaiton to test the performance of each model, and confirm our results from before that the model with interactions does best. 
+
+Now to perform cross-validation, we must take our original dataset of 16 graduates and randomly choose a subset of the samples to hold out. Since we have a fairly small dataset, let's use $k=1$ for the number of holdout samples. The cross-validation procedure goes like this:
+
+1. From the full dataset $D$, randomly select $k$ sample(s) to set aside in a validation set $V$
+2. Fit the models `m1` and `m2` on the set $D / V$ (D minus V)
+3. Make predictions on the sample(s) in $V$ and record the model performance
+4. Repeat steps 1-3 until every sample in $D$ has been used in the validation set
+
+For this analysis, we'll use the _cross-validation SSE_ to measure each model's performance. If $\hat y_{cv}$ is the prediction made by the model fit on the cross-validation set and $y$ is the true value, then the CV-SSE is given by $\text{CV-SSE} = \sum_{i=1}^n(\hat y_{cv,i} -y_i)^2$. 
+
+Let's write a function to do this:
+
+```{r}
+crossVal <- function(data, k=1) {
+  
+  for(fold in 1:k) {   # FIXME: not the correct iterations
+    # Select the row 
+    val_idx <- sample(nrow(data), size=k, replace=FALSE) 
+    V <- data[c(val_idx),]          # Construct the validation set
+    DminusV <- data[-c(val_idx),]   # Construct the training set
+    
+    # Fit model 1 without interactions
+    m1 <- lm(data=DminusV, income ~ experience + gender)
+    
+    # Fit model 2 with interactions
+    m2 <- lm(data=DminusV, income ~ experience + gender + experience:gender)
+    
+    # Compute the CV-SSE:
+    m1_cvsse <- mean((m1$residuals)**2)
+    m2_cvsse <- mean((m2$residuals)**2)
+    
+    # TODO: create a table of results for the above
+  }
+```
