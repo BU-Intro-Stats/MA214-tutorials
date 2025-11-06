@@ -106,6 +106,8 @@ In this tutorial, you'll learn more about inference and prediction for regressio
 Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance and air time. Then print a summary of the model results.
 
 ```{r, echo=FALSE}
+set.seed(42)
+
 # Dataset is too big for our purposes, just take 40 samples and select the
 # two columns of interest
 nycflights <- nycflights %>% 
@@ -113,7 +115,7 @@ nycflights <- nycflights %>%
   sample_n(size=40) 
 
 # Add some extra noise
-nycflights$air_time <- nycflights$air_time + rnorm(n=nrow(nycflights))
+nycflights$air_time <- nycflights$air_time + rnorm(n=nrow(nycflights), sd=5)
 head(nycflights)
 ```
 
@@ -139,59 +141,59 @@ ggplot(data=nycflights, aes(x=distance, y=air_time)) +
   geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
 ```
 
-$y = 18.655 + 0.1269x + residuals$
+$y = 18.36 + 0.126x + residuals$
 
 ```{r mc2, echo=FALSE}
 question("How would you interpret the model parameters above?",
-         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 12.69 minutes"),
-         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 0.1269 minutes.", correct=TRUE),
-         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 18.66 minutes."),
-         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 1.866 minutes."),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 12.6 minutes"),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 0.126 minutes.", correct=TRUE),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 18.36 minutes."),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 1.836 minutes."),
          answer("Not sure"))
 ```
 
 
 ### Review: quantifying (un)certainty
 
-As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.1269$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
+As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
 
 ```{r ex2, exercise=TRUE}
 ```
 
 ```{r ex2-hint1}
-# You have the point estimate, b1=0.1269, and the model summary gives you the
-# standard error for this estimate: SE = 0.002079
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
 ```
 
 ```{r ex2-hint2}
-# You have the point estimate, b1=0.1269, and the model summary gives you the
-# standard error for this estimate: SE = 0.002079
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
 
-# Now for the degrees of freedom: you have n=100 samples, so df = n-2 = 98
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
 ```
 
 ```{r ex2-hint3}
-# You have the point estimate, b1=0.1269, and the model summary gives you the
-# standard error for this estimate: SE = 0.002079
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
 
-# Now for the degrees of freedom: you have n=100 samples, so df = n-2 = 98
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
 
 # To compute the critical t value, use the qt() function:
-t_crit <- qt(p=0.05/2, df=98)
+t_crit <- qt(p=0.05/2, df=38)
 ```
 
 ```{r ex2-solution}
-# You have the point estimate, b1=0.1269, and the model summary gives you the
-# standard error for this estimate: SE = 0.002079
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
 
-# Now for the degrees of freedom: you have n=100 samples, so df = n-2 = 98
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
 
 # To compute the critical t value, use the qt() function, and remember we are
 # computing a two-sided CI:
-t_crit <- qt(p=0.05/2, df=98)
+t_crit <- qt(p=0.05/2, df=38)
 
 # Now compute the full interval:
-0.1269 + c(-1,1)*t_crit*0.002079
+0.126 + c(-1,1)*t_crit*0.002978
 ```
 
 *TODO: check above*
@@ -200,27 +202,30 @@ t_crit <- qt(p=0.05/2, df=98)
 
 Now imagine you're flying direct from NYC to BOS - about 187 miles. Your model can predict how long this flight might take:
 
-$\hat{y} = 18.66 + (0.1269\times187) = 42.39$ minutes
+$\hat{y} = 18.36 + (0.126\times187) = 41.92$ minutes
 
 But we know this model is based on our sample of 100 flights, and that the estimate might be different if we had generated the model from a different sample (this is called sample variation). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
 
 Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$. In the process of performing linear regression we estimate $\hat\sigma^2$, but there is still uncertainty inherent to the model.
 
-For example, there are three rows in the dataset corresponding to a flight of distance 200 miles:
+For example, there are two rows in the dataset corresponding to a flight of distance 200 miles:
 
 ```{r}
 subset(nycflights, distance == 200)
 ```
+Note how different the response values $y$ are! To visualize this, let's plot our regression line and the two `distance=200` points below: 
 
-Let's plot these with our line:
+```{r, echo=FALSE}
+x <- seq(100,300)
+example <- data.frame(x)
+example$yhat <- 18.36 + 0.126*x
 
-```{r}
-subset <- subset(nycflights, distance == 200)
-subset$yhat <- 18 + 0.12*(subset$distance)  # FIXME: these should be different values
+subset <- subset(nycflights, distance == 200)  
 
-ggplot(data=subset, aes(x=distance)) +
-  geom_point(aes(y=air_time)) +
-  geom_line(aes(y=yhat))
+ggplot() +
+  geom_line(data=example, aes(x=x,y=yhat), color='blue') +
+  geom_point(data=subset, aes(x=distance, y=air_time)) +
+  xlim(c(100,300))
 ```
 
 So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
@@ -234,16 +239,23 @@ In this simulation, we'll use bootstrapping to take a closer look at sample vari
 
 Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
 
-```{r}
+
+The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty.
+
+
+## Bootstrapping regression estimates
+
+***TODO: insert introduction/writeup for this section***
+
+```{r, echo=TRUE}
 # using infer package, as in tutorial 5
 # https://infer.netlify.app/articles/infer#introduction
 library(infer)
 
-# Generate fitted models from 1000 bootstrapped estimates:
+# Generate fitted models from 100 bootstrapped estimates:
 boots <- nycflights |>
   specify(air_time ~ distance) |>
-  hypothesize(null="independence") |>
-  generate(reps=1000, type="bootstrap") |>
+  generate(reps=100, type="bootstrap") |>
   fit()
 
 head(boots)  # display the table of estimated parameters
@@ -251,88 +263,56 @@ head(boots)  # display the table of estimated parameters
 # Grab the parameters
 bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
 bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
+```
 
-# TODO: calculate SE for each param and overall SE
-#summarize(boots, se=sd(stat))  # compute the SE
+Now let's compute the predicted values for each bootstrapped model, so we can plot them and see how they differ:
+
+```{r, echo=TRUE}
+# Create a matrix to hold the predicted values
+bPredictions <- matrix(nrow=nrow(bIntercepts)*nrow(nycflights), ncol=3)
+colnames(bPredictions) <- c("distance", "yhat", "bootstrapLine")
+bPredictions <- data.frame(bPredictions)
+
+bPredictions$distance <- rep(nycflights$distance, nrow(bIntercepts)/nrow(nycflights))
+bPredictions$yhat <- bIntercepts$estimate + (bPredictions$distance * bSlopes$estimate)
+names <- seq(1:nrow(bIntercepts))
+bPredictions$bootstrapLine <- rep(names, nrow(nycflights))
+```
+
+Plot the boostrapped models overlaid with a scatterplot of the original data:
+
+```{r, echo=TRUE}
+ggplot() +
+  geom_line(data=bPredictions, aes(x=distance, y=yhat, color=factor(bootstrapLine)), alpha=0.6) +
+  geom_point(data=nycflights, aes(x=distance, y=air_time)) +
+  theme(legend.position = "none") 
+```
+
+Now let's look at the boostrap models' residual SE, and the SE of each boostrapped parameter:
+
+```{r, echo=TRUE}
+# Compute the SE for each parameter
+se_bInt <- sd(bIntercepts$estimate)
+se_bSlopes <- sd(bSlopes$estimate)
+
+# Compute the residuals of the models
+residuals <- matrix(nrow=nrow(nycflights),ncol=1)
+colnames(residuals) <- c("residuals")
+residuals <- data.frame(residuals)
+
+# FIXME: indexing of model params is incorrect - not the same as indexing data
+for (model in 1:nrow(bIntercepts)) { # 1:nrow(nycflights)
+  yhat <- bIntercepts$estimate + (bPredictions$distance * bSlopes$estimate)
+  #yhat <- bIntercepts[i,"estimate"] + bSlopes[i,"estimate"]*nycflights[i,"distance"]
+  #e <- nycflights[i,"air_time"] - yhat
+  #residuals[i, "residuals"] <- e
+}
+
+# Compute the residual SE
+se_resid <- sd(residuals$residuals)
 ```
 
 Note how the slope SE here (0.00318) is higher than in our original model (0.00307). This is because, in using a bootstrap method, we have resampled the dataset and thus added some uncertainty to the estimates. 
-
-***TODO: talk thru this tutorial more***
-
-#### (From-scratch methods, don't seem to be working - delete from here down)
-First, we'll need to write a function that generates our boostrapped samples and their corresponding linear models:
-```{r}
-boots <- function(data=nycflights, n=1000) {
-  # Generate n bootstrapped samples
-  bsample <- data %>% sample_n(size=n, replace=TRUE)  # FIXME: not how bootstrap samples work
-  
-  # Create a model from the bootstrapped samples
-  bmodel <- lm(data=bsample, air_time ~ distance)
-  
-  # Grab the coefficients from the model
-  bIntercept <- bmodel$coefficients[["(Intercept)"]]
-  bSlope <- bmodel$coefficients[["distance"]]
-  
-  # Grab residual SE
-  bResidSE <- summary(bmodel)$sigma  #sd(bmodel$residuals)
-  
-  # Grab SE of just the slope parameter
-  bSlopeSE <- sqrt(diag(vcov(bmodel)))[["distance"]]
-  
-  return(list(bIntercept, bSlope, bResidSE, bSlopeSE))
-}
-```
-
-Now let's write a function to generate predicted y values from those models:
-
-```{r}
-generate_y <- function(coeffs) {
-  x <- nycflights$distance
-  y <- nycflights$air_time
-  
-  # Create an empty dataframe to hold the x, y, and y_pred values
-  pred_y <- data.frame()
-  
-  # Compute y_pred for each x, given the coefficients
-  for(k in 1:ncol(coeffs)) {
-    y_pred <- coeffs[1,k] + coeffs[2,k]*x
-    line <- colnames(coeffs)[k]
-    
-    row <- data.frame(x=x, y=y, y_pred=y_pred, line=line)
-    pred_y <- rbind(pred_y, row)
-  }
-  
-  return(pred_y)
-}
-```
-
-```{r}
-K <- 7   # number of bootstrap simulations to run - and the number of models
-x <- nycflights$distance
-coeffs <- matrix(nrow=2, ncol=K, byrow=TRUE)
-rownames(coeffs) <- c("Intercept", "Slope") 
-colnames(coeffs) <- paste0("B-line", seq_len(ncol(coeffs)))
-
-for(k in 1:K) {
-  sim <- boots(n=250)
-  coeffs[1,k] <- sim[[1]]
-  coeffs[2,k] <- sim[[2]]
-}
-
-# Create a dataframe of model coefficients 
-coeffs <- data.frame(coeffs)
-
-# Generate predicted y values
-predicted <- generate_y(coeffs)
-
-# Plot
-ggplot(data=predicted, aes(x=x, y=y)) +
-  geom_point(color="black", alpha=0.6) +
-  geom_line(data=predicted, aes(x=x, y=y_pred, color=line))
-```
-
-Note how each model is slightly different, and none fit the data exactly: we still have some error.
 
 
 ## Extrapolation
