@@ -117,15 +117,26 @@ nycflights <- nycflights %>%
 # Add some extra noise
 nycflights$air_time <- nycflights$air_time + rnorm(n=nrow(nycflights), sd=5)
 head(nycflights)
+
+# Store model object, can't knit otherwise
+model <- lm(data=nycflights, air_time ~ distance)
 ```
 
 ```{r ex1, exercise=TRUE}
-model <- lm(data=nycflights, _____)
+model <- lm(data=nycflights, ____)
 ```
 
 ```{r ex1-solution}
 model <- lm(data=nycflights, air_time ~ distance)
 summary(model)
+```
+
+###
+
+```{r, echo=FALSE}
+ggplot(data=nycflights, aes(x=distance, y=air_time)) + 
+  geom_point() +
+  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
 ```
 
 ```{r mc1, echo=FALSE}
@@ -135,11 +146,9 @@ question("Is there a correlation between flight distance and air time?",
          answer("Not sure"))
 ```
 
-```{r, echo=FALSE}
-ggplot(data=nycflights, aes(x=distance, y=air_time)) + 
-  geom_point() +
-  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
-```
+###
+
+Here is the model you should've gotten from your summary:
 
 $y = 18.36 + 0.126x + residuals$
 
@@ -155,7 +164,7 @@ question("How would you interpret the model parameters above?",
 
 ### Review: quantifying (un)certainty
 
-As we would expect, there is a strong correlation ($p=2.0\times10^{-16}$) between flight distance and air time. The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
+As we would expect, there is a strong correlation ($p=2.2\times10^{-16}$) between flight distance and air time. The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
 
 ```{r ex2, exercise=TRUE}
 ```
@@ -198,54 +207,57 @@ t_crit <- qt(p=0.05/2, df=38)
 
 *TODO: check above*
 
-### Predicting future values
+
+## Predicting future values
 
 Now imagine you're flying direct from NYC to BOS - about 187 miles. Your model can predict how long this flight might take:
 
 $\hat{y} = 18.36 + (0.126\times187) = 41.92$ minutes
 
-But we know this model is based on our sample of 100 flights, and that the estimate might be different if we had generated the model from a different sample (this is called sample variation). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
+But we know this model is based on our sample of 40 flights, and that the estimate might be different if we had generated the model from a different sample (this is called sample variation). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
+
+###
+
+### Model-based approach
 
 Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$. In the process of performing linear regression we estimate $\hat\sigma^2$, but there is still uncertainty inherent to the model.
 
-For example, there are two rows in the dataset corresponding to a flight of distance 200 miles:
+For example, there are two rows in the dataset corresponding to a flight of distance 529 miles:
 
 ```{r}
-subset(nycflights, distance == 200)
+subset(nycflights, distance == 529)
 ```
-Note how different the response values $y$ are! To visualize this, let's plot our regression line and the two `distance=200` points below: 
+
+Note how different the response values $y$ are! To visualize this, let's plot our regression line and the two `distance=529` points below: 
 
 ```{r, echo=FALSE}
-x <- seq(100,300)
+x <- seq(100,1000)
 example <- data.frame(x)
 example$yhat <- 18.36 + 0.126*x
 
-subset <- subset(nycflights, distance == 200)  
+subset <- subset(nycflights, distance == 529)  
 
 ggplot() +
   geom_line(data=example, aes(x=x,y=yhat), color='blue') +
   geom_point(data=subset, aes(x=distance, y=air_time)) +
-  xlim(c(100,300))
+  xlim(c(100,1000))
 ```
 
-So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
+The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty. So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
 
 
-## Simulation Approach
+## Simulation
 
 ### 
 
-In this simulation, we'll use bootstrapping to take a closer look at sample variation (introduced above). The model you generated for flight distance vs air time, $y = 18.66 + 0.1269x + residuals$, was based on a sample of $n=100$ flights. If you had a slightly different sample, then the model would be different too. 
+In this simulation, we'll use bootstrapping to take a closer look at sample variation (introduced above). The model you generated for flight distance vs air time, $y = 18.66 + 0.1269x + residuals$, was based on a sample of $n=40$ flights. If you had a slightly different sample, then the model would be different too. 
 
 Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
 
 
-The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty.
-
-
 ## Bootstrapping regression estimates
 
-***TODO: insert introduction/writeup for this section***
+First, let's fit a sequence of 100 bootstrap estimates for our intercept and slope parameters:
 
 ```{r, echo=TRUE}
 # using infer package, as in tutorial 5
@@ -264,6 +276,8 @@ head(boots)  # display the table of estimated parameters
 bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
 bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
 ```
+
+###
 
 Now let's compute the predicted values for each bootstrapped model, so we can plot them and see how they differ:
 
@@ -292,6 +306,8 @@ ggplot() +
   theme(legend.position = "none") 
 ```
 
+###
+
 Now let's look at the boostrap models' residual SE, and the SE of each boostrapped parameter:
 
 ```{r, echo=TRUE}
@@ -315,6 +331,8 @@ rownames(se_tab) <- c("Intercept SE", "Slope SE", "Residual SE")
 se_tab <- as.table(se_tab)
 print(se_tab)
 ```
+
+###
 
 Note how the bootstrap SE values are larger than the original model's. This extra uncertainty comes from our bootstrap resampling procedure. To be more concrete, we can examine the formula for the residual SE: for a chosen predictor value $x^*$, our prediction is given by $\hat{y}^* = \beta_0 + \beta_1x^*$, and
 
