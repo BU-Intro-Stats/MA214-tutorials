@@ -246,6 +246,14 @@ ggplot() +
 The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty. So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
 
 
+## Your turn!
+
+***TODO***
+Outline:
+- Find dataset 2, load and perform simple lm to get a base model
+- Show uncertainty in model with different repeat samples
+
+
 ## Simulation
 
 ### 
@@ -277,6 +285,12 @@ bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
 bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
 ```
 
+## Your turn!
+
+***TODO***
+Outline:
+- Repeat above on dataset 2
+
 ###
 
 Now let's compute the predicted values for each bootstrapped model, so we can plot them and see how they differ:
@@ -305,6 +319,15 @@ ggplot() +
   geom_point(data=nycflights, aes(x=distance, y=air_time)) +
   theme(legend.position = "none") 
 ```
+
+
+## Your turn!
+
+***TODO***
+Outline:
+- Extract estimates (dataset 2) for them, display head
+- Repeat graph
+- MC question
 
 ###
 
@@ -365,6 +388,8 @@ ggplot(data=observed, aes(x=x,y=y)) +
   xlim(c(0,20))
 ```
 
+###
+
 Let's try fitting a linear model, in particular to fill the gap in the neighborhood of x=10. We call this _interpolation_: making predictions based on observed data on new values that are still within the observed range.
 
 ```{r}
@@ -380,6 +405,8 @@ unobserved$observed <- rep(FALSE, nrow(unobserved))
 fullData <- rbind(observed, unobserved)
 ```
 
+###
+
 You're fairly confident that your model can predict the values around x=10, but what about x=0 or x=20? Since these values lie outside the observed range of your data, such a prediction task is called _extrapolation_. Say you make your extrapolations using the model based on observed data, and then new data comes in:
 
 ```{r}
@@ -393,12 +420,15 @@ As you can see, the model based on observed data is not likely to extrapolate we
 
 ## Your turn!
 
-First, we load the following dataset, which contains many observations of mammal size in different stages of the animals' lives. Note that the .csv file is tab-delimited. 
+First, we load the following dataset, which contains many observations of mammal size in different stages of the animals' lives. 
 
-```{r}
+```{r, echo=TRUE}
+# .csv file is tab-delimited, so need sep="\t" argument in function call
 mammals <- read.csv("sizeHistory.csv", sep="\t")
 head(mammals)
 ```
+
+###
 
 We will need to log-transform both the response and the independent variables in this dataset. If we want to model adult mass (`mass.g.`) vs newborn mass (`newborn.g.`), perform the log transformations below:
 
@@ -424,12 +454,147 @@ ggplot(data=mammals, aes(x=logNewbornMass, y=logAdultMass)) +
   geom_point()
 ```
 
+###
+
 Now, let's try to predict the log-adult mass of mammals with the following log-newborn masses:
 
 - 0.1 (remember that this is a log scale - this newborn is very small!)
 - 12.0 (newborn mass around $e^12$ grams, near the maximum observed)
 - 20 (newborn mass around $e^20$ grams, well beyond the maximum observed)
 
-First, create a linear regression model for the data
+First, create a linear regression model for the data and print the model summary:
+
 ```{r ex5, exercise=TRUE}
+```
+
+```{r ex5-solution}
+model <- lm(data=mammals, logAdultMass ~ logNewbornMass)
+summary(model)
+```
+
+###
+
+Now take the model parameters and generate new predictions:
+
+```{r ex6, exercise=TRUE}
+# Grab the parameters from the model object
+intercept <- ____
+slope <- ____
+
+# Compute:
+yhat1 <- ____  # the first prediction, for x=0.1
+yhat2 <- ____  # the second prediction, for x=12.0
+yhat3 <- ____  # the third prediction, for x=20.0
+```
+
+```{r ex6-hint1}
+# Grab the parameters from the model object
+intercept <- model$coefficients[[1]]
+slope <- model$coefficients[[2]]
+```
+
+```{r ex6-solution}
+# Grab the parameters from the model object
+intercept <- model$coefficients[[1]]
+slope <- model$coefficients[[2]]
+
+# Compute:
+yhat1 <- intercept + slope*(0.1)   # the first prediction, for x=0.1
+yhat2 <- intercept + slope*(12.0)  # the second prediction, for x=12.0
+yhat3 <- intercept + slope*(20.0)  # the third prediction, for x=20.0
+```
+
+Recall our formula for the SE of a prediction $\hat{y}^* = \beta_0 + \beta_1 x^*$ on a new value $x^*$:
+
+$$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
+###
+
+```{r mc3, echo=FALSE}
+question("Which value of x* would you expect to have the highest value of SE?",
+         answer("x* = 0.1"),
+         answer("x* = 12.0"),
+         answer("x* = 20.0", correct=TRUE),
+         answer("Not sure"))
+```
+
+###
+
+Now we'll walk through computing the SE for each of your 3 predictions above, step by step. To start, let's compute the first term, $s^2_e$
+
+```{r ex7, exercise=TRUE}
+# From your model, you can grab the variance of the residuals:
+se2 <- ____
+
+# How many observations do you have?
+n <- ____
+```
+
+```{r ex7-hint1}
+# From your model, you can grab the variance of the residuals:
+se2 <- var(model$residuals)
+```
+
+```{r ex7-hint2}
+# From your model, you can grab the variance of the residuals:
+se2 <- var(model$residuals)
+
+# How many observations do you have?
+n <- nrow(mammals)
+```
+
+###
+
+And now the second term, $\frac{s^2_e}{n}$, and $SE_{\beta_1}$:
+
+```{r, echo=TRUE}
+# Compute the average contribution of each observation to the variance
+se2_n <- se2 / n
+
+# Compute the SE of your slope parameter
+se_b1 <- summary(model)$coefficients[,2][[2]]
+```
+
+###
+
+Lastly, we need to compute $(x^*-\bar{x})^2$ for each value of $x^*$:
+
+```{r ex8, exercise=TRUE}
+# Compute xbar 
+xbar <- ____
+
+# Compute the squared distance between each new x* and the mean xbar
+
+```
+
+```{r ex8-solution}
+xs <- c(0.1, 12.0, 20.0)
+dev <- c(0.0, 0.0, 0.0)
+
+for(i in 1:length(xs)) {
+  dev[i] <- (xbar - xs[i])**2
+}
+```
+
+###
+
+Finally, put it all together to compute $SE$ from the formula:
+
+```{r ex9, exercise=TRUE}
+```
+
+```{r ex9-solution}
+for(i in 1:length(xs)) {
+  SE <- sqrt(se2 + se2_n + se_b1*dev[i])
+  print(SE)
+}
+```
+
+###
+
+```{r mc4, echo=FALSE}
+question("Which value of x* does have the highest value of SE?",
+         answer("x* = 0.1"),
+         answer("x* = 12.0"),
+         answer("x* = 20.0", correct=TRUE),
+         answer("Not sure"))
 ```
