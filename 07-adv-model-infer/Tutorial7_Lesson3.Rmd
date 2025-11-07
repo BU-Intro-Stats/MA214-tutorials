@@ -269,14 +269,18 @@ Now let's compute the predicted values for each bootstrapped model, so we can pl
 
 ```{r, echo=TRUE}
 # Create a matrix to hold the predicted values
-bPredictions <- matrix(nrow=nrow(bIntercepts)*nrow(nycflights), ncol=3)
-colnames(bPredictions) <- c("distance", "yhat", "bootstrapLine")
+bPredictions <- matrix(nrow=nrow(bIntercepts)*nrow(nycflights), ncol=5)
+colnames(bPredictions) <- c("distance", "yhat", "y", "residuals", "bootstrapLine")
 bPredictions <- data.frame(bPredictions)
 
 bPredictions$distance <- rep(nycflights$distance, nrow(bIntercepts)/nrow(nycflights))
+bPredictions$y <- rep(nycflights$air_time, nrow(bIntercepts)/nrow(nycflights))
 bPredictions$yhat <- bIntercepts$estimate + (bPredictions$distance * bSlopes$estimate)
+bPredictions$residuals <- bPredictions$yhat - bPredictions$y
 names <- seq(1:nrow(bIntercepts))
 bPredictions$bootstrapLine <- rep(names, nrow(nycflights))
+
+head(bPredictions)
 ```
 
 Plot the boostrapped models overlaid with a scatterplot of the original data:
@@ -295,24 +299,31 @@ Now let's look at the boostrap models' residual SE, and the SE of each boostrapp
 se_bInt <- sd(bIntercepts$estimate)
 se_bSlopes <- sd(bSlopes$estimate)
 
-# Compute the residuals of the models
-residuals <- matrix(nrow=nrow(nycflights),ncol=1)
-colnames(residuals) <- c("residuals")
-residuals <- data.frame(residuals)
-
-# FIXME: indexing of model params is incorrect - not the same as indexing data
-for (model in 1:nrow(bIntercepts)) { # 1:nrow(nycflights)
-  yhat <- bIntercepts$estimate + (bPredictions$distance * bSlopes$estimate)
-  #yhat <- bIntercepts[i,"estimate"] + bSlopes[i,"estimate"]*nycflights[i,"distance"]
-  #e <- nycflights[i,"air_time"] - yhat
-  #residuals[i, "residuals"] <- e
-}
-
 # Compute the residual SE
-se_resid <- sd(residuals$residuals)
+se_bResid <- sd(bPredictions$residuals)
+
+# Original model SE values:
+se_mInt <- summary(model)$coefficients[,2][[1]]
+se_mSlope <- summary(model)$coefficients[,2][[2]]
+se_mResid <- sd(summary(model)$residuals)
+
+# Create a table of values
+se_tab <- matrix(c(se_mInt, se_bInt, se_mSlope, se_bSlopes, se_mResid, se_bResid), 
+                 ncol=2, byrow=TRUE)
+colnames(se_tab) <- c("Original model", "Bootstraps")
+rownames(se_tab) <- c("Intercept SE", "Slope SE", "Residual SE")
+se_tab <- as.table(se_tab)
+print(se_tab)
 ```
 
-Note how the slope SE here (0.00318) is higher than in our original model (0.00307). This is because, in using a bootstrap method, we have resampled the dataset and thus added some uncertainty to the estimates. 
+Note how the bootstrap SE values are larger than the original model's. This extra uncertainty comes from our bootstrap resampling procedure. To be more concrete, we can examine the formula for the residual SE: for a chosen predictor value $x^*$, our prediction is given by $\hat{y}^* = \beta_0 + \beta_1x^*$, and
+
+$$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
+Let's look at each term in sequence:
+
+- $s_e^2$, the _variance of the residuals_, represents the uncertainty associated with the residuals
+- $\frac{s_e^2}{n}$ represents the average contribution to the variance of the residuals of each data pair $(x^*, \hat{y}^*)$
+- $(SE_{\beta_1})^2 \times (x^*-\bar{x})^2$: note that this term increases as the distance between $x^*$ and $\bar{x}$ increases, which means that our uncertainty increases as we move away from predicting values near the mean of $x$
 
 
 ## Extrapolation
