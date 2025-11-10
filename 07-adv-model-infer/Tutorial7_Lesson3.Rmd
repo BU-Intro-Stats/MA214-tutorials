@@ -124,6 +124,7 @@ model <- lm(data=nycflights, air_time ~ distance)
 
 ```{r ex1, exercise=TRUE}
 model <- lm(data=nycflights, ____)
+summary(model)
 ```
 
 ```{r ex1-solution}
@@ -218,11 +219,11 @@ But we know this model is based on our sample of 40 flights, and that the estima
 
 ###
 
-### Model-based approach
+### Model-based analysis
 
 Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$. In the process of performing linear regression we estimate $\hat\sigma^2$, but there is still uncertainty inherent to the model.
 
-For example, there are two rows in the dataset corresponding to a flight of distance 529 miles:
+For example, there are two rows in the dataset corresponding to a flight distance of 529 miles:
 
 ```{r}
 subset(nycflights, distance == 529)
@@ -244,14 +245,6 @@ ggplot() +
 ```
 
 The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty. So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
-
-
-## Your turn!
-
-***TODO***
-Outline:
-- Find dataset 2, load and perform simple lm to get a base model
-- Show uncertainty in model with different repeat samples
 
 
 ## Simulation
@@ -285,12 +278,6 @@ bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
 bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
 ```
 
-## Your turn!
-
-***TODO***
-Outline:
-- Repeat above on dataset 2
-
 ###
 
 Now let's compute the predicted values for each bootstrapped model, so we can plot them and see how they differ:
@@ -320,18 +307,9 @@ ggplot() +
   theme(legend.position = "none") 
 ```
 
-
-## Your turn!
-
-***TODO***
-Outline:
-- Extract estimates (dataset 2) for them, display head
-- Repeat graph
-- MC question
-
 ###
 
-Now let's look at the boostrap models' residual SE, and the SE of each boostrapped parameter:
+Now let's look at the boostrap models' residual SE, and the SE of each bootstrapped parameter:
 
 ```{r, echo=TRUE}
 # Compute the SE for each parameter
@@ -365,6 +343,213 @@ Let's look at each term in sequence:
 - $s_e^2$, the _variance of the residuals_, represents the uncertainty associated with the residuals
 - $\frac{s_e^2}{n}$ represents the average contribution to the variance of the residuals of each data pair $(x^*, \hat{y}^*)$
 - $(SE_{\beta_1})^2 \times (x^*-\bar{x})^2$: note that this term increases as the distance between $x^*$ and $\bar{x}$ increases, which means that our uncertainty increases as we move away from predicting values near the mean of $x$
+
+
+## Your turn!
+In this section, you'll repeat the bootstrap analysis on a dataset we've already seen. 
+
+###
+
+We return to the `possum` dataset from Tutorial 3, where we first reviewed how to find a line of best fit. Here's a scatterplot of the variables `total_l`, the total length in centimeters of a possum, vs `tail_l`, the length in centimeters of its tail:
+
+```{r, echo=TRUE}
+ggplot(data=possum, aes(x=tail_l, y=total_l)) +
+  geom_point()
+```
+
+Now load the data, fit a linear model, and output the model summary. Note the parameter and residual SE here - we will return to these values later. 
+
+```{r ex3, exercise=TRUE}
+model <- ____
+summary(model)
+```
+
+```{r ex3-solution}
+model <- lm(data=possum, total_l ~ tail_l)
+summary(model)
+```
+
+***TODO: keep this part?***
+Take a subset of the data where `tail_l=38` and plot your model from above alongside this subset:
+
+```{r ex4, exercise=TRUE}
+subset <- subset(data=possum, ____)
+head(subset)
+
+# Generate x values for plotting
+x <- seq(32:42)
+
+# Predict y~x using model coefficients from before
+# TODO: leave these blank and ask them to extract the coeffs, so they learn how?
+ypred <- model$coefficients[[1]] + x * model$coefficients[[2]]
+
+# Add the x and predicted y values to a dataframe
+line <- data.frame(x)
+line$ypred <- ypred
+colnames(line) <- c("tail_l", "pred_total_l")
+
+ggplot() +
+  geom_point(data=subset, aes(x=____, y=____)) +
+  geom_line(data=line, aes(x=____, y=____), color='blue')
+```
+
+```{r ex4-solution}
+subset <- subset(possum, tail_l == 38)
+head(subset)
+
+# Generate x values for plotting
+x <- seq(32,42)
+
+# Predict y~x using model coefficients from before
+# TODO: leave these blank and ask them to extract the coeffs, so they learn how?
+ypred <- model$coefficients[[1]] + x * model$coefficients[[2]]
+
+# Add the x and predicted y values to a dataframe
+line <- data.frame(x)
+line$ypred <- ypred
+colnames(line) <- c("tail_l", "pred_total_l")
+
+# Plot
+ggplot() +
+  geom_point(data=subset, aes(x=tail_l, y=total_l)) +
+  geom_line(data=line, aes(x=tail_l, y=pred_total_l), color='blue')
+```
+
+Again, even if we knew the exact $\beta_0$ and $\beta_1$ terms, there is still uncertainty in our predictions of `total_l`.
+
+###
+
+Now, generate 500 bootstrapped estimates for the possum data:
+
+```{r ex5, exercise=TRUE}
+bootsp <- possum |> 
+  specify(___) |> 
+  generate(reps=500, type=___) |>
+  fit()
+
+# Grab the parameters
+pIntercepts <- subset(data.frame(bootsp), term==____)["estimate"]
+pSlopes <- subset(data.frame(bootsp), term==____)["estimate"]
+
+```
+
+```{r ex5-solution}
+bootsp <- possum |> 
+  specify(total_l ~ tail_l) |> 
+  generate(reps=500, type="bootstrap") |>
+  fit()
+
+# Grab the parameters
+pIntercepts <- subset(data.frame(bootsp), term=="intercept")["estimate"]
+pSlopes <- subset(data.frame(bootsp), term=="tail_l")["estimate"]
+```
+
+```{r, echo=FALSE}
+# Need to include this in a separate chunk or the below won't knit
+bootsp <- possum |> 
+  specify(total_l ~ tail_l) |> 
+  generate(reps=500, type="bootstrap") |>
+  fit()
+pIntercepts <- subset(data.frame(bootsp), term=="intercept")["estimate"]
+pSlopes <- subset(data.frame(bootsp), term=="tail_l")["estimate"]
+```
+
+```{r}
+head(bootsp)
+```
+
+```{r, echo=FALSE}
+# Compute predictions and residuals for the bootstrapped possum models
+# Hidden from students now but can show if desired
+
+# Create a matrix to hold the predicted values
+pPredictions <- matrix(nrow=nrow(pIntercepts)*nrow(possum), ncol=5)
+colnames(pPredictions) <- c("tail_l", "yhat", "y", "residuals", "bootstrapLine")
+pPredictions <- data.frame(pPredictions)
+
+pPredictions$tail_l <- rep(possum$tail_l, nrow(pIntercepts)/nrow(possum))
+pPredictions$y <- rep(possum$total_l, nrow(pIntercepts)/nrow(possum))
+pPredictions$yhat <- pIntercepts$estimate + (pPredictions$tail_l * pSlopes$estimate)
+pPredictions$residuals <- pPredictions$yhat - pPredictions$y
+names <- seq(1:nrow(pIntercepts))
+pPredictions$bootstrapLine <- rep(names, nrow(possum))
+
+head(pPredictions)
+```
+
+Plot the boostrapped models overlaid with a scatterplot of the original data:
+
+```{r, echo=TRUE}
+ggplot() +
+  geom_line(data=pPredictions, aes(x=tail_l, y=yhat, color=factor(bootstrapLine)), alpha=0.6) +
+  geom_point(data=possum, aes(x=tail_l, y=total_l)) +
+  theme(legend.position = "none") 
+```
+
+Note how different all of the lines are from each other!
+
+###
+
+```{r mc4, echo=FALSE}
+question("Do you expect the bootstrapped models for the possum data to have higher, lower, or the same standard errors than your baseline linear model?",
+         answer("The bootstrapped models should have higher standard error.", correct=TRUE),
+         answer("The bootstrapped models should have lower standard error."),
+         answer("The bootstrapped models should have the same standard error as my model."),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc5, echo=FALSE}
+question("How do you compute the SE for each parameter?",
+         answer("Compute the standard deviation of the parameter estimates.", correct=TRUE),
+         answer("Compute the standard deviation of the model residuals."),
+         answer("Compute the mean of the parameter estimates."),
+         answer("Not sure"))
+```
+
+Compute $s_e^2$ for the slope and intercept parameters of your bootstrapped models:
+
+```{r ex6, exercise=TRUE}
+se_pInt <- ____
+se_pSlopes <- ____
+```
+
+```{r ex6-solution}
+se_pInt <- sd(pIntercepts$estimate)
+se_pSlopes <- sd(pSlopes$estimate)
+```
+
+And the residual SE:
+
+```{r ex7, exercise=TRUE}
+se_pResid <- ____
+```
+
+```{r ex7-solution}
+se_pResid <- sd(pPredictions$residuals)
+```
+
+And now we compare the SE for our bootstrapped models vs our baseline model:
+
+```{r, echo=FALSE}
+se_pInt <- sd(pIntercepts$estimate)
+se_pSlopes <- sd(pSlopes$estimate)
+se_pResid <- sd(pPredictions$residuals)
+
+# Original model SE values:
+se_mInt <- summary(model)$coefficients[,2][[1]]
+se_mSlope <- summary(model)$coefficients[,2][[2]]
+se_mResid <- sd(summary(model)$residuals)
+
+# Create a table of values
+se_tab <- matrix(c(se_mInt, se_pInt, se_mSlope, se_pSlopes, se_mResid, se_pResid), 
+                 ncol=2, byrow=TRUE)
+colnames(se_tab) <- c("Original model", "Bootstraps")
+rownames(se_tab) <- c("Intercept SE", "Slope SE", "Residual SE")
+se_tab <- as.table(se_tab)
+print(se_tab)
+```
 
 
 ## Extrapolation
@@ -432,24 +617,24 @@ head(mammals)
 
 We will need to log-transform both the response and the independent variables in this dataset. If we want to model adult mass (`mass.g.`) vs newborn mass (`newborn.g.`), perform the log transformations below:
 
-```{r ex3, exercise=TRUE}
+```{r ex8, exercise=TRUE}
 mammals$logAdultMass <- _____
 
 mammals$logNewbornMass <- _____
 ```
 
-```{r ex3-solution}
+```{r ex8-solution}
 mammals$logAdultMass <- log(mammals$mass.g.)
 mammals$logNewbornMass <- log(mammals$newborn.g.)
 ```
 
 Create a scatterplot of the log-adult mass (`logAdultMass`) and newborn mass (`logNewbornMass`). 
-```{r ex4, exercise=TRUE}
+```{r ex9, exercise=TRUE}
 ggplot(data=____, aes(x=_____, y=_____)) +
   _____
 ```
 
-```{r ex4-solution}
+```{r ex9-solution}
 ggplot(data=mammals, aes(x=logNewbornMass, y=logAdultMass)) +
   geom_point()
 ```
@@ -464,10 +649,10 @@ Now, let's try to predict the log-adult mass of mammals with the following log-n
 
 First, create a linear regression model for the data and print the model summary:
 
-```{r ex5, exercise=TRUE}
+```{r ex10, exercise=TRUE}
 ```
 
-```{r ex5-solution}
+```{r ex10-solution}
 model <- lm(data=mammals, logAdultMass ~ logNewbornMass)
 summary(model)
 ```
@@ -476,7 +661,7 @@ summary(model)
 
 Now take the model parameters and generate new predictions:
 
-```{r ex6, exercise=TRUE}
+```{r ex11, exercise=TRUE}
 # Grab the parameters from the model object
 intercept <- ____
 slope <- ____
@@ -487,13 +672,13 @@ yhat2 <- ____  # the second prediction, for x=12.0
 yhat3 <- ____  # the third prediction, for x=20.0
 ```
 
-```{r ex6-hint1}
+```{r ex11-hint1}
 # Grab the parameters from the model object
 intercept <- model$coefficients[[1]]
 slope <- model$coefficients[[2]]
 ```
 
-```{r ex6-solution}
+```{r ex11-solution}
 # Grab the parameters from the model object
 intercept <- model$coefficients[[1]]
 slope <- model$coefficients[[2]]
@@ -509,7 +694,7 @@ Recall our formula for the SE of a prediction $\hat{y}^* = \beta_0 + \beta_1 x^*
 $$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
 ###
 
-```{r mc3, echo=FALSE}
+```{r mc6, echo=FALSE}
 question("Which value of x* would you expect to have the highest value of SE?",
          answer("x* = 0.1"),
          answer("x* = 12.0"),
@@ -521,7 +706,7 @@ question("Which value of x* would you expect to have the highest value of SE?",
 
 Now we'll walk through computing the SE for each of your 3 predictions above, step by step. To start, let's compute the first term, $s^2_e$
 
-```{r ex7, exercise=TRUE}
+```{r ex12, exercise=TRUE}
 # From your model, you can grab the variance of the residuals:
 se2 <- ____
 
@@ -529,12 +714,12 @@ se2 <- ____
 n <- ____
 ```
 
-```{r ex7-hint1}
+```{r ex12-hint1}
 # From your model, you can grab the variance of the residuals:
 se2 <- var(model$residuals)
 ```
 
-```{r ex7-hint2}
+```{r ex12-hint2}
 # From your model, you can grab the variance of the residuals:
 se2 <- var(model$residuals)
 
@@ -558,7 +743,7 @@ se_b1 <- summary(model)$coefficients[,2][[2]]
 
 Lastly, we need to compute $(x^*-\bar{x})^2$ for each value of $x^*$:
 
-```{r ex8, exercise=TRUE}
+```{r ex13, exercise=TRUE}
 # Compute xbar 
 xbar <- ____
 
@@ -566,7 +751,7 @@ xbar <- ____
 
 ```
 
-```{r ex8-solution}
+```{r ex13-solution}
 xs <- c(0.1, 12.0, 20.0)
 dev <- c(0.0, 0.0, 0.0)
 
@@ -579,10 +764,10 @@ for(i in 1:length(xs)) {
 
 Finally, put it all together to compute $SE$ from the formula:
 
-```{r ex9, exercise=TRUE}
+```{r ex14, exercise=TRUE}
 ```
 
-```{r ex9-solution}
+```{r ex14-solution}
 for(i in 1:length(xs)) {
   SE <- sqrt(se2 + se2_n + se_b1*dev[i])
   print(SE)
@@ -591,7 +776,7 @@ for(i in 1:length(xs)) {
 
 ###
 
-```{r mc4, echo=FALSE}
+```{r mc7, echo=FALSE}
 question("Which value of x* does have the highest value of SE?",
          answer("x* = 0.1"),
          answer("x* = 12.0"),
