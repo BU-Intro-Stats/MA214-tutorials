@@ -1,5 +1,5 @@
 ---
-title: "Advanced Inference: 5 - Logistic Regression"
+title: "Advanced Inference: 5 - Case Study: Logistic Regression for Low Birthweights in Nepal"
 output:
   learnr::tutorial:
     progressive: true
@@ -97,5 +97,123 @@ hash_encoder_ui <- {
 }
 ```
 
+
 ## Welcome
 
+In this tutorial, you'll learn about logistic regression through a case study. The following data contains observations of infants' birth weights from July 2018 to March 2019 at a health facility in Nepal (source: Singh et. al., 2020). Low birth weight for an infant is defined as less than 2500 grams, and is a crucial indicator of maternal health, poverty, and future health of the child. The variables are:
+
+- `birthWeight` - weight of the infant at birth, in grams
+- `smoking` - indicator for whether the mother smoked during pregnancy: 0 (no) or 1 (yes)
+- `motherWeight2` - the mother's weight at her 2nd trimester visit to the care facility, in kg
+- `motherWeight3` - the mother's weight at her 3rd trimester visit to the care facility, in kg
+
+You want to determine which other health factors are correlated with low birthweight. 
+
+```{r}
+# Data pre-processing:
+#birthweights <- read_sav("pone.0234907.s001.sav")
+#birthweights <- data.frame(birthweights$BIRTHWEI, birthweights$SMOKINGH, birthweights$WEIGHTMO_1, #birthweights$WEIGHTM1_3)
+#colnames(birthweights) <- c("birthWeight", "smoking", "motherWeight2", "motherWeight3")
+#write.csv(birthweights, "~/bu/grad/teaching/LCT/MA214/MA214-tutorials/07-adv-model-infer/birthweights.csv", row.names=FALSE)
+```
+
+```{r}
+# Load data and display the first 10 rows:
+birthweights <- read.csv("birthweights.csv", header=TRUE)
+head(birthweights)
+```
+
+
+## Processing and exploring birthweight data
+
+Before we proceed, we'll need to process the data and compute the variables needed for our analysis. First, let's create an indicator variable for whether the infant had a low birthweight. How would you compute this using the `birthWeight` column?
+
+```{r ex1, exercise=TRUE}
+birthweights$low <- as.numeric(____)
+```
+
+```{r ex1-solution}
+birthweights$low <- as.numeric(birthweights$birthWeight <= 2500)
+```
+
+And now compute the difference between the mother's third trimester weight and second trimester weight:
+
+```{r ex2, exercise=TRUE}
+birthweights$weightChange <- ____
+```
+
+```{r ex2-solution}
+birthweights$weightChange <- birthweights$motherWeight3 - birthweights$motherWeight2
+```
+
+###
+
+Now we have what we need to explore the data. Graph the indicator variable `low` vs the mother's weight change, and color the points by whether the mother was smoking during pregnancy:
+
+```{r ex3, exercise=TRUE}
+ggplot(data=birthweights, aes(x=____, y=____, color=____)) +
+  geom_point(alpha=0.6)  # alpha=0.6 to make the points easier to see when they overlap
+```
+
+```{r ex3-solution}
+ggplot(data=birthweights, aes(x=weightChange, y=low, color=as.factor(smoking))) +
+  geom_point(alpha=0.6)
+```
+
+###
+
+Looks like a job for logistic regression!
+
+
+## Review: Logistic Regression
+
+Recall from Tutorial 3.9 that logistic regression models the probability of a "success" or "failure." In this case, if $Y_i \sim {\rm Bernoulli}(p_i)$ is the indicator for whether an infant has a low birthweight, then we have
+
+$$ \mathbb{P}(Y_i=1)=p_i \quad\quad\text{and}\quad\quad \mathbb{P}(Y_i=0)=1-p_i$$
+where we are careful to consider whether $p_i$ might be different for each case, given the other health, environmental, and social factors that affect pregnancy and birth. 
+
+###
+
+```{r mc-1}
+question("What is the expectation of Y_i as modeled above?",
+         answer("0"),
+         answer("p_i", correct=TRUE),
+         answer("1-p_i"),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc-2}
+question("What is the variance of Y_i as modeled above?",
+         answer("1"),
+         answer("p_i"),
+         answer("p_i(1-p_i)", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Odds and log-odds
+
+Recall that the logistic function is given by
+
+$$f(t) = \frac{e^t}{1+e^t}$$
+
+###
+
+and when we perform logistic regression, we model the data as
+
+$$\mathbb{E}[Y_i] = p_i = \frac{e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}}{1 + e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}}$$
+or equivalently,
+
+$$ \frac{p_i}{1-p_i} = e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}$$
+
+###
+
+The quantity on the left-hand side is called "odds." If we take the $\rm log$ of it, we get (predictably) the log-odds:
+
+$$ {\rm log} \biggl( \frac{p_i}{1-p_i} \biggr) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}$$
+
+###
+
+***TODO: plot p vs p, p vs odds, p vs log-odds***
