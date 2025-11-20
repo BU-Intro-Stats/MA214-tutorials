@@ -103,7 +103,7 @@ In this tutorial, you'll learn more about inference and prediction for regressio
 
 ### Review: estimate parameters
 
-Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance and air time. Then print a summary of the model results.
+Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance (in miles) and air time (in minutes). Then print a summary of the model results.
 
 ```{r, echo=FALSE}
 set.seed(42)
@@ -165,7 +165,7 @@ question("How would you interpret the model parameters above?",
 
 ### Review: quantifying (un)certainty
 
-As we would expect, there is a strong correlation ($p=2.2\times10^{-16}$) between flight distance and air time. The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
+As we would expect, there is a strong correlation between flight distance and air time ($R^2$=0.97). The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
 
 ```{r ex2, exercise=TRUE}
 ```
@@ -206,16 +206,16 @@ t_crit <- qt(p=0.05/2, df=38)
 0.126 + c(-1,1)*t_crit*0.002978
 ```
 
-*TODO: check above*
-
 
 ## Predicting future values
+
+***TODO: add concept check MC questions***
 
 Now imagine you're flying direct from NYC to BOS - about 187 miles. Your model can predict how long this flight might take:
 
 $\hat{y} = 18.36 + (0.126\times187) = 41.92$ minutes
 
-But we know this model is based on our sample of 40 flights, and that the estimate might be different if we had generated the model from a different sample (this is called sample variation). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
+But we know this model is based on our sample of 40 flights, and that the estimate might be different if we had generated the model from a different sample (this is called *sampling variability*). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
 
 ###
 
@@ -244,10 +244,10 @@ ggplot() +
   xlim(c(100,1000))
 ```
 
-The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section, we'll use different approaches to analyze this uncertainty. So, we'll need to adapt our tools to quantify the uncertainty we have about this error term - more on that below.
+The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section we'll use different approaches to analyze this uncertainty. First, we'll computed bootstrapped estimates of the linear model coefficients, and then we'll discuss extrapolation. 
 
 
-## Simulation
+## Bootstrap Simulation
 
 ### 
 
@@ -256,7 +256,9 @@ In this simulation, we'll use bootstrapping to take a closer look at sample vari
 Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
 
 
-## Bootstrapping regression estimates
+### Computing Bootstrap Estimates
+
+***TODO: add concept check MC questions***
 
 First, let's fit a sequence of 100 bootstrap estimates for our intercept and slope parameters:
 
@@ -309,7 +311,7 @@ ggplot() +
 
 ###
 
-Now let's look at the boostrap models' residual SE, and the SE of each bootstrapped parameter:
+Now let's look at the boostrap models' residual standard error, and the standard error of each bootstrapped parameter:
 
 ```{r, echo=TRUE}
 # Compute the SE for each parameter
@@ -335,7 +337,7 @@ print(se_tab)
 
 ###
 
-Note how the bootstrap SE values are larger than the original model's. This extra uncertainty comes from our bootstrap resampling procedure. To be more concrete, we can examine the formula for the residual SE: for a chosen predictor value $x^*$, our prediction is given by $\hat{y}^* = \beta_0 + \beta_1x^*$, and
+Note how the bootstrap standard error values are larger than the original model's. This extra uncertainty comes from our bootstrap resampling procedure. To be more concrete, we can examine the formula for the residual SE: for a chosen predictor value $x^*$, our prediction is given by $\hat{y}^* = \beta_0 + \beta_1x^*$, and
 
 $$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
 Let's look at each term in sequence:
@@ -357,7 +359,7 @@ ggplot(data=possum, aes(x=tail_l, y=total_l)) +
   geom_point()
 ```
 
-Now load the data, fit a linear model, and output the model summary. Note the parameter and residual SE here - we will return to these values later. 
+Now load the data, fit a linear model, and output the model summary. Note the parameter and residual standard error here - we will return to these values later. 
 
 ```{r ex3, exercise=TRUE}
 model <- ____
@@ -501,7 +503,7 @@ question("Do you expect the bootstrapped models for the possum data to have high
 ###
 
 ```{r mc5, echo=FALSE}
-question("How do you compute the SE for each parameter?",
+question("How do you compute the standard error for each parameter?",
          answer("Compute the standard deviation of the parameter estimates.", correct=TRUE),
          answer("Compute the standard deviation of the model residuals."),
          answer("Compute the mean of the parameter estimates."),
@@ -530,7 +532,7 @@ se_pResid <- ____
 se_pResid <- sd(pPredictions$residuals)
 ```
 
-And now we compare the SE for our bootstrapped models vs our baseline model:
+And now we compare the standard error for our bootstrapped models vs our baseline model:
 
 ```{r, echo=FALSE}
 se_pInt <- sd(pIntercepts$estimate)
@@ -609,7 +611,7 @@ First, we load the following dataset, which contains many observations of mammal
 
 ```{r, echo=TRUE}
 # .csv file is tab-delimited, so need sep="\t" argument in function call
-mammals <- read.csv("sizeHistory.csv", sep="\t")
+mammals <- read.csv("sizeHistory.tsv", sep="\t")
 head(mammals)
 ```
 
@@ -644,8 +646,8 @@ ggplot(data=mammals, aes(x=logNewbornMass, y=logAdultMass)) +
 Now, let's try to predict the log-adult mass of mammals with the following log-newborn masses:
 
 - 0.1 (remember that this is a log scale - this newborn is very small!)
-- 12.0 (newborn mass around $e^12$ grams, near the maximum observed)
-- 20 (newborn mass around $e^20$ grams, well beyond the maximum observed)
+- 12.0 (newborn mass around $e^{12}$ grams, near the maximum observed)
+- 20 (newborn mass around $e^{20}$ grams, well beyond the maximum observed)
 
 First, create a linear regression model for the data and print the model summary:
 
@@ -689,7 +691,7 @@ yhat2 <- intercept + slope*(12.0)  # the second prediction, for x=12.0
 yhat3 <- intercept + slope*(20.0)  # the third prediction, for x=20.0
 ```
 
-Recall our formula for the SE of a prediction $\hat{y}^* = \beta_0 + \beta_1 x^*$ on a new value $x^*$:
+Recall our formula for the standard error of a prediction $\hat{y}^* = \beta_0 + \beta_1 x^*$ on a new value $x^*$:
 
 $$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
 ###
@@ -704,7 +706,7 @@ question("Which value of x* would you expect to have the highest value of SE?",
 
 ###
 
-Now we'll walk through computing the SE for each of your 3 predictions above, step by step. To start, let's compute the first term, $s^2_e$
+Now we'll walk through computing the standard error for each of your 3 predictions above, step by step. To start, let's compute the first term, $s^2_e$
 
 ```{r ex12, exercise=TRUE}
 # From your model, you can grab the variance of the residuals:
