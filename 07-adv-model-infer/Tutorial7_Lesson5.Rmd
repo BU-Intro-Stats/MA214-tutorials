@@ -162,12 +162,12 @@ ggplot(data=birthweights, aes(x=weightChange, y=low, color=as.factor(smoking))) 
 
 ###
 
-Looks like a job for logistic regression!
+It looks like we have a binary response variable here, with one covariate. You may recall a similar setup in Tutorial 3.9, where we first covered logistic regression. We'll do a bit of review in the next section.
 
 
 ## Review: Logistic Regression
 
-Recall from Tutorial 3.9 that logistic regression models the probability of a "success" or "failure." In this case, if $Y_i \sim {\rm Bernoulli}(p_i)$ is the indicator for whether an infant has a low birthweight, then we have
+Recall from Tutorial 3.9 that logistic regression models a binary response, specifically the probability of a "success" or "failure." In this case, if $Y_i \sim {\rm Bernoulli}(p_i)$ is the indicator for whether an infant has a low birthweight, then we have
 
 $$ \mathbb{P}(Y_i=1)=p_i \quad\quad\text{and}\quad\quad \mathbb{P}(Y_i=0)=1-p_i$$
 where we are careful to consider whether $p_i$ might be different for each case, given the other health, environmental, and social factors that affect pregnancy and birth. 
@@ -210,10 +210,63 @@ $$ \frac{p_i}{1-p_i} = e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}$$
 
 ###
 
-The quantity on the left-hand side is called "odds." If we take the $\rm log$ of it, we get (predictably) the log-odds:
+The quantity on the left-hand side is called "odds." In words, it indicates how much more likely an event occurring is than it not occurring. For some examples of how this works concretely, check out the table below:
+
+```{r table1, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Odds Ratio    |                 Interpretation                       |
+|---------------|:----------------------------------------------------:|
+| = 1           | p=0.5, event is equally likely to occur or not occur |
+| > 1           | Event is more likely to occur than to not occur      |
+| < 1           | Event is more likely to not occur than to occur      |
+"
+cat(tabl) # output the table
+```
+
+While odds are a useful concept, they can be hard to work with in modeling contexts. Consider: odds are bounded in the interval $[0,1]$. What if we take the $\rm log$ of it? This function is called (predictably) the log-odds:
 
 $$ {\rm log} \biggl( \frac{p_i}{1-p_i} \biggr) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}$$
+and the log-odds function is not bounded: it maps a probability $p\in[0,1]$ to the entire real line: $(-\infty, +\infty)$. Now a revised table interpreting both odds and log-odds values looks like this:
+
+```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Odds Ratio    | Log-odds |                 Interpretation                       |
+|---------------|----------|:----------------------------------------------------:|
+| = 1           |   = 0    | p=0.5, event is equally likely to occur or not occur |
+| > 1           |   > 0    | Event is more likely to occur than to not occur      |
+| < 1           |   < 0    | Event is more likely to not occur than to occur      |
+"
+cat(tabl) # output the table
+```
+
+***TODO: plot p vs p, p vs odds, p vs log-odds***
 
 ###
 
-***TODO: plot p vs p, p vs odds, p vs log-odds***
+```{r mc-3}
+question("For p=0.4, what are the odds?",
+         answer("0.67", correct=TRUE),
+         answer("1.5"),
+         answer("0.6"),
+         answer("Not sure"))
+```
+
+```{r mc-4}
+question("For p=0.4, what are the log-odds?",
+         answer("-0.22"),
+         answer("0.17"),
+         answer("-0.17", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Modeling Low Birthweight
+
+***TODO: fit a model***
+
+```{r}
+```
+
+***TODO: (concept check MC) ask what is the probability of a low birthweight if mom's weight did not change but she is a smoker? and, same setup but non-smoker?***
+
+
