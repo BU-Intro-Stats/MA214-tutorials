@@ -100,7 +100,7 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In this tutorial, you'll learn about logistic regression through a case study. The following data contains observations of infants' birth weights from July 2018 to March 2019 at a health facility in Nepal (source: Singh et. al., 2020). Low birth weight for an infant is defined as less than 2500 grams, and is a crucial indicator of maternal health, poverty, and future health of the child. The variables are:
+In this tutorial, you'll learn about logistic regression through a case study. The following data contains observations of infants' birth weights from July 2018 to March 2019 at a health facility in Nepal (source: K.C. et. al., 2020). Low birth weight for an infant is defined as less than 2500 grams, and is a crucial indicator of maternal health, poverty, and future health of the child. The variables are:
 
 - `birthWeight` - weight of the infant at birth, in grams
 - `smoking` - indicator for whether the mother smoked during pregnancy: 0 (no) or 1 (yes)
@@ -146,6 +146,11 @@ birthweights$weightChange <- ____
 birthweights$weightChange <- birthweights$motherWeight3 - birthweights$motherWeight2
 ```
 
+```{r, echo=FALSE}
+# need this or the document won't knit
+birthweights$low <- as.numeric(birthweights$birthWeight <= 2500)
+birthweights$weightChange <- birthweights$motherWeight3 - birthweights$motherWeight2
+```
 ###
 
 Now we have what we need to explore the data. Graph the indicator variable `low` vs the mother's weight change, and color the points by whether the mother was smoking during pregnancy:
@@ -208,9 +213,10 @@ or equivalently,
 
 $$ \frac{p_i}{1-p_i} = e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}$$
 
-###
+### 
 
 The quantity on the left-hand side is called "odds." In words, it indicates how much more likely an event occurring is than it not occurring. For some examples of how this works concretely, check out the table below:
+
 
 ```{r table1, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tabl <- "
@@ -223,9 +229,14 @@ tabl <- "
 cat(tabl) # output the table
 ```
 
+###
+
 While odds are a useful concept, they can be hard to work with in modeling contexts. Consider how you might interpret the coefficients $\beta_j$ from a model using the odds function above: you'd have to take into account the exponential. On the other hand, if we take the logarithm of the odds function, we get (predictably) a log-odds function:
 
 $$ {\rm log} \biggl( \frac{p_i}{1-p_i} \biggr) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}$$
+
+###
+
 Log-odds is symmetric around zero, which makes interpreting coefficients a bit more intuitive. Moreover, now we have our linear model directly on the right-hand side. Unfortunately, as we explored in Tutorial 3.9, the scale of the log-odds function is not a natural one for interpretation, so we need to take care when comparing values. 
 
 A revised table interpreting both odds and log-odds values looks like this:
@@ -297,11 +308,17 @@ logReg <- glm(data=birthweights, formula=low~smoking + weightChange,
 summary(logReg)
 ```
 
+```{r, echo=FALSE}
+# need this or the document won't knit
+logReg <- glm(data=birthweights, formula=low~smoking + weightChange, 
+              family=binomial)
+```
+
 ###
 
-Let's see how we might interpret the coefficients. Recall that logistic regression is based on the log-odds function, so we still have a logarithm on the left-hand side of the equation. What happens when we take $exp{...}$ of the model?
+Let's see how we might interpret the coefficients. Recall that logistic regression is based on the log-odds function, so we still have a logarithm on the left-hand side of the equation. What happens when we take ${\rm exp}\{...\}$ of the model?
 
-```{r}
+```{r, include=TRUE, echo=TRUE}
 coef(logReg)         # original model coefficients, log-odds scale
 exp(coef(logReg))    # take exp() to convert to odds scale
 ```
@@ -317,6 +334,10 @@ question("According to our model, what are the odds of low birthweight for an in
 ###
 
 In addition to the odds and log-odds, we can also recover the estimated probabilities from our model. For example, let's say we have a mother whose weight decreased by 2 kg during pregnancy, but did not smoke. What is the estimated probability that the infant will have a low birthweight?
+
+###
+
+From our model coefficients, we have:
 
 $$ e^{4.53*0 - 0.94*2} = e^{-1.88} = \frac{p}{1-p} $$
 Solving for p gives us:
@@ -334,9 +355,9 @@ For reasons we'll see more clearly below, we should be careful when interpreting
 
 ### 
 
-First, let's examine the relationship between smoking during pregnancy and low birthweight. It turns out that the dataset used did not have many examples of mothers who smoked during pregnancy: just 8 out of 369 did - and of those, 6 of the infants had a low birthweight (see below). 
+First, let's examine the relationship between smoking during pregnancy and low birthweight. It turns out that the dataset used did not have many examples of mothers who smoked during pregnancy: just 8 out of 369 did - and of those, 6 of the infants had a low birthweight: 
 
-```{r}
+```{r, echo=TRUE, include=TRUE}
 # Count the number of rows where the smoking indicator variable = 1:
 sum(birthweights$smoking)
 
@@ -359,3 +380,14 @@ It's a bit of a trick question. The `birthweights` data we've analyzed here is a
 Reference for the birthweights data and study results:
 
 K. C. A., Basel P. L., Singh S. Low birth weight and its associated risk factors: Health facility-based case-control study. PLoS One. 2020 Jun 22;15(6):e0234907. doi: 10.1371/journal.pone.0234907. PMID: 32569281; PMCID: PMC7307746.
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
