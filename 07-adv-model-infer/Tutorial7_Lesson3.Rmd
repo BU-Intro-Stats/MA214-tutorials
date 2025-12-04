@@ -785,3 +785,14 @@ question("Which value of x* does have the highest value of SE?",
          answer("x* = 20.0", correct=TRUE),
          answer("Not sure"))
 ```
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
