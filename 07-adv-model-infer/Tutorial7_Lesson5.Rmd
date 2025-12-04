@@ -216,30 +216,52 @@ The quantity on the left-hand side is called "odds." In words, it indicates how 
 tabl <- "
 | Odds Ratio    |                 Interpretation                       |
 |---------------|:----------------------------------------------------:|
+| < 1           | Event is more likely to not occur than to occur      |
 | = 1           | p=0.5, event is equally likely to occur or not occur |
 | > 1           | Event is more likely to occur than to not occur      |
-| < 1           | Event is more likely to not occur than to occur      |
 "
 cat(tabl) # output the table
 ```
 
-While odds are a useful concept, they can be hard to work with in modeling contexts. Consider: odds are bounded in the interval $[0,1]$. What if we take the $\rm log$ of it? This function is called (predictably) the log-odds:
+While odds are a useful concept, they can be hard to work with in modeling contexts. Consider how you might interpret the coefficients $\beta_j$ from a model using the odds function above: you'd have to take into account the exponential. On the other hand, if we take the logarithm of the odds function, we get (predictably) a log-odds function:
 
 $$ {\rm log} \biggl( \frac{p_i}{1-p_i} \biggr) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}$$
-and the log-odds function is not bounded: it maps a probability $p\in[0,1]$ to the entire real line: $(-\infty, +\infty)$. Now a revised table interpreting both odds and log-odds values looks like this:
+Log-odds is symmetric around zero, which makes interpreting coefficients a bit more intuitive. Moreover, now we have our linear model directly on the right-hand side. Unfortunately, as we explored in Tutorial 3.9, the scale of the log-odds function is not a natural one for interpretation, so we need to take care when comparing values. 
+
+A revised table interpreting both odds and log-odds values looks like this:
 
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tabl <- "
 | Odds Ratio    | Log-odds |                 Interpretation                       |
 |---------------|----------|:----------------------------------------------------:|
+| < 1           |   < 0    | Event is more likely to not occur than to occur      |
 | = 1           |   = 0    | p=0.5, event is equally likely to occur or not occur |
 | > 1           |   > 0    | Event is more likely to occur than to not occur      |
-| < 1           |   < 0    | Event is more likely to not occur than to occur      |
 "
 cat(tabl) # output the table
 ```
 
-***TODO: plot p vs p, p vs odds, p vs log-odds***
+###
+
+And here we have a plot of the values of p, odds, and log-odds:
+
+```{r, echo=FALSE}
+library(gridExtra)
+
+p <- seq(from=0.0001, to=1, length.out=100)
+odds_data <- data.frame(p)
+odds_data$odds <- (odds_data$p)/(1-odds_data$p)
+odds_data$logOdds <- log(odds_data$odds)
+
+#head(odds_data)
+plot1 <- ggplot(data=odds_data, aes(x=p, y=p)) + geom_line()
+plot2 <- ggplot(data=odds_data, aes(x=p, y=odds)) + geom_line()
+plot3 <- ggplot(data=odds_data, aes(x=p, y=logOdds)) + geom_line()
+
+grid.arrange(plot1, plot2, plot3)
+```
+
+Notice how both the odds and log-odds increase with p, but the log-odds has a more moderate curve and is symmetric around 0. 
 
 ###
 
@@ -262,11 +284,78 @@ question("For p=0.4, what are the log-odds?",
 
 ## Modeling Low Birthweight
 
-***TODO: fit a model***
+Now we have the tools needed to model low birthweight outcomes with logistic regression. Using the `glm` function in R, fit a model with a Binomial link function. 
 
-```{r}
+```{r ex4, exercise=TRUE}
+logReg <- glm(data=birthweights, formula=____, family=____)
+summary(logReg)
 ```
 
-***TODO: (concept check MC) ask what is the probability of a low birthweight if mom's weight did not change but she is a smoker? and, same setup but non-smoker?***
+```{r ex4-solution}
+logReg <- glm(data=birthweights, formula=low~smoking + weightChange, 
+              family=binomial)
+summary(logReg)
+```
 
+###
 
+Let's see how we might interpret the coefficients. Recall that logistic regression is based on the log-odds function, so we still have a logarithm on the left-hand side of the equation. What happens when we take $exp{...}$ of the model?
+
+```{r}
+coef(logReg)         # original model coefficients, log-odds scale
+exp(coef(logReg))    # take exp() to convert to odds scale
+```
+
+```{r mc-5}
+question("According to our model, what are the odds of low birthweight for an infant whose mother smoked during pregnancy? Assume her weight change was 0 kg, so we control for that variable.",
+         answer("The odds of low birthweight increased by a factor of 1.5 if the mother smoked during pregnancy."),
+         answer("The odds of low birthweight decreased by a factor of 0.9 if the mother smoked during pregnancy."),
+         answer("The odds of low birthweight increased by a factor of 4.5 if the mother smoked during pregnancy.", correct=TRUE),
+         answer("Not sure"))
+```
+
+###
+
+In addition to the odds and log-odds, we can also recover the estimated probabilities from our model. For example, let's say we have a mother whose weight decreased by 2 kg during pregnancy, but did not smoke. What is the estimated probability that the infant will have a low birthweight?
+
+$$ e^{4.53*0 - 0.94*2} = e^{-1.88} = \frac{p}{1-p} $$
+Solving for p gives us:
+
+$$ e^{-1.88}(1-p) = p $$
+$$ e^{-1.88} - pe^{-1.88} = p $$
+
+$$ \frac{e^{-1.88}}{1+e^{-1.88}} = p = 0.13$$
+
+So according to our model, a moderate loss of weight between the 2nd and 3rd trimesters, barring other factors, is correlated with a low probability of low birthweight of the infant. 
+
+## Taking Care with Model Interpretations
+
+For reasons we'll see more clearly below, we should be careful when interpreting our model results. 
+
+### 
+
+First, let's examine the relationship between smoking during pregnancy and low birthweight. It turns out that the dataset used did not have many examples of mothers who smoked during pregnancy: just 8 out of 369 did - and of those, 6 of the infants had a low birthweight (see below). 
+
+```{r}
+# Count the number of rows where the smoking indicator variable = 1:
+sum(birthweights$smoking)
+
+# Let's see those rows:
+birthweights[birthweights$smoking==1,]
+```
+
+This small segment of outcomes is likely skewing the results. 
+
+### 
+
+On the other hand, what about the weight change variable? Our model says that for each +1 kg gained (weightChange$>0$), the infant's odds of a low birthweight increased by a factor of 0.9. But that doesn't sound quite right: gestating mothers are usually told that weight gain during pregnancy is healthy and aids in the fetus' development during gestation ([CDC, May 2024](https://www.cdc.gov/maternal-infant-health/pregnancy-weight/index.html)). What else might be going on?
+
+###
+
+It's a bit of a trick question. The `birthweights` data we've analyzed here is actually a subset of a larger dataset which included several other variables. The source study, published in PLoS One, found that three other factors were significant predictors of low birthweight: having a firewood or kerosene kitchen in the home, low iron intake during pregnancy, and pre-term birth (K.C. et. al., 2020). In short, there are other factors affecting low birthweight that we did not measure in this case study. 
+
+###
+
+Reference for the birthweights data and study results:
+
+K. C. A., Basel P. L., Singh S. Low birth weight and its associated risk factors: Health facility-based case-control study. PLoS One. 2020 Jun 22;15(6):e0234907. doi: 10.1371/journal.pone.0234907. PMID: 32569281; PMCID: PMC7307746.
