@@ -201,7 +201,7 @@ We return to the ice cream consumption dataset from Lesson 7.1. Recall what the 
 - `price` - ice cream price
 
 ```{r}
-icecream <- read.csv("icecream.csv")
+icecream <- read.csv("data/icecream.csv")
 head(icecream)
 ```
 

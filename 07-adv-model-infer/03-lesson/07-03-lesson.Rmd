@@ -611,7 +611,7 @@ First, we load the following dataset, which contains many observations of mammal
 
 ```{r, echo=TRUE}
 # .csv file is tab-delimited, so need sep="\t" argument in function call
-mammals <- read.csv("sizeHistory.tsv", sep="\t")
+mammals <- read.csv("data/sizeHistory.tsv", sep="\t")
 head(mammals)
 ```
 

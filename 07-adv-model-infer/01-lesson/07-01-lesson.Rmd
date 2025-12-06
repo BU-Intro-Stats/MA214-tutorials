@@ -185,7 +185,7 @@ To start, load the `icecream.csv` data file into a DataFrame and create scatterp
 
 ```{r ex1, exercise = TRUE}
 # Load data
-icecream <- _______("icecream.csv")
+icecream <- _______("data/icecream.csv")
 
 # View some of the variables
 head(icecream)
@@ -205,12 +205,12 @@ ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
 
 ```{r ex1-hint-1}
 # Try the following command for loading the csv file:
-read.csv("icecream.csv")
+read.csv("data/icecream.csv")
 ```
 
 ```{r ex1-solution}
 # Solution
-icecream <- read.csv("icecream.csv")
+icecream <- read.csv("data/icecream.csv")
 
 ggplot(data=icecream, aes(y=cons, x=temp)) +
   geom_point()
