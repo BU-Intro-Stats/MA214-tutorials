@@ -106,16 +106,81 @@ Interpreting probability in a Bayesian way may be new to you (at least in Statis
 
 ###
 
-The former interpretation is often attributed to a *Frequentist* way of thinking, while the second is more *Bayesian*. Which one feels more intuitive to you will depend on how you think, and both are valuable ways of approaching statistical problems. You'll notice that the Frequentist philosophy is more explicitly taught in Statistics classes, including in this one (so far!). Starting from now, we will explore the Bayesian way. 
+The former interpretation is often attributed to a *Frequentist* way of thinking, while the second is more *Bayesian*. 
 
+For another example, say that two students are preparing for a test and guessing at their probability of passing. The first student is very confident in their preparation, and says that their probability of passing is 0.9. The second student feels less confident, and says 0.6. 
+
+###
+
+A Frequentist interpretation says that, if the students could each take the exam many times over and over again, they would pass 90% or 60% of the time, respectively. 
+
+###
+
+In fact, there's an even stricter interpretation: assuming the students can only take the exam once, this is a binary event --- so their probability of passing is either 0 or 1. That is, both students are wrong!
+
+This may raise some eyebrows for you (or not). Do you find this way of thinking about probabilities intuitive?
+
+###
+
+On the other hand, a more Bayesian interpretation of the probabilities says that the first student is much more likely to pass than to fail, and the second student is only a bit more likely to pass than to fail. 
+
+Their estimates of these probabilities are based on how much they've each prepared for the exam, what they know about the class, the professor, and/or the exam itself, and how they think they'll be evaluated. In other words, the students each have some prior knowledge and they each make an informed guess based on that knowledge. This, in essence, is the Bayesian approach to statistics. More on that in a bit!
+
+###
+
+These are just two ways of interpreting probabilities. Which one feels more intuitive to you will depend on how you think, and you may even use one or the other (or both) when approaching different problems. You'll notice that the Frequentist philosophy is more explicitly taught in Statistics classes, including in this one (so far!). Starting from now, we will explore the Bayesian way. 
+
+###
 
 ## Big Picture
 
-***TODO: incorporate knowledge-building figures from BR - can just paste and cite?***
+In the exam example above, we introduced the idea of a "Bayesian approach" to statistical problems. Let's describe this approach in more detail. 
+
+Imagine that you are one of the two students studying for an exam. Say that, for the same class, you already took one other exam and you passed with a grade of 80%. Let's call this your _prior_: given your typical study methods, you can confidently pass an exam for this class. 
+
+###
+
+Now, you sit for the exam, and unfortunately it goes poorly. You missed something in your preparations or just had a bad day, and when you get the grade back it is now a 60%. Still a pass, but much lower than you had hoped. Here's your _new data_: in your most recent exam, you performed worse than before.
+
+###
+
+Your class has one more exam left in the semester. Given your past two performances, you know you can do well on the material in the beginning of the class, but you'll need to review the second exam material. You make a plan to adjust your study methods and take care of yourself outside of class, and you hope to get at least a 75% on the final exam. This is your _posterior_. 
+
+###
+
+This method of building up knowledge (prior -> data -> posterior) is the nature of Bayesian analysis (see the figure below).
+
+![Figure 1: Bayesian knowledge-building at work. Source: BayesRules! (Chapter 1.1)](./bayes_diagram.png)
+
+In the coming sections we will formalize these ideas in terms of statistical objects like probabilities and distributions. But first, let's continue the review.
 
 
 ## Events Review
 
+Often when we study a problem in statistics, we are interested in an _outcome_. For example, we may want to know how likely an event is to happen or not happen, whether in terms of a discrete probability or with a distribution. To do this, we build models that help us understand the underlying structure of data we have observed - which tells us about the events we are interested in. 
+
+
+Outline:
+1. Introduce diagnostic test background (true/false pos/neg, etc.)
+2. Work out the probabilities of each event
+3. MC questions for computing probabilities of events in different problems
+
 
 ## Conditional Probability Review
 
+Outline:
+1. Same diagnostic test, now we have a result (patient goes to doc., etc.)
+2. Given the result, what is the probability of each event?
+3. Derive Bayes' Rule?? Or maybe just use it to answer (2)
+4. MC questions for using BR in different problems
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
