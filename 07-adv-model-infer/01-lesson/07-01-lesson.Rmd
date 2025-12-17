@@ -18,6 +18,11 @@ library(grid)
 library(png)
 library(ggplot2)
 #library(emo)
+library(shiny)
+library(shinyjs)
+
+useShinyjs()  # enable shinyjs
+
 
 knitr::opts_chunk$set(echo = FALSE,
                       fig.align = "center",
@@ -96,7 +101,13 @@ hash_encoder_ui <- {
     input$caption
   }), )
 }
+
+
+my_reveal_time <- "2025-12-17 15:00:00"  # solution reveal time
+
 ```
+
+
 
 ## Welcome
 
@@ -203,23 +214,49 @@ ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
   geom_point()
 ```
 
+
 ```{r ex1-hint-1}
 # Try the following command for loading the csv file:
 read.csv("data/icecream.csv")
 ```
 
-```{r ex1-solution}
-# Solution
+```{r ex1-hint-2}
+# Hint 2
+```
+
+```{r, context="server", echo=FALSE}
+output$ex1_solution_code <- renderUI({
+  invalidateLater(1000)
+
+  reveal_time <- as.POSIXct(
+    my_reveal_time,
+    tz = "America/New_York"
+  )
+
+  if (Sys.time() < reveal_time) return(NULL)
+
+  tags$pre(
+    tags$code(
+'
+Solution
+
 icecream <- read.csv("data/icecream.csv")
 
-ggplot(data=icecream, aes(y=cons, x=temp)) +
+ggplot(data = icecream, aes(y = cons, x = temp)) +
   geom_point()
 
-ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
+ggplot(data = icecream, aes(y = cons, x = price, col = temp)) +
   geom_point()
 
-ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
-  geom_point()
+ggplot(data = icecream, aes(y = cons, x = income, col = temp)) +
+  geom_point()'
+    )
+  )
+})
+```
+
+```{r ex1-solution-ui, echo=FALSE}
+uiOutput("ex1_solution_code")
 ```
 
 ```{r mc1}
