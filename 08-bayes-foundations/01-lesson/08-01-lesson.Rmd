@@ -157,22 +157,140 @@ In the coming sections we will formalize these ideas in terms of statistical obj
 
 ## Events Review
 
-Often when we study a problem in statistics, we are interested in an _outcome_. For example, we may want to know how likely an event is to happen or not happen, whether in terms of a discrete probability or with a distribution. To do this, we build models that help us understand the underlying structure of data we have observed - which tells us about the events we are interested in. 
+Often when we study a problem in statistics, we are interested in an _outcome_. For example, we may want to know how likely an event is to happen or not happen. One such problem might go something like this: say that a given disease affects $0.5%$ of the US population. A test is developed to detect the disease, and experiments say that the test gives false positives $3%$ of the time, and false negatives $2%$ of the time. Then we can write out the events like this:
+
+$$\mathbb{P}(FP) = 0.03, \quad \mathbb{P}(FN) = 0.02, \quad \text{and} \quad \mathbb{P}(D) = 0.005$$
+where $D$ is the event that a random person has the disease, $FP$ is the event that the diagnostic test returns a _false positive_ result (where the result is positive but the patient in fact does not have the disease), and $FN$ is the event that the test returns a _false negative_ (where the result is negative but the patient does in fact have the disease).
+
+From the information given by the problem, we can also determine the probabilities of other events in the _sample spaces_, the full spaces of possibilities. 
+
+###
+
+```{r mc1}
+question("Which of the following is the correct description of the event FP^c (the complement of event FP)?",
+         answer("FP^c is the same thing as FN (false negative)"),
+         answer("FP^c is when the diagnostic test gives a positive result, and the patient does in fact have the disease (true positive)", correct=TRUE),
+         answer("FP^c is when the diagnostic test gives a negative result."),
+         answer("FP^c is when the diagnostic test gives a positive result."),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc2}
+question("Which of the following is the correct description of the event FN^c (the complement of event FN)?",
+         answer("FN^c is the same thing as FP (false positive)"),
+         answer("FN^c is when the diagnostic test gives a negative result, and the patient does not have the disease (true negative)", correct=TRUE),
+         answer("FN^c is when the diagnostic test gives a negative result."),
+         answer("FN^c is when the diagnostic test gives a positive result."),
+         answer("Not sure"))
+```
+
+###
+
+And finally, we also have
+
+$$D^c = \{\text{a random person in the US does not have the disease}\}$$
+Which has probability...
+
+```{r mc3}
+question("What is the probability of the event D^c (the complement of event D)?",
+         answer("1-0.005, or 0.995", correct=TRUE),
+         answer("0.005"),
+         answer("0.03"),
+         answer("Not sure"))
+```
+
+#$$ \mathbb{P}(D^c) = 1-\mathbb{P}(D) = 1-0.005 = 0.995$$
 
 
-Outline:
-1. Introduce diagnostic test background (true/false pos/neg, etc.)
-2. Work out the probabilities of each event
-3. MC questions for computing probabilities of events in different problems
+## Conditional Probability and Bayes' Rule Review 
+
+Now we'll extend the example. Say that a patient goes to the doctor for the diagnostic test and receives a positive test result. We want to work out: what is the probability that the patient truly has the disease? In other words, we need to compute the probability of the conditional event $D|P$.
+
+#$$\mathbb{P}(TP) = \mathbb{P}(\text{the test result is positive and the patient does have the disease}) = \text{?}$$
+
+###
+
+Recall that the _conditional probability_ of an event A _given_ B, is
+
+$$\mathbb{P}(A|B) = \frac{\mathbb{P}(A\cap B)}{\mathbb{P}(B)}$$ 
+
+Similarly, we have that the conditional probability of an event B given A is
+
+$$\mathbb{P}(B|A) = \frac{\mathbb{P}(A\cap B)}{\mathbb{P}(A)}$$ 
+
+Notice that we have $\mathbb{P}(A\cap B)$ in the numerator for both quantities, so we can solve for it to get 
+
+$$\mathbb{P}(A|B)\mathbb{P}(B) = \mathbb{P}(A\cap B) = \mathbb{P}(B|A)\mathbb{P}(A)$$
+
+And substitute back into the first equation to get
+
+$$\mathbb{P}(A|B) = \frac{\mathbb{P}(B|A)\mathbb{P}(A)}{\mathbb{P}(B)}$$
+
+###
+
+So, back to the problem at hand. We want to determine $\mathbb{P}(D|P)$, where event P is the positive test result. But what is $\mathbb{P}(P)$?
+
+***TODO: finish question***
+
+```{r mc4}
+question("(Challenge) How else can you express the probability of event P? Hint: remember the law of total probability.",
+         answer("The probability of P is ", correct=TRUE), 
+         answer("The probability of P is the same thing as the probability of D"),
+         answer("The probability of P is the sum of the probabilities of FP (false positive) and D (disease rate)"),
+         answer("The probability of P is the sum of the probabilities of FP (false positive) and FN (false negative)."),
+         answer("Not sure"))
+```
+
+###
+
+The key to answering the above question is the Law of Total Probability. First, note that our disease sample space can be *partitioned* into two *disjoint*, *mutually exclusive*, and *exhaustive* events: $D$ and $D^c$. Why are these two events mutually exclusive and exhaustive?
+
+###
+
+Then the Law of Total Probability states that
+
+$$\mathbb{P}(P) = \mathbb{P}(P \cap D) + \mathbb{P}(P \cap D^c) \\ = \mathbb{P}(P|D)\mathbb{P}(D) + \mathbb{P}(P|D^c)\mathbb{P}(D^c)$$
+where the second line follows from applying the rules of conditional probability.
+
+Now, what is $\mathbb{P}(P|D)$, or in other words the probability of a _true positive_ test result?
+
+###
+
+```{r mc5}
+question("How else can you express the event TP, or equivalently, P|D?",
+         answer("TP (true positive) is the same as P."),
+         answer("TP (true positive) can also be expressed as FN^c, the complement of FN (false negative).", correct=TRUE), 
+         answer("TP (true positive) can also be expressed as FP^c, the complement of FP (false positive)."),
+         answer("Not sure"))
+```
+
+###
+
+Now we can compute $\mathbb{P}(TP)$:
+
+```{r mc6}
+question("What is the probability of TP?",
+         answer("TP (true positive) is 1-0.03 = 0.97."),
+         answer("The probability of TP (true positive) is 0.005."),
+         answer("The probability of TP (true positive) is 1-0.02 = 0.98.", correct=TRUE), 
+         answer("The probability of TP (true positive) is 1-0.005 = 0.995."),
+         answer("Not sure"))
+```
+
+###
+
+Finally, we can put the pieces together and solve our problem:
+
+$$\mathbb{P}(D|P) = \frac{\mathbb{P}(P|D)\mathbb{P}(D)}{\mathbb{P}(P)} = \frac{\mathbb{P}(TP)\mathbb{P}(D)}{\mathbb{P}(TP)\mathbb{P}(D) + \mathbb{P}(FP)\mathbb{P}(D^c)} \\ = \frac{(1-0.02)(0.005)}{(1-0.02)(0.005) + (0.03)(1-0.005)} = 0.141$$
+
+## False Positive Paradox
+
+In this section, you will repeat the previous exercise in a new problem to explore what is known as the False Positive Paradox. Imagine we have the same setup, except this time we are dealing with a disease that is far more prevalent in the general population: $\mathbb{P}(D) = 0.4$. The other givens are the same, namely $\mathbb{P}(FP) = 0.03$ and $\mathbb{P}(0.02)$. As before, you'll have to use conditional probability, Bayes' Rule, and the Law of Total Probability. 
 
 
-## Conditional Probability Review
-
-Outline:
-1. Same diagnostic test, now we have a result (patient goes to doc., etc.)
-2. Given the result, what is the probability of each event?
-3. Derive Bayes' Rule?? Or maybe just use it to answer (2)
-4. MC questions for using BR in different problems
+***TODO: finish - maybe use R as a fill-in-the-blanks interface?***
 
 
 ## Submit
