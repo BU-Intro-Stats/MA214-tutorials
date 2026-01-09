@@ -13,7 +13,6 @@ library(tidyverse)
 library(openintro)
 library(grid)
 library(gapminder)
-library(emo)
 library(patchwork)
 
 knitr::opts_chunk$set(
@@ -226,9 +225,9 @@ question("Which of the following interpretations of the plot is valid?",
 )
 ```
 
-### Spam and !!!
+### Spam and exclamation marks!
 
-Let's look at a more obvious indicator of spam: exclamation marks. `exclaim_mess` contains the number of exclamation marks in each message. Using summary statistics and visualization, see if there is a relationship between this variable and whether or not a message is spam.
+Let's look at a more obvious indicator of spam: exclamation marks. The `exclaim_mess` variable contains the number of exclamation marks in each message. Using summary statistics and visualization, see if there is a relationship between this variable and whether or not a message is spam.
 
 Experiment with different types of plots until you find one that is the most informative. Recall that you've seen:
 
@@ -240,7 +239,12 @@ The `email` dataset is still available in your workspace.
 
 - Calculate appropriate measures of the center and spread of `exclaim_mess` for both spam and not spam using `group_by()` and `summarize()`.
 - Construct an appropriate plot to visualize the association between the same two variables, adding in a log-transformation step if necessary.
-- If you decide to use a log transformation, remember that `log(0)` is `-Inf` in R, which isn't a very useful value! You can get around this by adding a small number (like `0.01`) to the quantity inside the `log()` function. This way, your value is never zero. This small shift to the right won't affect your results.
+- If you decide to use a log transformation, remember that `log(0)` is `-Inf` in R, which isn't a very useful value! You can get around this by adding `1` to the quantity inside the `log()` function. This way, values of 
+zero will be mapped to zero since `log(1 + 0) = log(1) = 0`, which helps with interpretation. 
+This is a commonly used trick. 
+Sometimes a number other than `1` is added, but this can be more difficult to interpret. 
+- Another recommendation is to use `log10` (log base 10) rather than `log` (the natural log) because
+base 10 is easier to interpret. 
 
 **Hint:** Take a look at how we calculated the summary statistics for `num_char` with the `median()` and `IQR()` functions in the `summarize()` call earlier.
 
@@ -268,40 +272,65 @@ email |>
 
 # Create plot for spam and exclaim_mess
 email |>
-  mutate(log_exclaim_mess = log(exclaim_mess + 0.01)) |>
+  mutate(log_exclaim_mess = log10(1 + exclaim_mess)) |>
   ggplot(aes(x = log_exclaim_mess)) +
   geom_histogram() +
   facet_wrap(~ spam)
 
 # Alternative plot: side-by-side box plots
 email |>
-  mutate(log_exclaim_mess = log(exclaim_mess + 0.01)) |>
+  mutate(log_exclaim_mess = log10(1 + exclaim_mess)) |>
   ggplot(aes(x = 1, y = log_exclaim_mess)) +
   geom_boxplot() +
   facet_wrap(~ spam)
 
 # Alternative plot: Overlaid density plots
 email |>
-  mutate(log_exclaim_mess = log(exclaim_mess + .01)) |>
+  mutate(log_exclaim_mess = log10(1 + exclaim_mess)) |>
   ggplot(aes(x = log_exclaim_mess, fill = spam)) +
   geom_density(alpha = 0.3)
 ```
 
-### Spam and !!! interpretation
-
-```{r mc2-pre}
-email |>
-  mutate(log_exclaim_mess = log(exclaim_mess + .01)) |>
-  ggplot(aes(x = log_exclaim_mess)) +
-  geom_histogram(binwidth = 0.5) +
-  facet_wrap(~spam)
-```
+<!-- ```{r mc2-pre} -->
+<!-- email |> -->
+<!--   mutate(log_exclaim_mess = log(exclaim_mess + .01)) |> -->
+<!--   ggplot(aes(x = log_exclaim_mess)) + -->
+<!--   geom_histogram(binwidth = 0.5) + -->
+<!--   facet_wrap(~spam) -->
+<!-- ``` -->
 
 ```{r mc2}
 question(
   "Which interpretation of these faceted histograms **is not** correct?
 ",
-  answer("The most common value of `exclaim_mess` in both classes of email is zero (a `log(exclaim_mess)` of -4.6 after adding .01)."),
+  answer("The most common value of `exclaim_mess` in both classes of email is zero."),
+  answer("There are more cases of spam in this dataset than not spam.", correct = TRUE, message = "Well done!"),
+  answer("Even after a transformation, the distribution of `exclaim_mess` in both classes of email is right-skewed."),
+  answer("The typical number of exclamations in the not spam group appears to be slightly higher than in the spam group."),
+  allow_retry = TRUE,
+  incorrect = "There are fewer cases of spam in this dataset than not spam."
+)
+```
+
+### Normalized histograms
+
+When the number of observations in the histograms is very different, which is somewhat the 
+case when comparing non-spam to spam, it can become more difficult to interpret. 
+For example, we cannot easily read off the relative probabilities of the histogram bins. 
+So accomplish that, we need to normalize the bin heights.
+This can be accomplished by setting the `y` aesthetic to `after_stat(density)`. 
+
+```{r ex2-density, exercise = TRUE}
+# Create plot for spam and exclaim_mess with normalized density histograms 
+
+```
+
+TODO: 
+```{r mc2-density}
+question(
+  "Which interpretation of these normalized faceted histograms is NOT correct?
+",
+  answer("The most common value of `exclaim_mess` in both classes of email is zero."),
   answer("There are more cases of spam in this dataset than not spam.", correct = TRUE, message = "Well done!"),
   answer("Even after a transformation, the distribution of `exclaim_mess` in both classes of email is right-skewed."),
   answer("The typical number of exclamations in the not spam group appears to be slightly higher than in the spam group."),
@@ -318,18 +347,18 @@ The box plots show the association between whether or not an email is spam and t
 
 When you looked at the distribution of spam and the number of exclamation marks used, you found that both distributions are heavily right skewed: there only a few instances of many exclamation marks being using and many many more of 0 or 1 being used. It also bucks the expectation that spam messages will be filled with emphatic exclamation marks to entice you to click on their links. If anything, here it's actually not spam that typically has more exclamation marks.
 
-The dominant feature of the exclaim mess variable, though, is the large proportion of cases that report zero or on this log scale, -4.6 exclamation marks. This is a common occurrence in data analysis that is often termed "zero-inflation", and there are several common ways to think about those zeros.
+The dominant feature of the exclaim mess variable, though, is the large proportion of cases that report zero  exclamation marks. This is a common occurrence in data analysis that is often termed "zero-inflation", and there are several common ways to think about those zeros.
 
 ```{r}
 p1 <- email |> 
-  mutate(log_num_char = log(num_char)) |> 
+  mutate(log_num_char = log10(num_char)) |> 
   ggplot(aes(y = spam , x = log_num_char)) +
   geom_boxplot()
 
 p2 <- email |> 
-  mutate(log_exclaim_mess = log(exclaim_mess+0.01)) |> 
+  mutate(log_exclaim_mess = log10(1 + exclaim_mess)) |> 
   ggplot(aes(x = log_exclaim_mess)) +
-  geom_histogram(binwidth = 0.5)+
+  geom_histogram(binwidth = 0.5) +
   facet_wrap(~spam)
 
 p1 / p2
@@ -341,12 +370,12 @@ One approach says that there are two mechanisms going on: one generating the zer
 
 ```{r 9, fig.asp = 0.5, warning=FALSE}
 email2 <- email |>
-  mutate(zero = exclaim_mess == 1, log_exclaim_mess = log(exclaim_mess))
+  mutate(zero = exclaim_mess == 1, log_exclaim_mess = log10(exclaim_mess))
 
 email2 |> 
   ggplot(aes(x = log_exclaim_mess, fill = zero)) +
-  geom_histogram(binwidth = 0.5)+
-  facet_wrap(~spam)+
+  geom_histogram(binwidth = 0.5) +
+  facet_wrap(~spam) +
   theme(legend.position = "none") 
 ```
 
@@ -530,7 +559,8 @@ The code makes it clear that you are using `num_char` to measure the length of a
 
 This chain concluded with summary statistics, but others might end in a plot; it all depends on the question that you're trying to answer.
 
-Build a chain to answer each of the following questions, both about the variable `dollar`. 
+Build a chain to answer each of the following questions, both about the variable `dollar`:
+
 - For emails containing the word "dollar", does the typical spam email contain a greater number of occurrences of the word than the typical non-spam email? Create a summary statistic that answers this question.
 - If you encounter an email with greater than 10 occurrences of the word "dollar", is it more likely to be spam or not spam? Create a bar plot that answers this question.
 
@@ -838,29 +868,6 @@ comics |>
     median = median(appearances)
   )
 ```
-
-
-
-## Congratulations!
-
-You have successfully completed Lesson 4 in Tutorial 2: Summarizing and visualizing data.
-If you need to generate a hash for submission, click "Next Topic".
-
-What's next?
-
-`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
-
-`r emo::ji("spiral_notepad")` [Tutorial 2: Exploratory data analysis](https://openintrostat.github.io/ims-tutorials/02-explore/)
-
-`r emo::ji("one")` [Tutorial 2 - Lesson 1: Visualizing categorical data](https://openintro.shinyapps.io/ims-02-explore-01/)
-
-`r emo::ji("two")` [Tutorial 2 - Lesson 2: Visualizing numerical data](https://openintro.shinyapps.io/ims-02-explore-02/)
-
-`r emo::ji("three")` [Tutorial 2 - Lesson 3: Summarizing with statistics](https://openintro.shinyapps.io/ims-02-explore-03/)
-
-`r emo::ji("four")` [Tutorial 2 - Lesson 4: Case study](https://openintro.shinyapps.io/ims-02-explore-04/)
-
-`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
 
 ## Submit
