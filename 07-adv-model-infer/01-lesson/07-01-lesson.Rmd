@@ -1,0 +1,305 @@
+---
+title: "Advanced Inference: 1 - Interactions"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+#devtools::install_github("rundel/learnrhash")
+#devtools::install_git("git@github.com:rundel/learnrhash.git")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+library(ggplot2)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+## Welcome
+
+In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables interact with each other and the outcome of interest.
+
+As a simple example, suppose we want to predict how much food cats will eat in a week. We have a sample of 16 pet cats, and have recorded their ages, weights, and body lengths, as well as how many grams of food they eat. Many of these variables are inter-correlated: kittens eat less than adult cats, and they are also smaller by weight and length. Similarly, many larger cats by length also weigh more (and eat more) than their shorter peers. In a situation like this, it's difficult to tease apart the relationships between the covariates and the outcome. We will learn how to address this below. 
+
+
+### Example: demographic data
+
+An academic advisor wants to study the career outcomes of former students under her mentorship. She collects the following data on 16 recent graduates: 
+
+- `income` - annual income, in tens of thousands of USD
+- `experience` - years of work experience
+- `gender` - factor indicating gender 
+
+Here's what a scatterplot of the data looks like:
+
+```{r, echo=FALSE}
+inc <- c(43, 48, 52, 70, 61, 83, 96, 100,
+         36, 40, 39, 44, 46, 49, 50, 53) 
+exp <- c(1, 2, 4, 6, 5, 3, 8, 10,
+         1, 3, 2, 5, 8, 6, 7, 10)
+gen <- c("male", "male", "male", "male", "male", "male", "male", "male",
+         "female", "female", "female", "female", "female", "female", "female", 
+         "female")
+
+data <- data.frame(inc, exp, gen)
+colnames(data) <- c("income", "experience", "gender")
+
+ggplot(data=data, aes(y=income, x=experience, col=gender)) +
+  geom_point()
+```
+
+
+### Modeling the demographic data
+
+Let's fit a linear model to these data, using all the covariates we have. 
+
+```{r, include=TRUE}
+m1 <- lm(data=data, income ~ .)
+summary(m1)
+```
+
+
+### Adding interactions to our model
+
+In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. 
+
+```{r, include=TRUE}
+m2 <- lm(data=data, income ~ experience + gender + experience:gender)
+summary(m2)
+```
+
+
+### Assessing model fit
+
+```{r, echo=FALSE}
+ggplot(data=data, aes(x=experience, y=income)) +
+  geom_point(aes(col=gender)) +
+  geom_smooth(method='lm', se=FALSE) +
+  ggtitle('Linear model without interaction term')
+  
+tab <- matrix(c(0.733, 0.692, 11.1, 0.833, 0.791, 9.1), ncol=3, byrow=TRUE)
+colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
+rownames(tab) <- c('m1', 'm2')
+tab <- as.table(tab)
+print(tab)
+```
+
+We can see that the model that includes an interaction term performs better by the measures of goodness of fit that we know: the $R^2$ and adjusted $R^2$ are higher, and the SE's are lower. 
+
+
+## Your turn!
+
+### Data exploration
+
+Now we'll turn to a more interesting problem that does not have a categorical variable, but where our model can still benefit from including interactions. In this analysis, we are interested in determining what factors influence ice cream consumption from an ice cream truck with a route that travels across different neighborhoods. The variables are:
+
+- `cons` - ice cream consumption
+- `temp` - outdoor temperature
+- `income` - average neighborhood income
+- `price` - ice cream price
+
+To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the varables. 
+
+```{r ex1, exercise = TRUE}
+# Load data
+icecream <- _______("data/icecream.csv")
+
+# View some of the variables
+head(icecream)
+
+# Plot ice cream consumption vs outside temperature
+ggplot(data=icecream, aes(y=_______, x=_______)) +
+  geom_point()
+
+# Plot ice cream consumption vs ice cream price, colored by outside temperature
+ggplot(data=icecream, aes(y=_______, x=_______, col=temp)) +
+  geom_point()
+
+# Plot ice cream consumption vs consumer income, colored by price
+ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
+  geom_point()
+```
+
+```{r ex1-hint-1}
+# Try the following command for loading the csv file:
+read.csv("data/icecream.csv")
+```
+
+```{r ex1-solution}
+# Solution
+icecream <- read.csv("data/icecream.csv")
+
+ggplot(data=icecream, aes(y=cons, x=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
+  geom_point()
+
+ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
+  geom_point()
+```
+
+```{r mc1}
+question("What is the relationship between ice cream consumption and temperature?",
+         answer("Positive and somewhat linear", correct=TRUE),
+         answer("Positive and strongly linear"),
+         answer("Negative and non-linear"),
+         answer("There is no correlation"))
+```
+
+### Modeling icecream consumption
+
+We can see that ice cream consumption and temperature have a positive and somewhat linear relationship; that is, when temperature increases, we observe that consumption is also likely to increase. But, we have two other variables in the dataset: price and income. Could these two variables be inter-related?
+
+First, let's write a model for the data: if $y$ is consumption, then with the variables we explored above the model can be expressed as
+
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + residuals$
+
+Now, fit this model below:
+
+```{r ex2, exercise = TRUE}
+m1 <- ____
+
+summary(m1)
+```
+
+```{r ex2-solution}
+# Add the independent variables (covariates) after the ~ and separated by +
+m1 <- lm(data=icecream, cons ~ temp + price + income)
+
+summary(m1)
+```
+
+
+### Interactions between non-categorical variables
+
+Now add the interaction term corresponding to the written model below: 
+
+$y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + \beta_{\rm price:income}x_{\rm price}x_{\rm income} + residuals$
+
+Note that all of these are continuous variables, not categorical. 
+
+```{r ex3, exercise = TRUE}
+m2 <- ____
+
+summary(m2)
+```
+
+```{r ex3-solution}
+# Add the independent variables (covariates) after the ~ and separated by +
+m2 <- lm(data=icecream, cons ~ temp + price + income + price:income)
+
+summary(m2)
+```
+
+
+### Assessing model fit
+
+```{r, echo=FALSE}
+tab <- matrix(c(0.719, 0.687, 0.037, 0.759, 0.721, 0.035), ncol=3, byrow=TRUE)
+colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
+rownames(tab) <- c('m1', 'm2')
+tab <- as.table(tab)
+print(tab)
+```
+
+```{r mc2}
+question("Given the measures of model fit above, which model do you think fits the icecream consumption data better?",
+         answer("m1, linear model with no interactions"),
+         answer("m2, linear model with interaction between price and income", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

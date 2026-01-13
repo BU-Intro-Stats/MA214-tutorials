@@ -1,0 +1,45 @@
+---
+title: "Advanced Inferential Modeling"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<img style="float: right; margin: 0px 0px 20px 20px" src="../logo/openintro-hex.png" alt="Tutorial illustration" width="250" height="300">
+
+## Tutorial description
+
+***TODO: write***
+
+## Learning objectives
+
+***TODO: write***
+
+## Lessons
+
+### 1 - [Interactions](https://openintro.shinyapps.io/ims-07-adv-model-infer-01/)
+
+***TODO: write***
+
+### 2 - [Nonlinear Regression](https://openintro.shinyapps.io/ims-07-adv-model-infer-02/)
+
+***TODO: write***
+
+### 3 - [Inference and Prediction](https://openintro.shinyapps.io/ims-07-adv-model-infer-03/)
+
+***TODO: write***
+
+### 4 - [Cross-Validation](https://openintro.shinyapps.io/ims-07-adv-model-infer-04/)
+
+***TODO: write***
+
+### 5 - [Case Study: Logistic Regression for Low Birthweights in Nepal](https://openintro.shinyapps.io/ims-07-adv-model-infer-05/)
+
+***TODO: write***
+
+
+## Instructor
+
+***TODO: write***
