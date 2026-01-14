@@ -182,9 +182,9 @@ Take a peek at the `email50` dataset using the `glimpse()` function.
 
 ```
 
-```{r glimpse-email50-solution}
+<!-- ```{r glimpse-email50-solution}
 glimpse(email50)
-```
+``` -->
 
 ## Types of variables
 
@@ -297,9 +297,9 @@ dataset) in the code box and running it.
 glimpse(___)
 ```
 
-```{r glimpse-data-solution}
+<!-- ```{r glimpse-data-solution}
 glimpse(email50)
-```
+``` -->
 
 ## Categorical data in R: factors
 
@@ -441,14 +441,14 @@ email50_big <- email50 |>
   filter(number == "big")
 ```
 
-```{r email50-filter-number-big-solution}
+<!-- ```{r email50-filter-number-big-solution}
 # Subset of emails with big numbers: email50_big
 email50_big <- email50 |>
   filter(number == "big")
 
 # Glimpse the subset
 glimpse(email50_big)
-```
+``` -->
 
 ## Discretize variables
 
@@ -568,7 +568,7 @@ email50_updated |>
 ```
 
 
-```{r hsb2-mutate-num-char-cat-solution}
+<!-- ```{r hsb2-mutate-num-char-cat-solution}
 # Calculate median number of characters: med_num_char
 med_num_char <- median(email50$num_char)
 
@@ -582,7 +582,7 @@ email50_updated <- email50 |>
 # Count emails in each category
 email50_updated |>
   count(num_char_cat)
-```
+``` -->
 
 
 ### Combining levels of a different factor
@@ -640,7 +640,7 @@ number_cat = if_else(number == "none",
 
 ```
 
-```{r email50-fortified-solution}
+<!-- ```{r email50-fortified-solution}
 # Create number_cat column in email50
 email50_updated <- email50 |>
   mutate(number_cat = if_else(number == "none",
@@ -653,7 +653,7 @@ email50_updated <- email50 |>
 # Visualize the distribution of number_cat
 ggplot(email50_updated, aes(x = number_cat)) +
   geom_bar()
-```
+``` -->
 
 ## Visualizing numerical data
 
@@ -759,10 +759,10 @@ ggplot(email50, aes(x = num_char, y = exclaim_mess, color = spam)) +
   {GEOM}
 ```
 
-```{r email50-plot-solution}
+<!-- ```{r email50-plot-solution}
 ggplot(email50, aes(x = num_char, y = exclaim_mess, color = spam)) +
   geom_point()
-```
+``` -->
 
 *Based on the plot, does there appear to be a relationship between these variables?* 
 

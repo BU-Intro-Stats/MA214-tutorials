@@ -293,7 +293,7 @@ states_srs |>
   ___(___)
 ```
 
-```{r simple-random-sample-solution}
+<!-- ```{r simple-random-sample-solution}
 # Simple random sample
 states_srs <- us_regions |>
   slice_sample(n = 8)
@@ -301,7 +301,7 @@ states_srs <- us_regions |>
 # Count states by region
 states_srs |>
   count(region)
-```
+``` -->
 
 ### Exercise: Stratified sample in R
 
@@ -330,7 +330,7 @@ ___ |>
   ___
 ```
 
-```{r stratified-sample4-solution}
+<!-- ```{r stratified-sample4-solution}
 # Stratified sample
 states_str <- us_regions |>
   group_by(region) |>
@@ -339,7 +339,7 @@ states_str <- us_regions |>
 # Count states by region
 states_str |>
   count(region)
-```
+``` -->
 
 ### Exercise: Compare SRS vs. stratified sample
 

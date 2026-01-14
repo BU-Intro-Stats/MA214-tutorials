@@ -269,11 +269,11 @@ ___ |>
   count(___, ___)
 ```
 
-```{r count-male-solution}
+<!-- ```{r count-male-solution}
 # Count number of male and female applicants admitted
 ucb_admit |>
   count(Gender, Admit)
-```
+``` -->
 
 ### Proportion of males admitted overall
 
@@ -339,7 +339,7 @@ ucb_admission_counts |>
   filter(Admit == "Admitted")
 ```
 
-```{r gender-male-solution}
+<!-- ```{r gender-male-solution}
 ucb_admission_counts |>
   # Group by gender
   group_by(Gender) |>
@@ -347,7 +347,7 @@ ucb_admission_counts |>
   mutate(prop = n / sum(n)) |>
   # Filter for admitted
   filter(Admit == "Admitted")
-```
+``` -->
 
 ### Proportion of males admitted for each department
 
@@ -372,14 +372,14 @@ ucb_admission_counts <- ucb_admit |>
 ucb_admission_counts
 ```
 
-```{r gender-male2-solution}
+<!-- ```{r gender-male2-solution}
 ucb_admission_counts <- ucb_admit |>
   # Counts by department, then gender, then admission status
   count(Dept, Gender, Admit)
 
 # See the result
 ucb_admission_counts
-```
+``` -->
 
 Next, create a table with the proportions of male students admitted across departments, using the following steps: 
 
@@ -437,7 +437,7 @@ Next, create a table with the proportions of male students admitted across depar
   filter(Gender == "Male", Admit == "Admitted")
 ```
 
-```{r gender-male3-solution}
+<!-- ```{r gender-male3-solution}
 ucb_admission_counts  |>
   # Group by department, then gender
   group_by(Dept, Gender) |>
@@ -445,7 +445,7 @@ ucb_admission_counts  |>
   mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   filter(Gender == "Male", Admit == "Admitted")
-```
+``` -->
 
 ### Admission rates for males across departments
 
