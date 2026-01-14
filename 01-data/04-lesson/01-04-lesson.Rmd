@@ -134,13 +134,13 @@ evals <- evals |>
 # Inspect evals
 ```
 
-```{r inspect-data-solution}
+<!-- ```{r inspect-data-solution}
 # Inspect evals
 glimpse(evals)
 
 # Alternative solution
 dim(evals)
-```
+``` -->
 
 ### Identify type of study
 
@@ -215,7 +215,7 @@ cat_vars <- c("score", "rank", "ethnicity", "gender", "language", "age",
               "bty_avg", "pic_outfit", "pic_color")
 ```
 
-```{r inspect-variable-types-solution}
+<!-- ```{r inspect-variable-types-solution}
 # Inspect variable types
 glimpse(evals)
 
@@ -223,7 +223,7 @@ glimpse(evals)
 cat_vars <- c("rank", "ethnicity", "gender", "language",
               "cls_level", "cls_profs", "cls_credits",
               "pic_outfit", "pic_color")
-```
+``` -->
 
 ### Recode a variable
 
@@ -249,7 +249,7 @@ evals <- evals |>
   )
 ```
 
-```{r type-of-variable-solution}
+<!-- ```{r type-of-variable-solution}
 # Recode cls_students as cls_type
 evals <- evals |>
   mutate(
@@ -259,7 +259,7 @@ evals <- evals |>
       cls_students >= 60                      ~ "large"
     )
   )
-```
+``` -->
 
 ### Create a scatterplot
 
@@ -275,11 +275,11 @@ ___(evals, ___) +
   ___
 ```
 
-```{r create-scatterplot-solution}
+<!-- ```{r create-scatterplot-solution}
 # Scatterplot of score vs. bty_avg
 ggplot(evals, aes(x = bty_avg, y = score)) +
   geom_point()
-```
+``` -->
 
 ### Create a scatterplot, with an added layer
 
@@ -295,11 +295,11 @@ ___(evals, ___) +
   ___
 ```
 
-```{r scatterplot-added-layer-solution}
+<!-- ```{r scatterplot-added-layer-solution}
 # Scatterplot of score vs. bty_avg colored by cls_type
 ggplot(evals, aes(x = bty_avg, y = score, color = cls_type)) +
   geom_point()
-```
+``` -->
 
 
 
