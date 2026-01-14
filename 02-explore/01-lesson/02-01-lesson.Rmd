@@ -301,7 +301,7 @@ comics |>
 
 ```
 
-```{r ex1-solution}
+<!-- ```{r ex1-solution}
 # Print the first rows of the data
 glimpse(comics)
 
@@ -317,7 +317,7 @@ comics |>
 comics |>
   count(align, gender) |> 
   pivot_wider(names_from = align, values_from = n)
-```
+``` -->
 
 ### Dropping levels
 
@@ -360,7 +360,7 @@ comics_filtered <- ___ |>
 
 ```
 
-```{r ex2-solution}
+<!-- ```{r ex2-solution}
 # Print tab
 tab
 
@@ -373,7 +373,7 @@ comics_filtered <- comics |>
 comics_filtered |>
   distinct(align)
 
-```
+``` -->
 
 ```{r hsb2-mutate-num-char-cat-hint}
 "Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!"
@@ -437,7 +437,7 @@ ggplot(___, aes(x = ___, fill = ___)) +
   geom_bar(position = ___)
 ```
 
-```{r ex3-solution}
+<!-- ```{r ex3-solution}
 # Load ggplot2
 library(ggplot2)
 
@@ -449,7 +449,7 @@ ggplot(comics, aes(x = align, fill = gender)) +
 ggplot(comics, aes(x = gender, fill = align)) + 
   geom_bar(position = "dodge")
 
-```
+``` -->
 
 In many visualizations you make, you may be interested in changing the axis labels on the plot. Here, the axis labels of "gender" and "align" could use some spicing up, to be more descriptive. To change the labels of a `ggplot()`, you add (`+`) a `labs()` layer to the plot, where you can specify the `x`, `y`, and `fill` labels, as well as the plot's `title`. 
  
@@ -723,7 +723,7 @@ ggplot(comics, aes(x = ___, fill = ___)) +
 
 ```
 
-```{r ex4-solution}
+<!-- ```{r ex4-solution}
 # Plot of gender by align
 ggplot(comics, aes(x = align, fill = gender)) +
   geom_bar()
@@ -732,7 +732,7 @@ ggplot(comics, aes(x = align, fill = gender)) +
 ggplot(comics, aes(x = align, fill = gender)) + 
   geom_bar(position = "fill") +
   labs(y = "proportion")
-```
+``` -->
 
 
 ## Distribution of one variable
@@ -932,7 +932,7 @@ ggplot(___, aes(x = ___)) +
 ```
 
 
-```{r ex5-solution}
+<!-- ```{r ex5-solution}
 # Change the order of the levels in align
 comics_updated <- comics |> 
   mutate(align = factor(align, 
@@ -943,7 +943,7 @@ comics_updated <- comics |>
 # Create plot of align
 ggplot(comics_updated, aes(x = align)) + 
   geom_bar()
-```
+``` -->
 
 
 ### Conditional barchart
@@ -975,13 +975,13 @@ ggplot(comics_updated, aes(x = ___)) +
 # Specify align as the x aesthetic, then facet by gender within facet_wrap().
 ```
 
-```{r ex6-solution}
+<!-- ```{r ex6-solution}
 # Specify align as the x aesthetic, then facet by gender within facet_wrap().
 
 ggplot(comics_updated, aes(x = align)) + 
   geom_bar() +
   facet_wrap(~ gender)
-```
+``` -->
 
 
 ### Improving on the piechart
@@ -1031,12 +1031,12 @@ ggplot(___, aes(y = ___)) +
   geom_bar(fill = ___) 
 ```
 
-```{r ex7-solution}
+<!-- ```{r ex7-solution}
 # Create barchart of flavor
 # Using plot flavor on y-axis so label text fits
 ggplot(pies_updated, aes(y = flavor)) + 
   geom_bar(fill = "chartreuse") 
-```
+``` -->
 
 
 ## Submit

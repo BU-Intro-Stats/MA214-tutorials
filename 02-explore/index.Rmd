@@ -77,12 +77,3 @@ Apply what you've learned to explore and summarize a real world dataset in this 
 * Unwin, Anthony. *Graphical Data Analysis with R*.
 * Velleman, Paul and Hoaglin, David. *Exploratory Data Analysis*.
 
-## Instructor
-
-<img style="float: left; margin: 0px 20px 20px 0px" src="../instructor-photos/andrew.png" alt="Andrew Bray" width="150" height="150">
-
-### Andrew Bray
-
-#### Reed College
-
-Andrew Bray is an Assistant Professor of Statistics at Reed College and lover of all things statistics and R.

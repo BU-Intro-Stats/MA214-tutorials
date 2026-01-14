@@ -558,46 +558,6 @@ question("Which of the following interpretations is invalid?
 )
 ```
 
-## Congratulations!
-
-You have successfully completed Lesson 10 in Tutorial 3: Regression modeling.  
-If you need to generate a hash for submission, click "Next Topic".
-
-We hope that you've found this tutorial to be illuminating and useful. 
-
-You learned about a variety of multiple regression models by focusing on the interplay between the mathematical, geometric, and syntactical representations of these models. You extended many of those same ideas to logistic regression, which covers the case in which we have a binary response variable. 
-
-We discussed this material as a branch of descriptive statistics. That is, we focused on how the models work, how we should interpret them, and how they can be used, but we didn't talk at all about inference. Statisticians have developed many techniques for performing inference on the parameters of these regression models. Those techniques help us answer questions about whether the effects we observe are within the realm of statistical noise, or not. Without inference, we can only state how big the effect we observed was---we can't make any claims about whether that effect was likely the result of chance alone, or whether it represents a meaningful characterization of the underlying phenomenon. 
-
-To complete your understanding, you should learn about inferential techniques for regression in the tutorial on Inference for Regression. 
-
-What's next?
-
-`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
-
-`r emo::ji("spiral_notepad")` [Tutorial 3: Regression modeling](https://openintrostat.github.io/ims-tutorials/03-model/)
-
-`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-model-01/)
-
-`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-model-02/)
-
-`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-model-03/)
-
-`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-model-04/)
-
-`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-model-05/)
-
-`r emo::ji("six")` [Tutorial 3 - Lesson 6: Parallel slopes](https://openintro.shinyapps.io/ims-03-model-06/)
-
-`r emo::ji("seven")` [Tutorial 3 - Lesson 7: Evaluating and extending parallel slopes model](https://openintro.shinyapps.io/ims-03-model-07/)
-
-`r emo::ji("eight")` [Tutorial 3 - Lesson 8: Multiple regression](https://openintro.shinyapps.io/ims-03-model-08/)
-
-`r emo::ji("nine")` [Tutorial 3 - Lesson 9: Logistic regression](https://openintro.shinyapps.io/ims-03-model-09/)
-
-`r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
-
-`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
 ## Submit
 

@@ -41,17 +41,3 @@ Working through another complete hypothesis test (using the **infer** package), 
 
 Additionally, using the **infer** package, you will learn to create confidence intervals for a single population proportion.  A confidence interval will provide a range of plausible values to estimate the unknown population value.  The parameter is the true unknown proportion of successes in the population, estimated using the sample proportion.  Bootstrapping allows for estimation of the variability of the sample proportion which leads to an interval estimate.
 
-## Instructor
-
-<img style="float: left; margin: 0px 20px 20px 0px" src="../instructor-photos/jo.png" alt="Jo Hardin" width="150" height="150">
-
-### Jo Hardin
-
-#### Pomona College
-
-Jo Hardin is Professor of Mathematics and Statistics at Pomona College.
-She collaborates with molecular biologists to create novel statistical methods for analyzing high throughput data.
-She has also worked extensively in statistics and data science education, facilitating modern curricula for higher education instructors.
-She was a co-author on the [2014 ASA Curriculum Guidelines for Undergraduate Programs in Statistical Science](https://www.amstat.org/asa/education/Curriculum-Guidelines-for-Undergraduate-Programs-in-Statistical-Science.aspx), and she writes on the blog [teachdatascience.com](https://teachdatascience.com/).
-The best part of her job is collaborating with undergraduate students.
-In her spare time, she loves reading, running, and breeding tortoises.
