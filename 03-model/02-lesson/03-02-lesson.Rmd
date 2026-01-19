@@ -901,19 +901,6 @@ noise_summary |>
 <!--   filter(abs(spurious_cor) > 0.2) -->
 <!-- ``` -->
 
-###
-
-```{r mc6}
-question("What is the strongest correlation value?",
-  answer("(1) is invalid.", message = "(1) is valid"),
-  answer("(2) is invalid.", correct = TRUE, message ="Right! Correlation coefficients are always between -1 and 1." ),
-  answer("(3) is invalid.", message = "(3) is perfectly valid!"),
-  answer("Both (1) and (2) are invalid.", message = "Wrong!"),
-  answer("Both (2) and (3) are invalid.", message = "Incorrect!"),
-  allow_retry = TRUE
-)
-```
-
 ## Submit
 
 ```{r, echo=FALSE, context="server"}
