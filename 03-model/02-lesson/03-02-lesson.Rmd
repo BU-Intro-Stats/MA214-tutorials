@@ -290,30 +290,30 @@ ncbirths |>
             r = cor(___, ___, use = ___))
 ```
 
-```{r ex1-hint-1}
-ncbirths |>
-  summarize(N = n(), 
-            r = cor(weight, mage))
-```
+<!-- ```{r ex1-hint-1} -->
+<!-- ncbirths |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(weight, mage)) -->
+<!-- ``` -->
 
-```{r ex1-hint-2}
-ncbirths |>
-  summarize(N = n(), 
-            r = cor(___, ___, use = "pairwise.complete.obs"))
-```
+<!-- ```{r ex1-hint-2} -->
+<!-- ncbirths |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(___, ___, use = "pairwise.complete.obs")) -->
+<!-- ``` -->
 
-```{r ex1-solution}
-# Compute correlation
-ncbirths |>
-  summarize(N = n(), 
-            r = cor(weight, mage))
+<!-- ```{r ex1-solution} -->
+<!-- # Compute correlation -->
+<!-- ncbirths |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(weight, mage)) -->
 
-# Compute correlation for all non-missing pairs
-ncbirths |>
-  summarize(N = n(), 
-            r = cor(weight, weeks, use = "pairwise.complete.obs"))
+<!-- # Compute correlation for all non-missing pairs -->
+<!-- ncbirths |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(weight, weeks, use = "pairwise.complete.obs")) -->
 
-```
+<!-- ``` -->
 
 ## The Anscombe dataset
 
@@ -421,29 +421,29 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
   )
 ```
 
-```{r ex2-hint-3}
- anscombe |>
-  group_by(set) |>
-  summarize(
-    N = n(), 
-    mean_of_x = mean(x), 
-    ...
-  )
-```
+<!-- ```{r ex2-hint-3} -->
+<!--  anscombe |> -->
+<!--   group_by(set) |> -->
+<!--   summarize( -->
+<!--     N = n(),  -->
+<!--     mean_of_x = mean(x),  -->
+<!--     ... -->
+<!--   ) -->
+<!-- ``` -->
 
-```{r ex2-solution}
-# Compute properties of anscombe
-anscombe |>
-  group_by(set) |>
-  summarize(
-    N = n(), 
-    mean_of_x = mean(x), 
-    std_dev_of_x = sd(x), 
-    mean_of_y = mean(y), 
-    std_dev_of_y = sd(y), 
-    correlation_between_x_and_y = cor(x, y)
-  )
-```
+<!-- ```{r ex2-solution} -->
+<!-- # Compute properties of anscombe -->
+<!-- anscombe |> -->
+<!--   group_by(set) |> -->
+<!--   summarize( -->
+<!--     N = n(),  -->
+<!--     mean_of_x = mean(x),  -->
+<!--     std_dev_of_x = sd(x),  -->
+<!--     mean_of_y = mean(y),  -->
+<!--     std_dev_of_y = sd(y),  -->
+<!--     correlation_between_x_and_y = cor(x, y) -->
+<!--   ) -->
+<!-- ``` -->
 
 ## Perception of correlation
 
@@ -491,15 +491,15 @@ mlbbat10 |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3b-hint-2}
-mlbbat10 |>
-  summarize(N = n(), r = cor(___, ___))
-```
+<!-- ```{r ex3b-hint-2} -->
+<!-- mlbbat10 |> -->
+<!--   summarize(N = n(), r = cor(___, ___)) -->
+<!-- ``` -->
 
-```{r ex3b-solution}
-mlbbat10 |>
-  summarize(N = n(), r = cor(obp, slg))
-```
+<!-- ```{r ex3b-solution} -->
+<!-- mlbbat10 |> -->
+<!--   summarize(N = n(), r = cor(obp, slg)) -->
+<!-- ``` -->
 
 ### 
 
@@ -520,29 +520,29 @@ ___ |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4b-hint-1}
-mlbbat10 |>
-  filter(___) |>
-  summarize(N = ___, r = cor(___, ___))
-```
+<!-- ```{r ex4b-hint-1} -->
+<!-- mlbbat10 |> -->
+<!--   filter(___) |> -->
+<!--   summarize(N = ___, r = cor(___, ___)) -->
+<!-- ``` -->
 
-```{r ex4b-hint-2}
-mlbbat10 |>
-  filter(at_bat >= 200) |>
-  summarize(N = n(), r = cor(, ___))
-```
+<!-- ```{r ex4b-hint-2} -->
+<!-- mlbbat10 |> -->
+<!--   filter(at_bat >= 200) |> -->
+<!--   summarize(N = n(), r = cor(, ___)) -->
+<!-- ``` -->
 
-```{r ex4b-hint-3}
-mlbbat10 |>
-  filter(at_bat >= 200) |>
-  summarize(N = n(), r = cor(obp, ___))
-```
+<!-- ```{r ex4b-hint-3} -->
+<!-- mlbbat10 |> -->
+<!--   filter(at_bat >= 200) |> -->
+<!--   summarize(N = n(), r = cor(obp, ___)) -->
+<!-- ``` -->
 
-```{r ex4b-solution}
-mlbbat10 |>
-  filter(at_bat >= 200) |>
-  summarize(N = n(), r = cor(obp, slg))
-```
+<!-- ```{r ex4b-solution} -->
+<!-- mlbbat10 |> -->
+<!--   filter(at_bat >= 200) |> -->
+<!--   summarize(N = n(), r = cor(obp, slg)) -->
+<!-- ``` -->
 
 ### 
 
@@ -574,19 +574,19 @@ bdims |>
             r = cor(___, ___))
 ```
 
-```{r ex5-hint-3}
-bdims |>
-  group_by(sex) |>
-  summarize(N = n(), 
-            r = cor(___, ___))
-```
+<!-- ```{r ex5-hint-3} -->
+<!-- bdims |> -->
+<!--   group_by(sex) |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(___, ___)) -->
+<!-- ``` -->
 
-```{r ex5-solution}
-bdims |>
-  group_by(sex) |>
-  summarize(N = n(), 
-            r = cor(hgt, wgt))
-```
+<!-- ```{r ex5-solution} -->
+<!-- bdims |> -->
+<!--   group_by(sex) |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(hgt, wgt)) -->
+<!-- ``` -->
 
 ### 
 
@@ -620,19 +620,19 @@ mammals |>
             r_log = cor(log(___), log(___)))
 ```
 
-```{r ex6-hint-3}
-mammals |>
-  summarize(N = n(), 
-            r = cor(body_wt, brain_wt), 
-            r_log = cor(log(___), log(___)))
-```
+<!-- ```{r ex6-hint-3} -->
+<!-- mammals |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(body_wt, brain_wt),  -->
+<!--             r_log = cor(log(___), log(___))) -->
+<!-- ``` -->
 
-```{r ex6-solution}
-mammals |>
-  summarize(N = n(), 
-            r = cor(body_wt, brain_wt), 
-            r_log = cor(log(body_wt), log(brain_wt)))
-```
+<!-- ```{r ex6-solution} -->
+<!-- mammals |> -->
+<!--   summarize(N = n(),  -->
+<!--             r = cor(body_wt, brain_wt),  -->
+<!--             r_log = cor(log(body_wt), log(brain_wt))) -->
+<!-- ``` -->
 
 ## Interpretation of Correlation
 
@@ -844,11 +844,11 @@ ggplot(data = noise, aes(x = x, y = y)) +
   ___
 ```
 
-```{r ex7-solution, fig.height=5, fig.width=7}
-ggplot(data = noise, aes(x = x, y = y)) +
-  geom_point() + 
-  facet_wrap(~z)
-```
+<!-- ```{r ex7-solution, fig.height=5, fig.width=7} -->
+<!-- ggplot(data = noise, aes(x = x, y = y)) + -->
+<!--   geom_point() +  -->
+<!--   facet_wrap(~z) -->
+<!-- ``` -->
 
 2. Compute the correlation between each set of `x` and `y`.  
 
@@ -869,12 +869,12 @@ noise_summary <- noise |>
             spurious_cor = cor(___, ___))
 ```
 
-```{r ex8-hint-2}
-noise_summary <- noise |>
-  group_by(z) |>
-  summarize(N = n(), 
-            spurious_cor = cor(x, y))
-```
+<!-- ```{r ex8-solution} -->
+<!-- noise_summary <- noise |> -->
+<!--   group_by(z) |> -->
+<!--   summarize(N = n(),  -->
+<!--             spurious_cor = cor(x, y)) -->
+<!-- ``` -->
 
 3. Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
 
