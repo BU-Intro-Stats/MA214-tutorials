@@ -11,7 +11,6 @@ runtime: shiny_prerendered
 library(learnr)
 library(tidyverse)
 library(openintro)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -348,7 +347,7 @@ anscombe |>
   geom_point()
 ```
 
-In the third data set, we have an outlier. Here again, our eyes tell us that with the exception of the outlier, the correlation between $x$ and $y$ is perfect, and in this case, it is linear. However, the presence of the outlier has lowered the value of the correlation coefficient, and (as you will learn later) the slope of the regression line. 
+In the third data set, we have an outlier. Here again, our eyes tell us that with the exception of the outlier, the correlation between $x$ and $y$ is perfect, and in this case, it is linear. However, the presence of the outlier has lowered the value of the correlation coefficient, and (as you will learn later) increased the slope of the regression line. 
 
 
 ```{r ans4}
@@ -777,31 +776,32 @@ question("Which of the following conclusions **is not** a valid statistical inte
 
 Above all else, we must always remember that correlation does not imply causation. That is, just because two variables appear to move together does not mean that changes in one are causing changes in the other. There are many potential confounders that can cloud our ability to determine cause-and-effect. 
 
-Remarkable--but nonsensical--correlations are called "spurious." In fact, there is an <a href="https://tylervigen.com/" target="_blank">entire blog</a> devoted to them. Here is how the number of films Nicolas Cage has appeared in correlates with the number of people who drowned by falling into a pool.
+Remarkable--but nonsensical--correlations are called "spurious." In fact, there is an <a href="https://tylervigen.com/" target="_blank">entire blog</a> devoted to them. Here is how the number of films Dwayne "The Rock" Johnson has appeared in correlates with the number of Google searches for "zombies".
 
 
 ```{r img8, out.width=600}
-knitr::include_graphics("http://tylervigen.com/images/spurious-correlations-share.png")
+knitr::include_graphics("images/dwayne-johnson-correlation.png")
 ```
 
 Are these two variables related by any substantive means? Of course not.
 
 ### Spurious over time
 
-Here is another example that traces U.S. oil production to the quality of rock music. We suppose one may need to burn the midnight oil to make a truly endearing rock classic! 
+Here is another example that shows an extremely high correlation between the popularity of the name "Alix" and the number of carjackings in the US. 
+
 
 ```{r img9, out.width=500}
-knitr::include_graphics("http://strata.uga.edu/6370/lecturenotes/images/spuriousCorrelationOilMusic.jpg")
+knitr::include_graphics("images/first-name-alix-correlation.png")
 ```
 
-In each of these cases, the correlation was illustrated as two variables that seem to move together over time. In fact, time is an obvious confounder for many of these spurious correlations. Any time you see two variables linked over time, you should be skeptical of the role that time can play as a confounder. 
+In each of these cases, the correlation was illustrated as two variables that seem to move together over time. In fact, time is an obvious confounder for many of these spurious correlations. Any time you see two variables linked over time, you should be skeptical because of the role that time can play as a confounder. 
 
 ### Spurious over space
 
 This webcomic from XKCD illustrates how space can also be present in spurious correlations. Colored maps--called choropleths--can be visually arresting ways of conveying information, but they can also reveal spurious correlations. Many things occur more often in places where there are more people, so failure to control for the confounding influence of population can lead to spurious correlations. 
 
 ```{r img10, out.width=500}
-knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
+knitr::include_graphics("images/heatmap.png")
 ```
 
 ### Spurious for whatever reason
@@ -809,7 +809,8 @@ knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
 In other cases it may not be so obvious what confounding variables are driving the spurious correlation. This plot shows that as the number of lemons imported into the U.S. from Mexico has increased over time, the number of U.S. highway fatalities has decreased. The relationship appears to be strong, but there is no plausible causative mechanism that could explain the relationship. 
 
 ```{r img11, out.width=500}
-knitr::include_graphics("http://osu-wams-blogs-uploads.s3.amazonaws.com/blogs.dir/1015/files/2014/02/ci700332kn00001.gif")
+# http://osu-wams-blogs-uploads.s3.amazonaws.com/blogs.dir/1015/files/2014/02/ci700332kn00001.gif
+knitr::include_graphics("images/lemon-imports.gif")
 ```
 
 Now it's time for you to get your hands dirty with some truly spurious correlations.
@@ -890,50 +891,28 @@ noise_summary |>
   filter(abs(___) > ___)
 ```
 
-```{r ex9-hint}
-noise_summary |>
-  filter(abs(spurious_cor) > ___)
+<!-- ```{r ex9-hint} -->
+<!-- noise_summary |> -->
+<!--   filter(abs(spurious_cor) > ___) -->
+<!-- ``` -->
+
+<!-- ```{r ex9-solution} -->
+<!-- noise_summary |> -->
+<!--   filter(abs(spurious_cor) > 0.2) -->
+<!-- ``` -->
+
+###
+
+```{r mc6}
+question("What is the strongest correlation value?",
+  answer("(1) is invalid.", message = "(1) is valid"),
+  answer("(2) is invalid.", correct = TRUE, message ="Right! Correlation coefficients are always between -1 and 1." ),
+  answer("(3) is invalid.", message = "(3) is perfectly valid!"),
+  answer("Both (1) and (2) are invalid.", message = "Wrong!"),
+  answer("Both (2) and (3) are invalid.", message = "Incorrect!"),
+  allow_retry = TRUE
+)
 ```
-
-```{r ex9-solution}
-noise_summary |>
-  filter(abs(spurious_cor) > 0.2)
-```
-
-
-## Congratulations!
-
-You have successfully completed Lesson 2 in Tutorial 3: Regression modeling.  
-If you need to generate a hash for submission, click "Next Topic".
-
-What's next?
-
-`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
-
-`r emo::ji("spiral_notepad")` [Tutorial 3: Regression modeling](https://openintrostat.github.io/ims-tutorials/03-model/)
-
-`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-model-01/)
-
-`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-model-02/)
-
-`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-model-03/)
-
-`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-model-04/)
-
-`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-model-05/)
-
-`r emo::ji("six")` [Tutorial 3 - Lesson 6: Parallel slopes](https://openintro.shinyapps.io/ims-03-model-06/)
-
-`r emo::ji("seven")` [Tutorial 3 - Lesson 7: Evaluating and extending parallel slopes model](https://openintro.shinyapps.io/ims-03-model-07/)
-
-`r emo::ji("eight")` [Tutorial 3 - Lesson 8: Multiple regression](https://openintro.shinyapps.io/ims-03-model-08/)
-
-`r emo::ji("nine")` [Tutorial 3 - Lesson 9: Logistic regression](https://openintro.shinyapps.io/ims-03-model-09/)
-
-`r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
-
-`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
-
 
 ## Submit
 
