@@ -103,13 +103,13 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In this tutorial, we will learn how to extend simple linear regression to an arbitrary number of explanatory variables, which can be a mixture of numeric and categorical. We'll also learn about logistic regression, which allows us to model a binary response variable.
+In this tutorial, we will learn how to extend simple linear regression to an arbitrary number of explanatory variables, which can be a combination of numeric and categorical.
 
 ## What if we have two groups?
 
 ### Fuel efficiency by engine size
 
-OK, let's consider a situation in which simple linear regression might not be sophisticated enough to suit our needs. This scatterplot shows the relationship between highway fuel economy and engine size for 77 configurations of manual transmission cars popular from 1999 to 2008. It appears as though there is a negative relationship between engine size and fuel economy---which should make sense: bigger engines tend to go in bigger cars, which tend to be heavier, and which tend to get worse mileage. 
+Let's consider a situation in which simple linear regression might not be sophisticated enough to suit our needs. This scatterplot shows the relationship between highway fuel economy and engine size for 77 configurations of manual transmission cars popular from 1999 to 2008. It appears as though there is a negative relationship between engine size and fuel economy---which should make sense: bigger engines tend to go in bigger cars, which tend to be heavier, and which tend to get worse mileage. 
 
 We could certainly fit a linear regression line through these points, but that would only tell us part of the story.
 
@@ -150,7 +150,7 @@ ggplot(data = mpg, aes(x = displ, y = hwy, color = factor(year))) +
 Consider:
 
 $$
-hwy = \beta_0 + \beta_1 \cdot displ + \beta_2 \cdot year + \epsilon
+\mathrm{hwy} = \beta_0 + \beta_1 \cdot \mathrm{displ} + \beta_2 \cdot \mathrm{year} + \epsilon
 $$
 
 Multiple regression allows us to build such models by simply adding another variable---and another coefficient---to our model.
@@ -211,8 +211,8 @@ The `mariokart` data contains several other variables. The `total_pr`, `start_pr
 ```{r mc1, echo=FALSE}
 question("Which `formula` will result in a parallel slopes model?",
   answer("`total_pr ~ start_pr + ship_pr`", message = "Which variable is categorical?"),
-  answer("`cond ~ start_pr + stock_photo`", message = "Is the response numeric?"),
   answer("`total_pr ~ ship_pr + stock_photo`", correct = TRUE),
+  answer("`cond ~ start_pr + stock_photo`", message = "Is the response numeric?"),
   answer("`total_pr ~ cond`", message = "How many explanatory variables?"), 
   allow_retry = TRUE
 )
@@ -237,69 +237,69 @@ data_space
 
 ### Setting up the model
 
-
-- Define 
-$$newer = \begin{cases} 1 & \text{if } year = 2008 , \\\\  0 & \text{if } year = 1999 \end{cases}$$ 
-
-
-- Our model is:  
-$$ \hat{hwy} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot newer $$ 
-
-
-
-We're going to make use of a little high school algebra to inform our understanding of the geometry of our model. 
-
-First, since our categorical explanatory variable `year` has only two levels, we're going to define a binary variable called `newer` that takes on the value 1 for cars from 2008, and is 0 otherwise. 
-
-Then, we can express our model mathematically using the following equation.
-
-### Two vintages of cars
-
-- For `year = 2008`, we have 
-$$ \hat{hwy} = 35.276 - 3.611 \cdot displ + 1.402 \cdot (1) =$$ $$= \left( 35.276 + 1.402 \right) - 3.611 \cdot displ $$ 
-
-- For `year = 1999`, we have 
-$$ \hat{hwy}  = 35.276 - 3.611 \cdot displ + 1.402 \cdot (0) =$$  $$ = 35.276 - 3.611 \cdot displ $$ 
-
-We compute the fitted coefficients using `lm()`. 
+First, since our categorical explanatory variable `year` has only two levels, we're going to define a binary variable called `newer` that takes on the value 1 for cars from 2008, and is 0 otherwise:
+$$
+\mathrm{newer} = \begin{cases} 1 & \text{if } \mathrm{year} = 2008 , \\\\  0 & \text{if } \mathrm{year} = 1999 \end{cases}
+$$ 
+Using `displ` and `newer` as the two explanatory variables, the model is 
+$$
+\widehat{\mathrm{hwy}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{displ} + \widehat{\beta}_2 \cdot \mathrm{newer}.
+$$ 
+Now we compute the fitted coefficients for this model using `lm()`. 
 
 ```{r echo=TRUE}
 mod <- lm(hwy ~ displ + factor(year), data = mpg)
 mod
 ```
 
-So what happens when the cars are newer? Plugging in and simplifying reveals the equation for a line. Note that since `displ`acement is our numeric explanatory variable, the slope of the line is -3.611 mpg per litre, and the intercept is 36.678---the sum of the other two coefficients.
+### 
 
-What about the older cars from 1999? In that case, the value of `newer` is 0, and plugging that in to our equation also results in the equation for a line. This line also has a slope of -3.611 mpg per litre, but now the intercept is just 35.276 mpg.
+With the model parameters in hand, we're going to make use of a little high school algebra to inform our understanding of the geometry of our model. 
+For `year = 2008`, the model is 
+$$\begin{align}
+\widehat{\mathrm{hwy}} 
+&= 35.276 - 3.611 \cdot \mathrm{displ} + 1.402 \cdot (1)\\
+& = \left( 35.276 + 1.402 \right) - 3.611 \cdot \mathrm{displ} \\
+&= 36.678 -  3.611 \cdot \mathrm{displ}.
+\end{align}$$ 
+For `year = 1999`, the model is 
+$$\begin{align}
+\widehat{\mathrm{hwy}}
+&= 35.276 - 3.611 \cdot \mathrm{displ} + 1.402 \cdot (0) \\
+&= 35.276 - 3.611 \cdot \mathrm{displ}.
+\end{align}$$ 
+
+
+So what happens when the cars are newer? We get an equatioun for a line. Note that since `displ`acement is our numeric explanatory variable, the slope of the line is -3.611 mpg per liter, and the intercept is 36.678---the sum of the other two coefficients.
+
+What about the older cars from 1999? In that case, the value of `newer` is 0, and plugging that in to our equation also results in the equation for a line. This line also has a slope of -3.611 mpg per liter, but now the intercept is just 35.276 mpg.
 
 
 ### Two parallel lines
 
-
-$$
-\begin{aligned}
-    \hat{hwy} &= ( \hat{\beta}_0 + \hat{\beta}_2 ) + \hat{\beta}_1 \cdot displ \\\\
-    &= \left( 35.276 + 1.402 \right) - 3.611 \cdot displ \\\\
-    &= \, \stackrel{intercept}{36.678} - \stackrel{slope}{3.611} \cdot displ
-\end{aligned}
-$$
-
-
-$$
-\begin{aligned}
-    \hat{hwy} &= \hat{\beta}_0 + \hat{\beta}_1 \cdot displ \\\\
-    &= 35.276 - 3.611 \cdot displ \\\\
-    &= \, \stackrel{intercept}{35.276} - \stackrel{slope}{3.611} \cdot displ 
-\end{aligned}
-$$
-
-
 Thus, our model consists of two parallel lines: one for newer cars from 2008, and one for older cars from 1999. The two lines are parallel because they have the same slope, but they are not the same line, because they have different intercepts. 
 
 This is why models with one numeric explanatory variable and one categorical explanatory variable are called parallel slopes models. 
+So, to summarizze, we can write the linear equations for the new cars as 
+$$
+\begin{aligned}
+    \widehat{\mathrm{hwy}} &= ( \widehat{\beta}_0 + \widehat{\beta}_2 ) + \widehat{\beta}_1 \cdot \mathrm{displ} \\\\
+    &= \, \stackrel{\mathrm{intercept}}{36.678} - \stackrel{\mathrm{slope}}{3.611} \cdot ~ \mathrm{displ}
+\end{aligned}
+$$
+and for the old cars as
+$$
+\begin{aligned}
+    \widehat{\mathrm{hwy}} &= \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{displ} \\\\
+    &= \, \stackrel{\mathrm{intercept}}{35.276} - \stackrel{\mathrm{slope}}{3.611} \cdot \mathrm{displ}
+\end{aligned}
+$$
 
 ### Retrieving the coefficients
 
+In order to visualize our model, we need to extract the necessary information about our model that was created by `lm()`. Conceptually, the three fitted coefficients will give us that information. However, it's easier in ggplot to simply plot the fitted values and connect them with a line. This process is  streamlined by the `augment()` function from the broom package. 
+
+Applying `augment()` to our model will return a data frame with the fitted values attached, like the one you see here:
 ```{r eval=FALSE, echo=TRUE}
 augment(mod)
 ```
@@ -317,11 +317,7 @@ augment(mod)
     ## 9    25   1.8         1999 28.77593 0.4522966 -3.77593079 0.014314273
     ## 10   28   2.0         2008 29.45587 0.4753645 -1.45587016 0.015811613
 ```
-
-
-In order to visualize our model, we need to extract the necessary information about our model that was created by `lm()`. Conceptually, the three fitted coefficients will give us that information. However, it's easier in ggplot to simply plot the fitted values and connect them with a line. This process is  streamlined by the `augment()` function from the broom package. 
-
-Applying `augment()` to our model will return a data frame with the fitted values attached, like the one you see here. Note that the name for the variable that contains the fitted values is `.fitted`, and the name of the categorical variable is ``factor(year)``.
+Note that the name for the variable that contains the fitted values is `.fitted`, and the name of the categorical variable is ``factor(year)``.
 
 
 ### Parallel lines on the scatterplot
@@ -335,27 +331,18 @@ data_space +
   geom_line(data = augment(mod), aes(y = .fitted, color = `factor(year)`))
 ```
 
-### Using `geom_line()` and `augment()`
-
-Parallel slopes models are so-named because we can visualize these models in the data space as not one line, but two *parallel* lines. To do this, we'll draw two things:
-
-- a scatterplot showing the data, with color separating the points into groups
-- a line for each value of the categorical variable
-
-Our plotting strategy is to compute the fitted values, plot these, and connect the points to form a line. The `augment()` function from the **broom** package provides an easy way to add the fitted values to our data frame, and the `geom_line()` function can then use that data frame to plot the points and connect them. 
-
-Note that this approach has the added benefit of automatically colouring the lines appropriately to match the data. 
+Note that this approach has the benefit of automatically coloring the lines appropriately to match the data.  
 
 ### Your turn
 
-You already know how to use `ggplot()` and `geom_point()` to make the scatterplot. The only twist is that now you'll pass your `augment()`-ed model as the `data` argument in your `ggplot()` call. When you add your `geom_line()`, instead of letting the `y` aesthetic inherit its values from the `ggplot()` call, you can set it to the `.fitted` column of the `augment()`-ed model. This has the advantage of automatically colouring the lines for you.
+<!-- You already know how to use `ggplot()` and `geom_point()` to make the scatterplot. The only twist is that now you'll pass your `augment()`-ed model as the `data` argument in your `ggplot()` call. When you add your `geom_line()`, instead of letting the `y` aesthetic inherit its values from the `ggplot()` call, you can set it to the `.fitted` column of the `augment()`-ed model. This will automatically color the lines for you. -->
 
-Coming back to the `mariokart` data, try to plot the parallel slope model:
-
-The parallel slopes model `mod` relating total price (`total_pr`) to the number of `wheels` and `cond`ition is already in your workspace.
+Coming back to the `mariokart` data, try to plot the parallel slopes model.
+The fitted model `mod` relating total price (`total_pr`) to the number of `wheels` and `cond`ition is already in your workspace:
 
 - Call the `augment()` function on the model object `mod`, then use `glimpse(augmented_mod)` to explore the resulting data frame.
-- To create `data_space` first map each of the three variables to an aesthetic in your `ggplot()`, then use the `geom_point()` function.
+- To create `data_space` first map each of the three variables to an aesthetic in your `ggplot()`, then use the `geom_jitter()` function
+with `width = 0.2`, `height = 0`, and `alpha = 0.5`. 
 - To plot the fitted values as a line, your `geom_line()` call will need to specify a new `y` aesthetic to plot the `.fitted` values.
 
 ```{r ex2-setup}
@@ -383,7 +370,7 @@ glimpse(augmented_mod)
 
 ```{r ex2-hint-2}
 data_space <- ggplot(augmented_mod, aes(x = wheels, y = total_pr, color = cond)) + 
-  geom_point()
+  geom_jitter(width=.2, height=0, alpha=.5)
 ```
 
 ```{r ex2-solution}
@@ -393,11 +380,22 @@ glimpse(augmented_mod)
 
 # scatterplot, with color
 data_space <- ggplot(augmented_mod, aes(x = wheels, y = total_pr, color = cond)) + 
-  geom_point()
+  geom_jitter(width=.2, height=0, alpha=.5)
   
 # single call to geom_line()
 data_space + 
   geom_line(aes(y = .fitted))
+```
+
+###
+
+```{r mc2}
+question("Why use `geom_jitter` rather than `geom_point`?:",
+  answer("`geom_jitter` lets us use transparency (`alpha = 0.5`) to improve readability of the plot.", message="While tranparency does improve readability there, `geom_point` also supports transparency."),
+  answer("`geom_jitter` uses larger, more easily seen points.", message="Nope! We didn't adjust the point size, which in any case `geom_point` can do too."),
+  answer("`geom_jitter` lets us move the points slightly on the x axis so they are all visible; without the jitter, there are many points for each possible value of `wheel`", correct = TRUE,  message="You got it!"),
+  allow_retry=TRUE
+)
 ```
 
 ## Interpreting parallel slopes coefficients
@@ -410,9 +408,9 @@ Most often, our primary interest in models like this one is interpreting the val
 lm(hwy ~ displ + factor(year), data = mpg)
 ```
 
-Let's start with the main intercept. The value is 35.276 and the units are the same as those of the response variable---miles per gallon. Recall that this is the expected fuel economy for a car from 1999 that had an engine size of 0 litres. Of course, in this case, this value has little meaning, since there is no such thing as a car with an engine size of 0 litres, but that is the literal interpretation of the role that 35.276 plays in our model. 
+Let's start with the main intercept. The value is 35.276 and the units are the same as those of the response variable---miles per gallon. Recall that this is the expected fuel economy for a car from 1999 that had an engine size of 0 liters. Of course, in this case, this value has little meaning, since there is no such thing as a car with an engine size of 0 liters, but that is the literal interpretation of the role that 35.276 plays in our model. 
 
-As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the newer variable that we defined in the previous sections. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
+As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the `newer` variable that we defined in the previous sections. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
 
 ### Slope interpretation
 
@@ -422,7 +420,7 @@ How did we "control for engine size"?
 lm(hwy ~ displ + factor(year), data = mpg)
 ```
 
-By including the `displ` variable in our model, we also obtain a coefficient for engine size. This is our slope coefficient, and it tells us that each extra litre of engine size is associated with a decrease in expected fuel economy of 3.61 miles per gallon, after controlling for year of manufacture. This is the negative relationship we saw earlier: larger engines tend to go in less fuel efficient cars. The difference now is that we are able to estimate the size of that effect while simultaneously considering the effect of time.
+By including the `displ` variable in our model, we also obtain a coefficient for engine size. This is our slope coefficient, and it tells us that each extra liter of engine size is associated with a decrease in expected fuel economy of 3.61 miles per gallon, after controlling for year of manufacture. This is the negative relationship we saw earlier: larger engines tend to go in less fuel efficient cars. The difference now is that we are able to estimate the size of that effect while simultaneously considering the effect of time.
 
 
 ### Avoiding misunderstandings
@@ -432,7 +430,7 @@ The interpretation of coefficients in a multiple regression model can get compli
 - There is only *one* slope 
 - Which is the reference level?
 - What are the units?  
-- What does it mean to "controlling for"?
+- What does it mean to be "controlling for"?
 
 First, there is only one slope in the parallel slopes models that we have considered thus far. Yes, there are two explanatory variables, but only the one numeric explanatory variable is associated with a slope. Later, we will consider more complex models that have more than one "slope."
 
@@ -452,7 +450,7 @@ lm(total_pr ~ wheels + cond, data = mariokart)
 
 Choose the correct interpretation of the slope coefficient:
 
-```{r mc2}
+```{r mc3}
 question("Choose the correct interpretation of the coefficient on `condused`:",
   answer("For each additional wheel, the expected price of a used MarioKart is $5.58 lower.", message="Which coefficient are you interpreting?"),
   answer("The expected price of a used MarioKart is $5.58 less than that of a new one with the same number of wheels.", correct = TRUE, message="Right!"),
@@ -476,7 +474,7 @@ lm(total_pr ~ wheels + cond, data = mariokart)
 
 
 
-```{r mc3}
+```{r mc4}
 question("Choose the correct interpretation of the slope coefficient:",
   answer("For each additional wheel, the expected price of a MarioKart increases by $7.23 regardless of whether it is new or used.", correct = TRUE, message="Right!"),
   answer("For each additional wheel, the expected price of a new MarioKart increases by $7.23.", message="Doesn't the condition matter?"),
@@ -557,7 +555,7 @@ The `babies` data set contains observations about the birthweight and other char
 We would like to build a model for birthweight as a function of the mother's `age` and whether this child was her first (`parity == 0`). Use the mathematical specification below to code the model in R. 
 
 $$
-    birthweight = \beta_0 + \beta_1 \cdot age + \beta_2 \cdot parity + \epsilon
+    \mathrm{birthweight} = \beta_0 + \beta_1 \cdot age + \beta_2 \cdot \mathrm{parity} + \epsilon
 $$
 
 The birthweight variable is recorded in the column `bwt`.
@@ -578,10 +576,10 @@ $y = \beta_0 + \beta_1 \cdot x + \beta_2 \cdot z$, the corresponding formula is 
 lm(bwt ~ ___ + ___, data = ___)
 ```
 
-```{r ex3-solution}
-# build model
-lm(bwt ~ age + parity, data = babies)
-```
+<!-- ```{r ex3-solution} -->
+<!-- # build model -->
+<!-- lm(bwt ~ age + parity, data = babies) -->
+<!-- ``` -->
 
 ### Syntax from plot
 
@@ -593,21 +591,40 @@ ggplot(data = babies, aes(x = gestation, y = bwt, color = factor(smoke))) +
   labs(color = "smoke")
 ```
 
-Use `lm()` to build a parallel slopes model implied by the plot. It's not necessary to use `factor()` in this case either.
+Use `lm()` to build a parallel slopes model implied by the plot, then plot the data and the two lines.
+Make sure to still use `factor()` in this case. 
 
 ```{r ex4, exercise=TRUE}
 # build model
+bwt_mod = lm(___ ~ ___ + ___, data = ___)
 
+# scatterplot, with color
+ggplot(augment(___), aes(x = ___, y = ___, color = ___)) + 
+  geom_point(alpha = 0.3) +
+  geom_line(aes(y = ___))
 ```
 
-```{r ex4-hint}
-lm(___ ~ ___ + ___, data = babies)
-```
-
-```{r ex4-solution}
+```{r ex4-hint-1}
 # build model
-lm(bwt ~ gestation + smoke, data = babies)
+bwt_mod = lm(___ ~ ___ + ___, data = babies)
 ```
+
+```{r ex4-hint-2}
+# scatterplot, with color
+ggplot(augment(bwt_mod), aes(x = ___, y = ___, color = ___)) + 
+  geom_point(alpha = 0.3) +
+  geom_line(aes(y = ___))
+```
+
+<!-- ```{r ex4-solution} -->
+<!-- # build model -->
+<!-- bwt_mod = lm(___ ~ ___ + ___, data = ___) -->
+
+<!-- # scatterplot, with color -->
+<!-- ggplot(augment(bwt_mod), aes(x = gestation, y = bwt, color = `factor(smoke)`)) +  -->
+<!--   geom_point(alpha = 0.3) + -->
+<!--   geom_line(aes(y = .fitted)) -->
+<!-- ``` -->
 
 
 ## Submit
