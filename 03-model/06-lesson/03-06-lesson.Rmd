@@ -193,13 +193,13 @@ glimpse(mariokart)
 lm(total_pr ~ ___ + ___, data = mariokart)
 ```
 
-```{r ex1-solution}
-# Explore the data
-glimpse(mariokart)
+<!-- ```{r ex1-solution} -->
+<!-- # Explore the data -->
+<!-- glimpse(mariokart) -->
 
-# Fit parallel slopes
-lm(total_pr ~ wheels + cond, data = mariokart)
-```
+<!-- # Fit parallel slopes -->
+<!-- lm(total_pr ~ wheels + cond, data = mariokart) -->
+<!-- ``` -->
 
 ### Reasoning about two intercepts
 
@@ -356,7 +356,7 @@ glimpse(___)
 
 # scatterplot, with color
 data_space <- ggplot(___, aes(x = ___, y = ___, color = ___)) + 
-  geom_point()
+  geom_jitter(___)
   
 # single call to geom_line()
 data_space + 
@@ -365,27 +365,26 @@ data_space +
 
 ```{r ex2-hint-1}
 augmented_mod <- augment(mod)
-glimpse(augmented_mod)
 ```
 
 ```{r ex2-hint-2}
-data_space <- ggplot(augmented_mod, aes(x = wheels, y = total_pr, color = cond)) + 
-  geom_jitter(width=.2, height=0, alpha=.5)
+data_space <- ggplot(augmented_mod, aes(x = wheels, y = ___, color = ___)) + 
+  geom_jitter(width = 0.2, ___)
 ```
 
-```{r ex2-solution}
-# Augment the model
-augmented_mod <- augment(mod)
-glimpse(augmented_mod)
+<!-- ```{r ex2-solution} -->
+<!-- # Augment the model -->
+<!-- augmented_mod <- augment(mod) -->
+<!-- glimpse(augmented_mod) -->
 
-# scatterplot, with color
-data_space <- ggplot(augmented_mod, aes(x = wheels, y = total_pr, color = cond)) + 
-  geom_jitter(width=.2, height=0, alpha=.5)
-  
-# single call to geom_line()
-data_space + 
-  geom_line(aes(y = .fitted))
-```
+<!-- # scatterplot, with color -->
+<!-- data_space <- ggplot(augmented_mod, aes(x = wheels, y = total_pr, color = cond)) +  -->
+<!--   geom_jitter(width = 0.2, height = 0, alpha = 0.5) -->
+
+<!-- # single call to geom_line() -->
+<!-- data_space +  -->
+<!--   geom_line(aes(y = .fitted)) -->
+<!-- ``` -->
 
 ###
 
