@@ -283,11 +283,11 @@ lm(Price ~ Food + East, data = nyc)
 ### 
 
 ```{r mc2}
-question("Identify the statement that is *FALSE*:",
+question("Identify all statments that are *TRUE*:",
   answer("Each additional rating point of food quality is associated with a $2.88 increase in the expected price of meal, after controlling for location.", correct = TRUE),
   answer("The premium for an Italian restaurant in NYC associated with being on the east side of 5th Avenue is $1.46, after controlling for the quality of the food.
 ", correct = TRUE),
-  answer("The change in the coefficient of food from $2.94 in the simple linear model to $2.88 in this model has profound practical implications for restaurant owners.", correct = TRUE),
+  answer("The change in the coefficient of food from $2.94 in the simple linear model to $2.88 in this model could have practical implications for restaurant owners.", correct = TRUE),
 allow_retry=TRUE
 )
 ```
@@ -534,7 +534,7 @@ Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `
 
 ```
 
-```{r ex7-hint, exercise=TRUE}
+```{r ex7-hint}
 lm(Price ~ ___ + ___ + ___ + ___, data = nyc)
 ```
 
