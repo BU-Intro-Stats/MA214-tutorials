@@ -139,7 +139,7 @@ At the beginning of the upcoming chapters of this lesson, we will provide introd
 
 Mathematically, adding a second numeric explanatory variable is trivial---we just add another term to our model.
 
-$$ \widehat{bwt} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age $$
+$$ \widehat{\mathrm{bwt}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} $$
 
 #### Syntactical: 
 
@@ -623,7 +623,7 @@ question("This interpretation is correct …",
 #### Mathematical:
 
 $$
-    \widehat{bwt} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age + \widehat{\beta}_3 \cdot smoke
+    \widehat{\mathrm{bwt}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} + \widehat{\beta}_3 \cdot \mathrm{smoke}
 $$
 
 #### Syntactical:
@@ -833,9 +833,9 @@ question("Choose the right interpretation of the estimated coefficient for `cond
 
 $$
 \begin{align}
-    \widehat{bwt} &= \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age + \widehat{\beta}_3 \cdot smoke \\
-    &~~~+ \widehat{\beta}_4 \cdot height + \widehat{\beta}_5 \cdot weight + 
-    \widehat{\beta}_6 \cdot parity
+    \mathrm{\widehat{bwt}} &= \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} + \widehat{\beta}_3 \cdot \mathrm{smoke} \\
+    &~~~+ \widehat{\beta}_4 \cdot \mathrm{height} + \widehat{\beta}_5 \cdot \mathrm{weight} + 
+    \widehat{\beta}_6 \cdot \mathrm{parity}
     \end{align}
 $$
 
