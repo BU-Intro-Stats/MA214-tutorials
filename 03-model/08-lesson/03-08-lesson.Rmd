@@ -139,7 +139,7 @@ At the beginning of the upcoming chapters of this lesson, we will provide introd
 
 Mathematically, adding a second numeric explanatory variable is trivial---we just add another term to our model.
 
-$$ \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age $$
+$$ \widehat{bwt} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age $$
 
 #### Syntactical: 
 
@@ -336,7 +336,7 @@ lm(total_pr ~ ___ + ___, data = mariokart)
 Recall the steps to create a heatmap visualizion of the multiple regression model:
 
 1. Create a grid of the possible pairs of values of the explanatory variables. The grid should be over the actual range of the data present in each variable. We've done this for you and stored the result as a data frame called `grid`.
-2. Use `augment()` with the `newdata` argument to find the $\hat{y}$'s corresponding to the values in `grid`.
+2. Use `augment()` with the `newdata` argument to find the $\widehat{y}$'s corresponding to the values in `grid`.
 3. Add these to the `data_space` plot by using the `fill` aesthetic and `geom_tile()`.
 
 ```{r ex2-mariokart-setup}
@@ -623,7 +623,7 @@ question("This interpretation is correct …",
 #### Mathematical:
 
 $$
-    \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age + \hat{\beta}_3 \cdot smoke
+    \widehat{bwt} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age + \widehat{\beta}_3 \cdot smoke
 $$
 
 #### Syntactical:
@@ -833,9 +833,9 @@ question("Choose the right interpretation of the estimated coefficient for `cond
 
 $$
 \begin{align}
-    \hat{bwt} &= \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age + \hat{\beta}_3 \cdot smoke \\
-    &~~~+ \hat{\beta}_4 \cdot height + \hat{\beta}_5 \cdot weight + 
-    \hat{\beta}_6 \cdot parity
+    \widehat{bwt} &= \widehat{\beta}_0 + \widehat{\beta}_1 \cdot gestation + \widehat{\beta}_2 \cdot age + \widehat{\beta}_3 \cdot smoke \\
+    &~~~+ \widehat{\beta}_4 \cdot height + \widehat{\beta}_5 \cdot weight + 
+    \widehat{\beta}_6 \cdot parity
     \end{align}
 $$
 
