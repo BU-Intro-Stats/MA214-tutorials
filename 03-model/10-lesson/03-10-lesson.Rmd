@@ -159,11 +159,11 @@ Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
  The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
 ```
 
-```{r ex1-solution}
-nyc |>
-  select(-Restaurant) |>
-  pairs()
-```
+<!-- ```{r ex1-solution} -->
+<!-- nyc |> -->
+<!--   select(-Restaurant) |> -->
+<!--   pairs() -->
+<!-- ``` -->
 
 ```{r mc1}
 question("Which pairs of variables appear to be strongly correlated?",
@@ -201,14 +201,14 @@ ggplot(data = nyc, aes(x = Food, y = Price)) +
 lm(Price ~ Food, data = nyc)
 ```
 
-```{r ex2-solution}
-# Price by Food plot
-ggplot(data = nyc, aes(x = Food, y = Price)) +
-  geom_point()
+<!-- ```{r ex2-solution} -->
+<!-- # Price by Food plot -->
+<!-- ggplot(data = nyc, aes(x = Food, y = Price)) + -->
+<!--   geom_point() -->
 
-# Price by Food model
-lm(Price ~ Food, data = nyc)
-```
+<!-- # Price by Food model -->
+<!-- lm(Price ~ Food, data = nyc) -->
+<!-- ``` -->
 
 ## Incorporating another variable
 
@@ -276,9 +276,9 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 *Hint:* What is the difference between the coefficients that are in both models?
 ```
 
-```{r ex3-solution}
-lm(Price ~ Food + East, data = nyc)
-```
+<!-- ```{r ex3-solution} -->
+<!-- lm(Price ~ Food + East, data = nyc) -->
+<!-- ``` -->
 
 ### 
 
@@ -341,18 +341,18 @@ p |>
  Remember `add_surface()`?
 ```
 
-```{r ex4-solution}
-# fit model
-lm(Price ~ Food + Service, data = nyc)
+<!-- ```{r ex4-solution} -->
+<!-- # fit model -->
+<!-- lm(Price ~ Food + Service, data = nyc) -->
 
-# draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
-  add_markers() 
+<!-- # draw 3D scatterplot -->
+<!-- p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |> -->
+<!--   add_markers()  -->
 
-# draw a plane
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
-```
+<!-- # draw a plane -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE)  -->
+<!-- ``` -->
 
 ## Higher dimensions
 
@@ -428,10 +428,10 @@ Examine the coefficients closely. Do they make sense based on what you understan
 lm(Price ~ ___ + ___ + ___, data = nyc)
 ```
 
-```{r ex5-solution}
-# Price by Food and Service and East
-lm(Price ~ Food + Service + East, data = nyc)
-```
+<!-- ```{r ex5-solution} -->
+<!-- # Price by Food and Service and East -->
+<!-- lm(Price ~ Food + Service + East, data = nyc) -->
+<!-- ``` -->
 
 ### Interpretation of location coefficient
 
@@ -510,16 +510,16 @@ p |>
  In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
 ```
 
-```{r ex6-solution}
-# draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
-  add_markers(color = ~factor(East)) 
+<!-- ```{r ex6-solution} -->
+<!-- # draw 3D scatterplot -->
+<!-- p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |> -->
+<!--   add_markers(color = ~factor(East))  -->
 
-# draw two planes
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
-  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
-```
+<!-- # draw two planes -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE) -->
+<!-- ``` -->
 
 ### Full model
 
@@ -538,9 +538,9 @@ Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `
 lm(Price ~ ___ + ___ + ___ + ___, data = nyc)
 ```
 
-```{r ex7-solution}
-lm(Price ~ Food + Service + East + Decor, data = nyc)
-```
+<!-- ```{r ex7-solution} -->
+<!-- lm(Price ~ Food + Service + East + Decor, data = nyc) -->
+<!-- ``` -->
 
 Notice the dramatic change in the value of the `Service` coefficient. 
 

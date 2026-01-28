@@ -216,11 +216,11 @@ glimpse(bwt_hats)
 
 ```
 
-```{r sandbox-solution}
-x <- length(unique(grid$gestation)) 
-y <- length(unique(grid$age))
-x * y
-```
+<!--  ```{r sandbox-solution} -->
+<!--  x <- length(unique(grid$gestation))  -->
+<!--  y <- length(unique(grid$age)) -->
+<!--  x * y -->
+<!--  ``` -->
 
 **Step 3:** Finally, we use the `geom_tile()` function from the `ggplot2` package to superimpose these values on our data space. Setting the `alpha` argument to 0.5 allows us to see both the actual observations (as points) and the model predictions (as a smooth surface). 
 
@@ -298,9 +298,9 @@ Now you will fit a multiple linear regression model (MLR model) yourself. The da
 ___(___)
 ```
 
-```{r ex0-mariokart-glimpse-solution}
-glimpse(mariokart)
-```
+<!--  ```{r ex0-mariokart-glimpse-solution} -->
+<!--  glimpse(mariokart) -->
+<!--  ``` -->
 
 
 ### Fitting a MLR model
@@ -324,10 +324,10 @@ lm(___ ~ ___ + ___, data = ___)
 lm(total_pr ~ ___ + ___, data = mariokart)
 ```
 
-```{r ex1-mariokart-solution}
-# Fit the model using duration and starting price
-lm(total_pr ~ duration + start_pr, data = mariokart)
-```
+<!--  ```{r ex1-mariokart-solution} -->
+<!--  # Fit the model using duration and starting price -->
+<!--  lm(total_pr ~ duration + start_pr, data = mariokart) -->
+<!--  ``` -->
 
 
 ### Tiling the plane
@@ -381,14 +381,14 @@ data_space +
   geom_tile(data = price_hats, aes(___), alpha = ___)
 ```
 
-```{r ex2-mariokart-solution}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
-
-# tile the plane
-data_space + 
-  geom_tile(data = price_hats, aes(fill = .fitted), alpha = 0.5)
-```
+<!-- ```{r ex2-mariokart-solution} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
+<!--  -->
+<!-- # tile the plane -->
+<!-- data_space +  -->
+<!--   geom_tile(data = price_hats, aes(fill = .fitted), alpha = 0.5) -->
+<!-- ``` -->
 
 ### Models in 3D
 
@@ -482,18 +482,18 @@ p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opac
 ```
 
 
-```{r ex3-mariokart-solution}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-solution} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers() 
-  
-# draw the plane
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE)
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers()  -->
+
+<!-- # draw the plane -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) -->
+<!-- ``` -->
 
 ## Conditional interpretation of coefficients
 
@@ -577,10 +577,10 @@ Let's again fit a multiple linear regression model with the `mariokart` data set
 lm(formula = ___ ~ ___ + ___, data = ___)
 ```
 
-```{r ex4-mariokart-solution}
-# Fit the model using duration and starting price
-lm(formula = total_pr ~ duration + start_pr, data = mariokart)
-```
+<!-- ```{r ex4-mariokart-solution} -->
+<!-- # Fit the model using duration and starting price -->
+<!-- lm(formula = total_pr ~ duration + start_pr, data = mariokart) -->
+<!-- ``` -->
 
 The coefficients from our model for the total auction price of `mariokart` as a function of auction duration and starting price are shown above. A colleague claims that these results imply that the duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
 
@@ -778,19 +778,19 @@ p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opac
 ```
 
 
-```{r ex5-mariokart-solution}
-# load plotly
-library(plotly)
+<!-- ```{r ex5-mariokart-solution} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers(color = ~cond) 
-  
-# draw two planes
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
-  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers(color = ~cond)  -->
+
+<!-- # draw two planes -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE) -->
+<!-- ``` -->
 
 
 By including the duration, starting price, and condition variables in our model, we now have two explanatory variables and one categorical variable. Our model now takes the geometric form of two parallel planes!
@@ -808,9 +808,9 @@ using the `mariokart` data.
 lm(formula = ___ ~ ___ + ___ + ___, data = ___)
 ```
 
-```{r ex6-mariokart-solution}
-lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart)
-```
+<!-- ```{r ex6-mariokart-solution} -->
+<!-- lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart) -->
+<!-- ``` -->
 
 <!-- The coefficients from our parallel planes model is shown below. -->
 <!-- Choose the right interpretation of $\beta_3$ (the coefficient on `condused`): -->
@@ -880,9 +880,9 @@ lm(formula = ___ ~ ___ + ___ + ___ + ___ + ___, data = ___)
 ```
 
 
-```{r ex7-mariokart-solution}
-lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart)
-```
+<!-- ```{r ex7-mariokart-solution} -->
+<!-- lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart) -->
+<!-- ``` -->
 
 Unfortunately this makes a full visualization of our model impossible, but we can still interpret the coefficients. 
 

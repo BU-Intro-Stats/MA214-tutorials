@@ -265,20 +265,20 @@ mariokart_noisy <- mariokart |>
 mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
 ```
 
-```{r ex1-solution}
-# R^2 and adjusted R^2
-summary(mod)
-
-# add random noise
-mariokart_noisy <- mariokart |>
-  mutate(noise = rnorm(n = nrow(mariokart)))
-  
-# compute new model
-mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
-
-# new R^2 and adjusted R^2
-summary(mod2)
-```
+<!-- ```{r ex1-solution} -->
+<!-- # R^2 and adjusted R^2 -->
+<!-- summary(mod) -->
+<!--  -->
+<!-- # add random noise -->
+<!-- mariokart_noisy <- mariokart |> -->
+<!--   mutate(noise = rnorm(n = nrow(mariokart))) -->
+<!--    -->
+<!-- # compute new model -->
+<!-- mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy) -->
+<!--  -->
+<!-- # new R^2 and adjusted R^2 -->
+<!-- summary(mod2) -->
+<!-- ``` -->
 
 ### Prediction
 
@@ -312,13 +312,13 @@ You can get predictions with `predict(mod)`, and `augment()` works similarly as 
 </details>
 
 
-```{r ex2-solution}
-# return a vector
-predict(mod)
+<!-- ```{r ex2-solution} -->
+<!-- # return a vector -->
+<!-- predict(mod) -->
 
-# return a data frame
-augment(mod)
-```
+<!-- # return a data frame -->
+<!-- augment(mod) -->
+<!-- ``` -->
 
 
 ## Understanding Interaction
@@ -448,10 +448,10 @@ Include the term `cond:duration` in your formula to model the interaction of con
 To include an interaction effect of variable A and B, use `A:B`.
 </details>
 
-```{r ex3-solution}
-# include interaction
-lm(total_pr ~ duration + cond + cond:duration, data = mariokart)
-```
+<!-- ```{r ex3-solution} -->
+<!-- # include interaction -->
+<!-- lm(total_pr ~ duration + cond + cond:duration, data = mariokart) -->
+<!-- ``` -->
 
 ### Visualizing interaction models
 
@@ -476,12 +476,12 @@ ggplot(___, aes(___)) +
 Define groups using the color `aes`thetic in the ggplot call.
 </details>
 
-```{r ex4-solution}
-# interaction plot
-ggplot(mariokart, aes(y = total_pr, x = duration, color = cond)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-```
+<!-- ```{r ex4-solution} -->
+<!-- # interaction plot -->
+<!-- ggplot(mariokart, aes(y = total_pr, x = duration, color = cond)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_smooth(method = "lm", se = FALSE) -->
+<!-- ``` -->
 
 ## Simpson's Paradox
 
@@ -603,13 +603,13 @@ slr + aes(___)
 You can add layers to an existing plot with `+`.
 </details>
 
-```{r ex5-solution}
-# model with one slope
-lm(formula = total_pr ~ duration, data = mariokart)
+<!-- ```{r ex5-solution} -->
+<!-- # model with one slope -->
+<!-- lm(formula = total_pr ~ duration, data = mariokart) -->
 
-# plot with two slopes
-slr + aes(color = cond)
-```
+<!-- # plot with two slopes -->
+<!-- slr + aes(color = cond) -->
+<!-- ``` -->
 
 
 ## Submit
