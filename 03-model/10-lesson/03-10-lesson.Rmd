@@ -155,9 +155,10 @@ Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
 
 ```
 
-```{r ex1-hint}
- The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
-```
+<details>
+<summary>**Hint**</summary>
+The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
+</details>
 
 <!-- ```{r ex1-solution} -->
 <!-- nyc |> -->
@@ -192,14 +193,14 @@ On your own, interpret these coefficients and examine the fit of the model. What
 
 ```
 
-```{r ex2-hint-1}
-ggplot(data = nyc, aes(x = Food, y = Price)) +
-  geom_point()
-```
+<!-- ```{r ex2-hint-1} -->
+<!-- ggplot(data = nyc, aes(x = Food, y = Price)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex2-hint-2}
-lm(Price ~ Food, data = nyc)
-```
+<!-- ```{r ex2-hint-2} -->
+<!-- lm(Price ~ Food, data = nyc) -->
+<!-- ``` -->
 
 <!-- ```{r ex2-solution} -->
 <!-- # Price by Food plot -->
@@ -272,9 +273,10 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 
 ```
 
-```{r ex3-hint}
-*Hint:* What is the difference between the coefficients that are in both models?
-```
+<details>
+<summary>**Hint**</summary>
+What is the difference between the coefficients that are in both models?
+</details>
 
 <!-- ```{r ex3-solution} -->
 <!-- lm(Price ~ Food + East, data = nyc) -->
@@ -337,9 +339,10 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) 
 ```
 
-```{r ex4-hint}
- Remember `add_surface()`?
-```
+<details>
+<summary>**Hint**</summary>
+Remember `add_surface()`?
+</details>
 
 <!-- ```{r ex4-solution} -->
 <!-- # fit model -->
@@ -424,9 +427,9 @@ Examine the coefficients closely. Do they make sense based on what you understan
 
 ```
 
-```{r ex5-hint}
-lm(Price ~ ___ + ___ + ___, data = nyc)
-```
+<!-- ```{r ex5-hint} -->
+<!-- lm(Price ~ ___ + ___ + ___, data = nyc) -->
+<!-- ``` -->
 
 <!-- ```{r ex5-solution} -->
 <!-- # Price by Food and Service and East -->
@@ -443,8 +446,6 @@ lm(Price ~ Food + Service + East, data = nyc)
 
 Reason about the magnitude of the `East` coefficient.
 
-*Hint:* Does being on the East side increase or decrease the price of a meal?
-
 ```{r mc3}
 question("Which of the following statements is **FALSE**?",
   answer("The premium for being on the East side of 5th Avenue is just less than a dollar, after controlling for the quality of food and service.", message = "This message is TRUE"),
@@ -453,6 +454,11 @@ question("Which of the following statements is **FALSE**?",
   allow_retry=TRUE
 )
 ```
+
+<details>
+<summary>**Hint**</summary>
+Does being on the East side increase or decrease the price of a meal?
+</details>
 
 ### Impact of location
 
@@ -506,9 +512,10 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
-```{r ex6-hint}
- In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
-```
+<details>
+<summary>**Hint**</summary>
+In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
+</details>
 
 <!-- ```{r ex6-solution} -->
 <!-- # draw 3D scatterplot -->
@@ -534,17 +541,15 @@ Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `
 
 ```
 
-```{r ex7-hint}
-lm(Price ~ ___ + ___ + ___ + ___, data = nyc)
-```
+<!-- ```{r ex7-hint} -->
+<!-- lm(Price ~ ___ + ___ + ___ + ___, data = nyc) -->
+<!-- ``` -->
 
 <!-- ```{r ex7-solution} -->
 <!-- lm(Price ~ Food + Service + East + Decor, data = nyc) -->
 <!-- ``` -->
 
 Notice the dramatic change in the value of the `Service` coefficient. 
-
-*Hint:* If the coefficient on `Service` changes so much, how likely is it that any interpretation relying on the estimate is valid?
 
 ```{r mc4}
 question("Which of the following interpretations is invalid?
@@ -556,6 +561,11 @@ question("Which of the following interpretations is invalid?
   allow_retry=TRUE
 )
 ```
+
+<details>
+<summary>**Hint**</summary>
+If the coefficient on `Service` changes so much, how likely is it that any interpretation relying on the estimate is valid?
+</details>
 
 ## Submit
 

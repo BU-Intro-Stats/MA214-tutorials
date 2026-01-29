@@ -249,21 +249,38 @@ mod2 <- ____
 _____(____)
 ```
 
-```{r ex1-hint-1}
-# R^2 and adjusted R^2
-summary(mod)
-```
 
-```{r ex1-hint-2}
-# add random noise
-mariokart_noisy <- mariokart |>
-  mutate(noise = rnorm(n = nrow(mariokart)))
-```
+<details>
+<summary>**Hint 1**</summary>
+You can get a summary of the model with `summary()`. What output does `summary()` give you? 
+</details>
 
-```{r ex1-hint-3}
-# compute new model
-mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
-```
+<details>
+<summary>**Hint 2**</summary>
+Recall that the syntax for `mutate()` is `mutate(new_column = function(existing_column))`. You can add noise with this - try using `rnorm()` to generate random variables. 
+</details>
+
+<details>
+<summary>**Hint 3**</summary>
+When computing a new model, be careful to use your new dataset `mariokart_noisy`, not the original dataset, and add the noise variable to the model.
+</details>
+
+
+<!-- ```{r ex1-hint-1} -->
+<!-- # R^2 and adjusted R^2 -->
+<!-- summary(mod) -->
+<!-- ``` -->
+
+<!-- ```{r ex1-hint-2} -->
+<!-- # add random noise -->
+<!-- mariokart_noisy <- mariokart |> -->
+<!--   mutate(noise = rnorm(n = nrow(mariokart))) -->
+<!-- ``` -->
+
+<!-- ```{r ex1-hint-3} -->
+<!-- # compute new model -->
+<!-- mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy) -->
+<!-- ``` -->
 
 <!-- ```{r ex1-solution} -->
 <!-- # R^2 and adjusted R^2 -->

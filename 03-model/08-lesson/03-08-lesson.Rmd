@@ -319,10 +319,10 @@ If you don't remember the variable names look at the previous exercise or at the
 lm(___ ~ ___ + ___, data = ___)
 ```
 
-```{r ex1-mariokart-hint}
-# Fit the model using duration and starting price
-lm(total_pr ~ ___ + ___, data = mariokart)
-```
+<!-- ```{r ex1-mariokart-hint} -->
+<!-- # Fit the model using duration and starting price -->
+<!-- lm(total_pr ~ ___ + ___, data = mariokart) -->
+<!-- ``` -->
 
 <!--  ```{r ex1-mariokart-solution} -->
 <!--  # Fit the model using duration and starting price -->
@@ -367,19 +367,24 @@ data_space +
   geom_tile(data = ____, aes(___),____)
 ```
 
-```{r ex2-mariokart-hint-1}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
-```
+<!-- ```{r ex2-mariokart-hint-1} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
+<!-- ``` -->
 
-```{r ex2-mariokart-hint-2}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
+<details>
+<summary>**Hint**</summary>
+You can get predictions using `augment(mod, newdata=variable_name)`. 
+</details>
 
-# tile the plane
-data_space + 
-  geom_tile(data = price_hats, aes(___), alpha = ___)
-```
+<!-- ```{r ex2-mariokart-hint-2} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
+
+<!-- # tile the plane -->
+<!-- data_space +  -->
+<!--   geom_tile(data = price_hats, aes(___), alpha = ___) -->
+<!-- ``` -->
 
 <!-- ```{r ex2-mariokart-solution} -->
 <!-- # add predictions to grid -->
@@ -466,20 +471,20 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~_____, showscale = FALSE)
 ```
 
-```{r ex3-mariokart-hint-1}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-hint-1} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-```
+<!-- ``` -->
 
-```{r ex3-mariokart-hint-2}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-hint-2} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers() 
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers()  -->
+<!-- ``` -->
 
 
 <!-- ```{r ex3-mariokart-solution} -->
@@ -762,20 +767,20 @@ p |>
 ```
 
 
-```{r ex5-mariokart-hint-1}
-# load plotly
-library(plotly)
-```
+<!-- ```{r ex5-mariokart-hint-1} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
+<!-- ``` -->
 
 
-```{r ex5-mariokart-hint-2}
-# load plotly
-library(plotly)
+<!-- ```{r ex5-mariokart-hint-2} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers(color = ~cond) 
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers(color = ~cond)  -->
+<!-- ``` -->
 
 
 <!-- ```{r ex5-mariokart-solution} -->

@@ -216,9 +216,10 @@ data_space +
   ___
 ```
 
-```{r ex1-hint}
- In `geom_smooth()` define the `method` and `se` arguments for a straight line fit without the standard error band.
-```
+<details>
+<summary>**Hint**</summary>
+In `geom_smooth()` define the `method` and `se` arguments for a straight line fit without the standard error band.
+</details>
 
 <!-- ```{r ex1-solution} -->
 <!-- # scatterplot with jitter -->
@@ -259,15 +260,15 @@ data_space +
   ___
 ```
 
-```{r ex2-hint-1}
-MedGPA_middle <- MedGPA |>
-  filter(GPA >= ___, GPA <= ___)
-```
+<!-- ```{r ex2-hint-1} -->
+<!-- MedGPA_middle <- MedGPA |> -->
+<!--   filter(GPA >= ___, GPA <= ___) -->
+<!-- ``` -->
 
-```{r ex2-hint-2}
-data_space + 
-  geom_smooth(method = "lm", se = FALSE)
-```
+<!-- ```{r ex2-hint-2} -->
+<!-- data_space +  -->
+<!--   geom_smooth(method = "lm", se = FALSE) -->
+<!-- ``` -->
 
 <!-- ```{r ex2-solution} -->
 <!-- # filter -->
@@ -306,9 +307,10 @@ $$
 glm(___, data = ___, family = ___)
 ```
 
-```{r ex3-hint}
- The only difference in syntax for `lm()` and `glm()` is that in `glm()` you also have to specify `family = binomial`.
-```
+<details>
+<summary>**Hint**</summary>
+The only difference in syntax for `lm()` and `glm()` is that in `glm()` you also have to specify `family = binomial`.
+</details>
 
 <!-- ```{r ex3-solution} -->
 <!-- # fit model -->
@@ -412,29 +414,29 @@ ggplot(___) +
   ___
 ```
 
-```{r ex4-hint-1}
-ggplot(___) + 
-  geom_jitter(width = 0, height = 0.05, alpha = 0.5)
-  ___
-```
+<!-- ```{r ex4-hint-1} -->
+<!-- ggplot(___) +  -->
+<!--   geom_jitter(width = 0, height = 0.05, alpha = 0.5) -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex4-hint-2}
-ggplot(___) + 
-  geom_jitter(width = 0, height = 0.05, alpha = 0.5)
-  geom_smooth(method = "glm", ___)
-```
+<!-- ```{r ex4-hint-2} -->
+<!-- ggplot(___) +  -->
+<!--   geom_jitter(width = 0, height = 0.05, alpha = 0.5) -->
+<!--   geom_smooth(method = "glm", ___) -->
+<!-- ``` -->
 
-```{r ex4-hint-3}
-ggplot(___) + 
-  geom_jitter(width = 0, height = 0.05, alpha = 0.5)
-  geom_smooth(method = "glm", se = ___, ___)
-```
+<!-- ```{r ex4-hint-3} -->
+<!-- ggplot(___) +  -->
+<!--   geom_jitter(width = 0, height = 0.05, alpha = 0.5) -->
+<!--   geom_smooth(method = "glm", se = ___, ___) -->
+<!-- ``` -->
 
-```{r ex4-hint-4}
-ggplot(___) + 
-  geom_jitter(width = 0, height = 0.05, alpha = 0.5)
-  geom_smooth(method = "glm", se = ___, method.args = list(___))
-```
+<!-- ```{r ex4-hint-4} -->
+<!-- ggplot(___) +  -->
+<!--   geom_jitter(width = 0, height = 0.05, alpha = 0.5) -->
+<!--   geom_smooth(method = "glm", se = ___, method.args = list(___)) -->
+<!-- ``` -->
 
 <!-- ```{r ex4-solution} -->
 <!-- data_space <- ggplot(data = MedGPA, aes(y = Acceptance, x = GPA)) +  -->
@@ -491,21 +493,21 @@ data_space +
   geom_line(data = ___, aes(___), color = "red")
 ```
 
-```{r ex5-hint-1}
-data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = acceptance_rate)) + 
-  geom_point() + 
-  geom_line()
-```
+<!-- ```{r ex5-hint-1} -->
+<!-- data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = acceptance_rate)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_line() -->
+<!-- ``` -->
 
-```{r ex5-hint-2}
-MedGPA_plus <- mod |>
-  augment(type.predict = "response")
-```
+<!-- ```{r ex5-hint-2} -->
+<!-- MedGPA_plus <- mod |> -->
+<!--   augment(type.predict = "response") -->
+<!-- ``` -->
 
-```{r ex5-hint-3}
-data_space +
-  geom_line(data = ___, aes(x = GPA, y = .fitted), color = "red")
-```
+<!-- ```{r ex5-hint-3} -->
+<!-- data_space + -->
+<!--   geom_line(data = ___, aes(x = GPA, y = .fitted), color = "red") -->
+<!-- ``` -->
 
 <!-- ```{r ex5-solution} -->
 <!-- # binned points and line -->
@@ -694,22 +696,31 @@ data_space +
   geom_line(___, color = "red")
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+For the odds, first try thinking of how the acceptance rate and odds are related. Then, use `mutate()` to do the computation.
+</details>
 
-```{r ex6-hint-1}
-MedGPA_binned <- MedGPA_binned |>
-  mutate(odds = acceptance_rate / (1 - acceptance_rate))
-```
+<details>
+<summary>**Hint 2**</summary>
+For computing the observed odds, what output from the model do you think you could use?
+</details>
 
-```{r ex6-hint-2}
-data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = odds)) + 
-  geom_point() + 
-  geom_line()
-```
+<!-- ```{r ex6-hint-1} -->
+<!-- MedGPA_binned <- MedGPA_binned |> -->
+<!--   mutate(odds = acceptance_rate / (1 - acceptance_rate)) -->
+<!-- ``` -->
 
-```{r ex6-hint-3}
-MedGPA_plus <- MedGPA_plus |>
-  mutate(odds_hat = .fitted / (1 - .fitted))
-```
+<!-- ```{r ex6-hint-2} -->
+<!-- data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = odds)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_line() -->
+<!-- ``` -->
+
+<!-- ```{r ex6-hint-3} -->
+<!-- MedGPA_plus <- MedGPA_plus |> -->
+<!--   mutate(odds_hat = .fitted / (1 - .fitted)) -->
+<!-- ``` -->
 
 <!-- ```{r ex6-solution} -->
 <!-- # compute odds for bins -->
@@ -785,21 +796,21 @@ data_space +
   geom_line(___, color = "red")
 ```
 
-```{r ex7-hint-1}
-MedGPA_binned <- MedGPA_binned |>
-  mutate(log_odds = log(acceptance_rate / (1 - acceptance_rate)))
-```
+<!-- ```{r ex7-hint-1} -->
+<!-- MedGPA_binned <- MedGPA_binned |> -->
+<!--   mutate(log_odds = log(acceptance_rate / (1 - acceptance_rate))) -->
+<!-- ``` -->
 
-```{r ex7-hint-2}
-data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = log_odds)) + 
-  geom_point() + 
-  geom_line()
-```
+<!-- ```{r ex7-hint-2} -->
+<!-- data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = log_odds)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_line() -->
+<!-- ``` -->
 
-```{r ex7-hint-3}
-MedGPA_plus <- MedGPA_plus |>
-  mutate(log_odds_hat = log(.fitted / (1 - .fitted)))
-```
+<!-- ```{r ex7-hint-3} -->
+<!-- MedGPA_plus <- MedGPA_plus |> -->
+<!--   mutate(log_odds_hat = log(.fitted / (1 - .fitted))) -->
+<!-- ``` -->
 
 <!-- ```{r ex7-solution} -->
 <!-- # compute log odds for bins -->
@@ -927,9 +938,9 @@ new_data <- ___
 
 ```
 
-```{r ex8-hint}
-new_data <- data.frame(GPA = 3.51)
-```
+<!-- ```{r ex8-hint} -->
+<!-- new_data <- data.frame(GPA = 3.51) -->
+<!-- ``` -->
 
 <!-- ```{r ex8-solution} -->
 <!-- mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial) -->
@@ -971,16 +982,26 @@ tidy_mod |>
   ___()
 ```
 
-```{r ex9-hint-1}
-tidy_mod <- augment(mod, type.predict = "response") |> 
-  mutate(Acceptance_hat = round(.fitted)) 
-```
+<details>
+<summary>**Hint 1 **</summary>
+Try using `augment()` and `mutate()` to create `tidy_mod`.
+</details>
 
-```{r ex9-hint-2}
-tidy_mod |> 
-  select(Acceptance, Acceptance_hat) |>
-  ___
-```
+<details>
+<summary>**Hint 2**</summary>
+For the confusion matrix, you'll want the output to be in a `table()`, which you can use the last line to specify.
+</details>
+
+<!-- ```{r ex9-hint-1} -->
+<!-- tidy_mod <- augment(mod, type.predict = "response") |>  -->
+<!--   mutate(Acceptance_hat = round(.fitted))  -->
+<!-- ``` -->
+
+<!-- ```{r ex9-hint-2} -->
+<!-- tidy_mod |>  -->
+<!--   select(Acceptance, Acceptance_hat) |> -->
+<!--   ___ -->
+<!-- ``` -->
 
 <!-- ```{r ex9-solution} -->
 <!-- # data frame with binary predictions -->
