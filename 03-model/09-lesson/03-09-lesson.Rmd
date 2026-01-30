@@ -746,7 +746,7 @@ For computing the observed odds, what output from the model do you think you cou
 Previously, we considered two formulations of logistic regression models:
 
 1. on the probability scale, the units are easy to interpret, but the function is non-linear, which makes it hard to understand
-2. on the odds scale, the units are harder (but not impossible) to interpret, and the function in exponential, which makes it harder (but not impossible) to interpret
+2. on the odds scale, the units are harder (but not impossible) to interpret, and the function is exponential, which makes it harder (but not impossible) to interpret
 
 We'll now add a third formulation:
 
@@ -762,6 +762,7 @@ Thus, the exponentiated coefficient $\beta_1$ tells us how the expected *odds* c
 
 
 **Exercise:**
+
 - Add a variable called `log_odds` to `MedGPA_binned` that records the odds of being accepted for each bin. Recall that $odds(p) = p / (1-p)$.  
 - Create a scatterplot called `data_space` for `log_odds` as a function of `mean_GPA` using the binned data in `MedGPA_binned`. Use `geom_line` to connect the points.
 - Add a variable called `log_odds_hat` to `MedGPA_plus` that records the predicted odds of being accepted for each observation. 
@@ -833,11 +834,50 @@ data_space +
 
 ### Interpretation of logistic regression
 
-The fitted coefficient $\widehat{\beta}_1$ from the medical school logistic regression model is 5.45. The exponential of this is 233.73. 
+Our fitted medical school logistic regression model is given by the following:
 
-Donald's GPA is 2.9, and thus the model predicts that the probability of him getting into medical school is 3.26%. The odds of Donald getting into medical school are 0.0337, or - phrased in gambling terms - 29.6:1. 
+$$
+odds(\widehat{p}) = e^{\widehat{\beta_0} + \widehat{\beta_1}x} = e^{-19.21 + 5.45x}
+$$
+Say that Donald, a student applying to medical schools, has a GPA of $2.9$. Use the fitted model above to answer the following questions.
 
-**Food for thought:** If Donald hacks the school's registrar and changes his GPA to 3.9, how would his expected odds of getting into medical school change?
+```{r mc1}
+question("What are Donald's odds of being accepted into medical school, according to our model?",
+  answer("e^{15.81}"),
+  answer("e^{-3.41}", correct = TRUE),
+  answer("e^{-19.21}"),
+  answer("e^{5.45}"),
+  allow_retry=TRUE
+)
+```
+
+<details>
+<summary>**Hint**</summary>
+Use the odds equation: $odds(\widehat{p})=\frac{\widehat{p}}{1-\widehat{p}}$ 
+</details>
+
+Say that Donald (allegedly) hacks into his school's registrar and changes his GPA to 3.9. 
+
+```{r mc2}
+question("Now what is the probability that Donald is accepted into medical school, according to our model?",
+  answer("3.2%"),
+  answer("< 0.1"),
+  answer("99%"),
+  answer("89%", correct = TRUE),
+  allow_retry=TRUE
+)
+```
+
+<details>
+<summary>**Hint**</summary>
+Use the odds equation: $odds(\widehat{p})=\frac{\widehat{p}}{1-\widehat{p}}$ 
+</details>
+
+<!-- The fitted coefficient $\widehat{\beta}_1$ from the medical school logistic regression model is 5.45. The exponential of this is 233.73.  -->
+
+<!-- Donald's GPA is 2.9, and thus the model predicts that the probability of him getting into medical school is 3.26%. The odds of Donald getting into medical school are 0.0337, or - phrased in gambling terms - 29.6:1.  -->
+
+<!-- **Food for thought:** If Donald hacks the school's registrar and changes his GPA to 3.9, how would his expected odds of getting into medical school change? -->
 
 ## Using a logistic model
 
@@ -912,7 +952,19 @@ mod_plus |>
   table()
 ```
 
-So how well did our model perform? One common way of assessing performance of models for a categorical response is via a confusion matrix. This simply cross-tabulates the reality with what our model predicted. In this case, our model predicted that 91 patients would die, and only 12 would live. Of those 91, 71 actually did die, while of the 12, 8 actually lived. Thus, our overall accuracy was 79 out of 103, or about 77%. 
+So how well did our model perform? One common way of assessing performance of models for a categorical response is via a confusion matrix. This simply cross-tabulates the reality with what our model predicted. In this case, our model predicted that 91 patients would die, and only 12 would live. Of those 91, 71 actually did die, while of the 12, 8 actually lived. 
+
+<!-- Thus, our overall accuracy was 79 out of 103, or about 77%.  -->
+
+```{r mc2}
+question("What is the overall accuracy of the model?",
+  answer("71 out of 91, or about 78%."),
+  answer("8 out of 12, or about 67%."),
+  answer("79 out of 103, or about 77%.", correct = TRUE),
+  allow_retry=TRUE
+)
+```
+
 
 Note that our model predicted only 12 patients would live, but more than twice as many patients actually survived. Our model's under-prediction is probably a consequence of the low survival rate overall, coupled with our clumsy rounding scheme. One way to improve the accuracy of our binary predictions would be to experiment with looser rounding thresholds.
 
@@ -954,7 +1006,7 @@ new_data <- ___
 
 ### Making binary predictions
 
-Naturally, we want to know how well our model works. Did it predict acceptance for the students who were actually accepted to medical school? Did it predict rejections for the student who were not admitted? These types of predictions are called *in-sample*. One common way to evaluate models with a binary response is with a confusion matrix. [Yes, that is actually what it is called!] 
+Naturally, we want to know how well our model works. Did it predict acceptance for the students who were actually accepted to medical school? Did it predict rejections for the student who were not admitted? These types of predictions are called *in-sample*. As before, we can evaluate the binary response model with a confusion matrix.
 
 However, note that while our response variable is binary, our fitted values are probabilities. Thus, we have to round them somehow into binary predictions. While the probabilities convey more information, we might ultimately have to make a decision, and so this rounding is common in practice. There are many different ways to round, but for simplicity we will predict admission if the fitted probability is greater than 0.5, and rejection otherwise. 
 
