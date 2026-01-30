@@ -148,8 +148,9 @@ Multiple regression can be an effective technique for understanding how a respon
 
 One quick technique for jump-starting EDA is to examine all of the pairwise scatterplots in your data. This can be achieved using the `pairs()` function. Look for variables in the `nyc` data set that are strongly correlated, as those relationships will help us check for **multicollinearity** later on.
 
-Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
+**Exercise:**
 
+Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
 
 ```{r ex1, exercise=TRUE}
 
@@ -181,6 +182,8 @@ question("Which pairs of variables appear to be strongly correlated?",
 Based on your knowledge of the restaurant industry, do you think that the quality of the food in a restaurant is an important determinant of the price of a meal at that restaurant? It would be hard to imagine that it wasn't. We'll start our modeling process by plotting and fitting a model for `Price` as a function of `Food`. 
 
 On your own, interpret these coefficients and examine the fit of the model. What does the coefficient of `Food` mean in plain English? "Each additional rating point of food quality is associated with a..."
+
+**Exercise:**
 
 - Use `ggplot` to make a scatter plot for `Price` as a function of `Food`. 
 - Use `lm()` to fit a simple linear regression model for `Price` as a function of `Food`.
@@ -265,6 +268,8 @@ In real estate, a common mantra is that the three most important factors in dete
 
 Let's expand our model into a parallel slopes model by including the `East` variable in addition to `Food`. 
 
+**Exercise:**
+
 * Use `lm()` to fit a parallel slopes model for `Price` as a function of `Food` and `East`. 
 * Interpret the coefficients and the fit of the model. 
 * Can you explain the meaning of the coefficient on `East` in simple terms? Did the coefficient on `Food` change from the previous model? If so, why? Did it change by a lot or just a little? 
@@ -302,10 +307,6 @@ Multiple regression gives us a way to reason about these questions. Fit the mode
 
 Next, let's visually assess our model using `plotly`. The `x` and `y` vectors, as well as the `plane` matrix, have been created for you.
 
-- Use `lm()` to fit a multiple regression model for `Price` as a function of `Food` and `Service`.
-- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food` and `Service` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
-- Use `add_surface()` to draw a plane through the cloud of points using the object `plane`.
-
 ```{r ex4-setup}
 mod <- lm(Price ~ Food + Service, data = nyc)
 
@@ -325,6 +326,12 @@ plane <- tidy_planes |>
   pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
+
+**Exercise:**
+
+- Use `lm()` to fit a multiple regression model for `Price` as a function of `Food` and `Service`.
+- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food` and `Service` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
+- Use `add_surface()` to draw a plane through the cloud of points using the object `plane`.
 
 ```{r ex4, exercise=TRUE}
 # fit model
@@ -420,6 +427,8 @@ We have explored models that included the quality of both food and service, as w
 
 Examine the coefficients closely. Do they make sense based on what you understand about these data so far? How did the coefficients change from the previous models that you fit?
 
+**Exercise:**
+
 - Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `Service`, and `East` from the dataset `nyc`.
 
 ```{r ex5, exercise=TRUE}
@@ -468,9 +477,6 @@ One way to think about this would be in terms of the practical significance. Is 
 
 Another way is to examine the impact of location in the context of the variability of the other variables. We can do this by building our parallel planes in 3D and seeing how far apart they are. Are the planes close together or far apart? Does the `East` variable clearly separate the data into two distinct groups? Or are the points all mixed up together?
 
-- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food`, `Service`, and `East` by mapping the `z` variable to the response and the `x` and `y` variables to the numeric explanatory variables. Use color to indicate the value of `East`. Place `Food` on the x-axis and `Service` on the y-axis.
-- Use `add_surface()` (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects `plane0` and `plane1`.
-
 ```{r ex6-setup}
 mod <- lm(Price ~ Food + Service + East, data = nyc)
 
@@ -500,6 +506,11 @@ plane1 <- tidy_planes |>
 col1 <- c('#BF382A', '#0C4B8E')
 col3 <- colorRamp(c("orange"))
 ```
+
+**Exercise:**
+
+- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food`, `Service`, and `East` by mapping the `z` variable to the response and the `x` and `y` variables to the numeric explanatory variables. Use color to indicate the value of `East`. Place `Food` on the x-axis and `Service` on the y-axis.
+- Use `add_surface()` (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects `plane0` and `plane1`.
 
 ```{r ex6, exercise=TRUE}
 # draw 3D scatterplot
@@ -533,6 +544,8 @@ In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the oth
 One variable we haven't considered is `Decor`. Do people, on average, pay more for a meal in a restaurant with nicer decor? If so, does it still matter after controlling for the quality of food, service, and location? 
 
 By adding a third numeric explanatory variable to our model, we lose the ability to visualize the model in even three dimensions. Our model is now a hyperplane -- or rather, parallel hyperplanes -- and while we won't go any further with the geometry, know that we can continue to add as many variables to our model as we want. As humans, our spatial visualization ability taps out after three numeric variables (maybe you could argue for four, but certainly no further), but neither the mathematical equation for the regression model, nor the formula specification for the model in R, is bothered by the higher dimensionality. 
+
+**Exercise:**
 
 Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `Service`, `Decor`, and `East` using the dataset `nyc`.
 

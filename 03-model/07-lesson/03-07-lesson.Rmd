@@ -227,6 +227,8 @@ So, in summary, the key points about $R^2$ and adjusted $R^2$ are:
 
 Now try it for yourself. The model `mod` from the `mariokart` data set is already in your workspace.
 
+**Exercise:**
+
 - Use `mutate()` to add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` to the `mariokart` data set. Save the new dataframe as `mariokart_noisy`.
 - The first argument of `lm()` is a formula involving the variables `total_pr`, `wheels`, `cond`, and `noise`.
 - Call the function `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object `mod2`. Did the value of $R^2$ increase? What about adjusted $R^2$?
@@ -305,11 +307,12 @@ A traditional way to return the fitted values (i.e. the $\widehat{y}$'s) is to r
 
 A newer alternative is the `augment()` function from the **broom** package, which returns a `data.frame` with the response variable ($y$), the relevant explanatory variables (the $x$'s), the fitted value ($\widehat{y}$) and some information about the residuals ($e$). `augment()` will also take a `newdata` argument that allows you to make predictions.
 
+**Exercise:**
+
 The fitted model `mod` is already in your environment.
 
 - Compute the fitted values of the model as a vector using `predict()`.
 - Compute the fitted values of the model as one column in a `data.frame` using `augment()`.
-
 
 ```{r ex2-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
@@ -448,10 +451,11 @@ lm(y ~ x + z + x:z, data = mydata)
 
 will do the trick. The use of the colon (`:`) here means that the interaction between $x$ and $z$ will be a third term in the model.
 
+**Exercise:**
+
 The data frame `mariokart` is already loaded in your workspace.
 
 - Use `lm()` to fit a model for the price of a MarioKart as a function of its condition and the duration of the auction, *with interaction*.
-
 
 Include the term `cond:duration` in your formula to model the interaction of condition and duration.
 
@@ -475,6 +479,8 @@ To include an interaction effect of variable A and B, use `A:B`.
 Interaction allows the slope of the regression line in each group to vary. In this case, this means that the relationship between the final price and the length of the auction is moderated by the condition of each item. 
 
 Interaction models are easy to visualize in the data space with **ggplot2** because they have the same coefficients as if the models were fit independently to each group defined by the level of the categorical variable. In this case, new and used MarioKarts each get their own regression line. To see this, we can set an aesthetic (e.g. `color`) to the categorical variable, and then add a `geom_smooth()` layer to overlay the regression line for each color.
+
+**Exercise:**
 
 The dataset `mariokart` is already loaded in your workspace.
 
@@ -600,6 +606,8 @@ slr
 
 
 Our simple linear regression model is misleading, in that it suggests a negative relationship between final auction price and duration. However, *for the used* MarioKarts, the relationship is positive.
+
+**Exercise:**
 
 The object `slr` is already defined for you.
 

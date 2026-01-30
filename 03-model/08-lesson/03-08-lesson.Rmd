@@ -292,6 +292,8 @@ Note how the plane cuts through the data points. The residual associated with ea
 
 ## Your turn
 
+**Exercise:**
+
 Now you will fit a multiple linear regression model (MLR model) yourself. The dataset `mariokart` you are going to use is already loaded in your workspace. Have a first look with `glimpse()` at the data:
 
 ```{r ex0-mariokart-glimpse, exercise=TRUE}
@@ -309,6 +311,7 @@ In terms of the R code, fitting a MLR model is easy: Simply add variables to the
 
 In a parallel slopes model, we had two explanatory variables: one was numeric and one was categorical. Here, we will allow both explanatory variables to be numeric.
 
+**Exercise:**
 
 Fit a multiple linear regression model for total price as a function of the duration of the auction and the starting price.
 If you don't remember the variable names look at the previous exercise or at the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
@@ -352,6 +355,8 @@ grid <- mariokart |>
     start_pr = seq_range(start_pr, by = 0.01)
   )
 ```
+
+**Exercise:**
 
 The model object `mod` is already in your workspace.
 
@@ -454,6 +459,8 @@ plane <- tidy_planes |>
 Much like `ggplot()`, the `plot_ly()` function will allow you to create a plot object with variables mapped to `x`, `y`, and `z` aesthetics. The `add_markers()` function is similar to `geom_point()` in that it allows you to add points to your 3D plot. 
 
 Note that `plot_ly` uses the pipe (`|>`) operator to chain commands together.
+
+**Exercise:**
 
 - Run the `plot_ly` command to draw 3D scatterplot for `total_pr` as a function of `duration` and `start_pr` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis.
 - Use `add_surface()` to draw a plane through the cloud of points by setting `z = ~plane`.
@@ -574,8 +581,9 @@ Now it is your turn to look at the `mariokart` data set.
 
 ### Coefficient magnitude
 
-Let's again fit a multiple linear regression model with the `mariokart` data set for total price (`total_pr`) as a function of the `duration` of the auction and the starting price (`start_pr`).
+**Exercise:**
 
+Let's again fit a multiple linear regression model with the `mariokart` data set for total price (`total_pr`) as a function of the `duration` of the auction and the starting price (`start_pr`).
 
 ```{r ex4-mariokart, exercise=TRUE}
 # Fit the model using duration and starting price
@@ -747,7 +755,7 @@ plane1 <- tidy_planes |>
 
 Draw a 3D plot for the `mariokart` model. Once again we have stored the `x` and `y` vectors for you. Since we now have two planes, there are matrix objects `plane0` and `plane1` stored for you as well.
 
-**Instructions**
+**Exercise:**
 
 - Apply `plot_ly` to draw 3D scatterplot for the mariokart model, Use `total_pr` as a function of `duration`, `start_pr`, and `cond` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis. Use color to represent `cond`.
 - Use `add_surface()` (twice) to draw two planes through the cloud of points, one for new MarioKarts and another for used ones. Use the objects `plane0` and `plane1`.
@@ -804,6 +812,8 @@ The first plane corresponds to the model output when the condition of the item i
 
 
 ### Parallel plane interpretation
+
+**Exercise:**
 
 Now fit a linear model the response `total_pr` and explanatory variabels `duration`, `start_pr`, and `cond` 
 using the `mariokart` data. 
@@ -877,6 +887,8 @@ The interpretation of the coefficients in larger models remains the same. We can
 ## Your turn
 
 ### Interpretation of coefficient in a big model
+
+**Exercise:**
 
 This time you will throw even more variables into your `mariokart` model, including the number of bids in each auction (`n_bids`) and the number of `wheels`. 
 
