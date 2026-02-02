@@ -411,7 +411,7 @@ gap2007 |>
 ```
 
 
-```{r ex1-solution}
+<!-- ```{r ex1-solution}
 # Create dataset of 2007 data
 gap2007 <- filter(gapminder, year == 2007)
 
@@ -425,7 +425,7 @@ gap2007 |>
 gap2007 |>
   ggplot(aes(x = continent, y = lifeExp)) +
   geom_boxplot()
-```
+``` -->
 
 
 ## Measures of variability
@@ -699,7 +699,7 @@ gap2007 |>
   geom_density(alpha = 0.3)
 ```
 
-```{r ex2-solution}
+<!-- ```{r ex2-solution}
 # Compute groupwise measures of spread
 gap2007 |>
   group_by(continent) |>
@@ -711,7 +711,7 @@ gap2007 |>
 gap2007 |>
   ggplot(aes(x = lifeExp, fill = continent)) +
   geom_density(alpha = 0.3)
-```
+``` -->
 
 Consider the density plots shown here. What are the most appropriate measures to describe their centers and spreads? In this exercise, you'll select the measures and then calculate them.
 
@@ -749,12 +749,12 @@ gap2007 |>
             sd(lifeExp))
 ```
 
-```{r ex3-solution}
+<!-- ```{r ex3-solution}
 gap2007 |>
   filter(continent == "Americas") |>
   summarize(mean(lifeExp),
             sd(lifeExp))
-```
+``` -->
 
 ## Shape and transformations
 
@@ -901,7 +901,7 @@ gap2007 |>
   geom_density()
 ```
 
-```{r ex4-solution}
+<!-- ```{r ex4-solution}
 # Create density plot of old variable
 gap2007 |>
   ggplot(aes(x = pop)) +
@@ -915,7 +915,7 @@ gap2007 <- gap2007 |>
 gap2007 |>
   ggplot(aes(x = log_pop)) +
   geom_density()
-```
+``` -->
 
 
 ## Outliers
@@ -1075,7 +1075,7 @@ gap2007 |>
   geom_boxplot()
 ```
 
-```{r ex5-solution}
+<!-- ```{r ex5-solution}
 # Create a boxplot of the distribution of life expectancy with the outlier removed 
 gap2007 |>
   filter(continent == "Asia") |>
@@ -1083,7 +1083,7 @@ gap2007 |>
   filter(!is_outlier) |>
   ggplot(aes(x = lifeExp)) +
   geom_boxplot()
-```
+``` -->
 
 ## Submit
 

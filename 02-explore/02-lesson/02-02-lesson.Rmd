@@ -230,7 +230,7 @@ ggplot(data = cars, aes(horsepwr)) +
   geom_histogram(binwidth = 3)
 ```
 
-```{r ex4-solution}
+<!-- ```{r ex4-solution}
 # Create hist of horsepwr with binwidth of 3
 ggplot(data = cars, aes(horsepwr)) +
   geom_histogram(binwidth = 3) +
@@ -248,7 +248,7 @@ ggplot(data = cars, aes(horsepwr)) +
   geom_histogram(binwidth = 60) +
   ## adds on a title to the plot
   labs(title = "binwidth = 60")
-```
+``` -->
 
 ### Three binwidths interpretation
 
@@ -647,7 +647,7 @@ ggplot(data = cars, ___) +
  Does a distribution appear to have outliers? If so, a boxplot is more appropriate. Does a distribution have multiple modes? If so, a density plot is more appropriate.  
 ```
 
-```{r ex6-solution}
+<!-- ```{r ex6-solution}
 # Create plot of city_mpg
 ggplot(data = cars, aes(x = city_mpg)) +
   geom_boxplot()
@@ -655,7 +655,7 @@ ggplot(data = cars, aes(x = city_mpg)) +
 # Create plot of width
 ggplot(data = cars, aes(x = width)) +
   geom_density()
-```
+``` -->
 
 ### Boxplots for outlier detection
 
@@ -745,7 +745,7 @@ ggplot(data = cars_no_out, aes(x = msrp)) +
   geom_boxplot()
 ```
 
-```{r ex5-solution}
+<!-- ```{r ex5-solution}
 # Construct boxplot of msrp
 cars |>
   ggplot(aes(x = msrp)) +
@@ -758,7 +758,7 @@ cars_no_out <- cars |>
 # Construct boxplot of msrp using the reduced dataset
 ggplot(data = cars_no_out, aes(x = msrp)) +
   geom_boxplot()
-```
+``` -->
 
 
 ## Visualizations of two variables 
@@ -814,12 +814,12 @@ ggplot(data = cars, aes(x = city_mpg)) +
   facet_wrap(___)
 ```
 
-```{r ex1-solution}
+<!-- ```{r ex1-solution}
 # Create faceted histogram
 ggplot(data = cars, aes(x = city_mpg)) +
   geom_histogram() +
   facet_wrap(suv)
-```
+``` -->
 
 ## Colored density plots
 
@@ -885,11 +885,11 @@ ggplot(data = common_cyl, aes(x = city_mpg, fill = ___)) +
   geom_density(alpha = 0.3)
 ```
 
-```{r ex2-solution}
+<!-- ```{r ex2-solution}
 # Create overlaid density plots for same data
 ggplot(data = common_cyl, aes(x = city_mpg, fill = as.factor(ncyl))) +
   geom_density(alpha = 0.3)
-```
+``` -->
 
 ### Compare distribution via plots
 
@@ -1090,13 +1090,13 @@ common_cyl |>
 
 ```
 
-```{r ex7-solution}
+<!-- ```{r ex7-solution}
 # Facet histograms using hwy mileage and ncyl
 common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
   facet_grid(ncyl ~ suv, labeller = label_both)
-```
+``` -->
 
 ### Interpreting plots with three variables
 

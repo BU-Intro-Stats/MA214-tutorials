@@ -1,0 +1,393 @@
+---
+title: "Advanced Inference: 5 - Case Study: Logistic Regression for Low Birthweights in Nepal"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+#devtools::install_github("rundel/learnrhash")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+library(ggplot2)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+
+## Welcome
+
+In this tutorial, you'll learn about logistic regression through a case study. The following data contains observations of infants' birth weights from July 2018 to March 2019 at a health facility in Nepal (source: K.C. et. al., 2020). Low birth weight for an infant is defined as less than 2500 grams, and is a crucial indicator of maternal health, poverty, and future health of the child. The variables are:
+
+- `birthWeight` - weight of the infant at birth, in grams
+- `smoking` - indicator for whether the mother smoked during pregnancy: 0 (no) or 1 (yes)
+- `motherWeight2` - the mother's weight at her 2nd trimester visit to the care facility, in kg
+- `motherWeight3` - the mother's weight at her 3rd trimester visit to the care facility, in kg
+
+You want to determine which other health factors are correlated with low birthweight. 
+
+```{r}
+# Data pre-processing:
+#birthweights <- read_sav("pone.0234907.s001.sav")
+#birthweights <- data.frame(birthweights$BIRTHWEI, birthweights$SMOKINGH, birthweights$WEIGHTMO_1, #birthweights$WEIGHTM1_3)
+#colnames(birthweights) <- c("birthWeight", "smoking", "motherWeight2", "motherWeight3")
+#write.csv(birthweights, "~/bu/grad/teaching/LCT/MA214/MA214-tutorials/07-adv-model-infer/birthweights.csv", row.names=FALSE)
+```
+
+```{r}
+# Load data and display the first 10 rows:
+birthweights <- read.csv("data/birthweights.csv", header=TRUE)
+head(birthweights)
+```
+
+
+## Processing and exploring birthweight data
+
+Before we proceed, we'll need to process the data and compute the variables needed for our analysis. First, let's create an indicator variable for whether the infant had a low birthweight. How would you compute this using the `birthWeight` column?
+
+```{r ex1, exercise=TRUE}
+birthweights$low <- as.numeric(____)
+```
+
+```{r ex1-solution}
+birthweights$low <- as.numeric(birthweights$birthWeight <= 2500)
+```
+
+And now compute the difference between the mother's third trimester weight and second trimester weight:
+
+```{r ex2, exercise=TRUE}
+birthweights$weightChange <- ____
+```
+
+```{r ex2-solution}
+birthweights$weightChange <- birthweights$motherWeight3 - birthweights$motherWeight2
+```
+
+```{r, echo=FALSE}
+# need this or the document won't knit
+birthweights$low <- as.numeric(birthweights$birthWeight <= 2500)
+birthweights$weightChange <- birthweights$motherWeight3 - birthweights$motherWeight2
+```
+###
+
+Now we have what we need to explore the data. Graph the indicator variable `low` vs the mother's weight change, and color the points by whether the mother was smoking during pregnancy:
+
+```{r ex3, exercise=TRUE}
+ggplot(data=birthweights, aes(x=____, y=____, color=____)) +
+  geom_point(alpha=0.6)  # alpha=0.6 to make the points easier to see when they overlap
+```
+
+```{r ex3-solution}
+ggplot(data=birthweights, aes(x=weightChange, y=low, color=as.factor(smoking))) +
+  geom_point(alpha=0.6)
+```
+
+###
+
+It looks like we have a binary response variable here, with one covariate. You may recall a similar setup in Tutorial 3.9, where we first covered logistic regression. We'll do a bit of review in the next section.
+
+
+## Review: Logistic Regression
+
+Recall from Tutorial 3.9 that logistic regression models a binary response, specifically the probability of a "success" or "failure." In this case, if $Y_i \sim {\rm Bernoulli}(p_i)$ is the indicator for whether an infant has a low birthweight, then we have
+
+$$ \mathbb{P}(Y_i=1)=p_i \quad\quad\text{and}\quad\quad \mathbb{P}(Y_i=0)=1-p_i$$
+where we are careful to consider whether $p_i$ might be different for each case, given the other health, environmental, and social factors that affect pregnancy and birth. 
+
+###
+
+```{r mc-1}
+question("What is the expectation of Y_i as modeled above?",
+         answer("0"),
+         answer("p_i", correct=TRUE),
+         answer("1-p_i"),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc-2}
+question("What is the variance of Y_i as modeled above?",
+         answer("1"),
+         answer("p_i"),
+         answer("p_i(1-p_i)", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Odds and log-odds
+
+Recall that the logistic function is given by
+
+$$f(t) = \frac{e^t}{1+e^t}$$
+
+###
+
+and when we perform logistic regression, we model the data as
+
+$$\mathbb{E}[Y_i] = p_i = \frac{e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}}{1 + e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}}$$
+or equivalently,
+
+$$ \frac{p_i}{1-p_i} = e^{\beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}}$$
+
+### 
+
+The quantity on the left-hand side is called "odds." In words, it indicates how much more likely an event occurring is than it not occurring. For some examples of how this works concretely, check out the table below:
+
+
+```{r table1, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Odds Ratio    |                 Interpretation                       |
+|---------------|:----------------------------------------------------:|
+| < 1           | Event is more likely to not occur than to occur      |
+| = 1           | p=0.5, event is equally likely to occur or not occur |
+| > 1           | Event is more likely to occur than to not occur      |
+"
+cat(tabl) # output the table
+```
+
+###
+
+While odds are a useful concept, they can be hard to work with in modeling contexts. Consider how you might interpret the coefficients $\beta_j$ from a model using the odds function above: you'd have to take into account the exponential. On the other hand, if we take the logarithm of the odds function, we get (predictably) a log-odds function:
+
+$$ {\rm log} \biggl( \frac{p_i}{1-p_i} \biggr) = \beta_0 + \beta_1 X_{i,1} + \beta_2 X_{i,2}$$
+
+###
+
+Log-odds is symmetric around zero, which makes interpreting coefficients a bit more intuitive. Moreover, now we have our linear model directly on the right-hand side. Unfortunately, as we explored in Tutorial 3.9, the scale of the log-odds function is not a natural one for interpretation, so we need to take care when comparing values. 
+
+A revised table interpreting both odds and log-odds values looks like this:
+
+```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Odds Ratio    | Log-odds |                 Interpretation                       |
+|---------------|----------|:----------------------------------------------------:|
+| < 1           |   < 0    | Event is more likely to not occur than to occur      |
+| = 1           |   = 0    | p=0.5, event is equally likely to occur or not occur |
+| > 1           |   > 0    | Event is more likely to occur than to not occur      |
+"
+cat(tabl) # output the table
+```
+
+###
+
+And here we have a plot of the values of p, odds, and log-odds:
+
+```{r, echo=FALSE}
+library(gridExtra)
+
+p <- seq(from=0.0001, to=1, length.out=100)
+odds_data <- data.frame(p)
+odds_data$odds <- (odds_data$p)/(1-odds_data$p)
+odds_data$logOdds <- log(odds_data$odds)
+
+#head(odds_data)
+plot1 <- ggplot(data=odds_data, aes(x=p, y=p)) + geom_line()
+plot2 <- ggplot(data=odds_data, aes(x=p, y=odds)) + geom_line()
+plot3 <- ggplot(data=odds_data, aes(x=p, y=logOdds)) + geom_line()
+
+grid.arrange(plot1, plot2, plot3)
+```
+
+Notice how both the odds and log-odds increase with p, but the log-odds has a more moderate curve and is symmetric around 0. 
+
+###
+
+```{r mc-3}
+question("For p=0.4, what are the odds?",
+         answer("0.67", correct=TRUE),
+         answer("1.5"),
+         answer("0.6"),
+         answer("Not sure"))
+```
+
+```{r mc-4}
+question("For p=0.4, what are the log-odds?",
+         answer("-0.22"),
+         answer("0.17"),
+         answer("-0.17", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Modeling Low Birthweight
+
+Now we have the tools needed to model low birthweight outcomes with logistic regression. Using the `glm` function in R, fit a model with a Binomial link function. 
+
+```{r ex4, exercise=TRUE}
+logReg <- glm(data=birthweights, formula=____, family=____)
+summary(logReg)
+```
+
+```{r ex4-solution}
+logReg <- glm(data=birthweights, formula=low~smoking + weightChange, 
+              family=binomial)
+summary(logReg)
+```
+
+```{r, echo=FALSE}
+# need this or the document won't knit
+logReg <- glm(data=birthweights, formula=low~smoking + weightChange, 
+              family=binomial)
+```
+
+###
+
+Let's see how we might interpret the coefficients. Recall that logistic regression is based on the log-odds function, so we still have a logarithm on the left-hand side of the equation. What happens when we take ${\rm exp}\{...\}$ of the model?
+
+```{r, include=TRUE, echo=TRUE}
+coef(logReg)         # original model coefficients, log-odds scale
+exp(coef(logReg))    # take exp() to convert to odds scale
+```
+
+```{r mc-5}
+question("According to our model, what are the odds of low birthweight for an infant whose mother smoked during pregnancy? Assume her weight change was 0 kg, so we control for that variable.",
+         answer("The odds of low birthweight increased by a factor of 1.5 if the mother smoked during pregnancy."),
+         answer("The odds of low birthweight decreased by a factor of 0.9 if the mother smoked during pregnancy."),
+         answer("The odds of low birthweight increased by a factor of 4.5 if the mother smoked during pregnancy.", correct=TRUE),
+         answer("Not sure"))
+```
+
+###
+
+In addition to the odds and log-odds, we can also recover the estimated probabilities from our model. For example, let's say we have a mother whose weight decreased by 2 kg during pregnancy, but did not smoke. What is the estimated probability that the infant will have a low birthweight?
+
+###
+
+From our model coefficients, we have:
+
+$$ e^{4.53*0 - 0.94*2} = e^{-1.88} = \frac{p}{1-p} $$
+Solving for p gives us:
+
+$$ e^{-1.88}(1-p) = p $$
+$$ e^{-1.88} - pe^{-1.88} = p $$
+
+$$ \frac{e^{-1.88}}{1+e^{-1.88}} = p = 0.13$$
+
+So according to our model, a moderate loss of weight between the 2nd and 3rd trimesters, barring other factors, is correlated with a low probability of low birthweight of the infant. 
+
+## Taking Care with Model Interpretations
+
+For reasons we'll see more clearly below, we should be careful when interpreting our model results. 
+
+### 
+
+First, let's examine the relationship between smoking during pregnancy and low birthweight. It turns out that the dataset used did not have many examples of mothers who smoked during pregnancy: just 8 out of 369 did - and of those, 6 of the infants had a low birthweight: 
+
+```{r, echo=TRUE, include=TRUE}
+# Count the number of rows where the smoking indicator variable = 1:
+sum(birthweights$smoking)
+
+# Let's see those rows:
+birthweights[birthweights$smoking==1,]
+```
+
+This small segment of outcomes is likely skewing the results. 
+
+### 
+
+On the other hand, what about the weight change variable? Our model says that for each +1 kg gained (weightChange$>0$), the infant's odds of a low birthweight increased by a factor of 0.9. But that doesn't sound quite right: gestating mothers are usually told that weight gain during pregnancy is healthy and aids in the fetus' development during gestation ([CDC, May 2024](https://www.cdc.gov/maternal-infant-health/pregnancy-weight/index.html)). What else might be going on?
+
+###
+
+It's a bit of a trick question. The `birthweights` data we've analyzed here is actually a subset of a larger dataset which included several other variables. The source study, published in PLoS One, found that three other factors were significant predictors of low birthweight: having a firewood or kerosene kitchen in the home, low iron intake during pregnancy, and pre-term birth (K.C. et. al., 2020). In short, there are other factors affecting low birthweight that we did not measure in this case study. 
+
+###
+
+Reference for the birthweights data and study results:
+
+K. C. A., Basel P. L., Singh S. Low birth weight and its associated risk factors: Health facility-based case-control study. PLoS One. 2020 Jun 22;15(6):e0234907. doi: 10.1371/journal.pone.0234907. PMID: 32569281; PMCID: PMC7307746.
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

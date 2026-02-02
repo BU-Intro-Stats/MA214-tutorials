@@ -1,0 +1,798 @@
+---
+title: "Advanced Inference: 3 - Inference and Prediction"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+#devtools::install_github("rundel/learnrhash")
+
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+#library(emo)
+
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+## Welcome
+
+In this tutorial, you'll learn more about inference and prediction for regression models. Our main goal is to learn how to quantify uncertainty not just in our model parameters, but also in the predictions that we make with them. To start, let's review the workflow for estimating parameters. 
+
+
+### Review: estimate parameters
+
+Fit a linear model to the following dataset containing records of flights out of New York City in 2013. In particular, model the relationship between distance (in miles) and air time (in minutes). Then print a summary of the model results.
+
+```{r, echo=FALSE}
+set.seed(42)
+
+# Dataset is too big for our purposes, just take 40 samples and select the
+# two columns of interest
+nycflights <- nycflights %>% 
+  select(distance, air_time) %>%
+  sample_n(size=40) 
+
+# Add some extra noise
+nycflights$air_time <- nycflights$air_time + rnorm(n=nrow(nycflights), sd=5)
+head(nycflights)
+
+# Store model object, can't knit otherwise
+model <- lm(data=nycflights, air_time ~ distance)
+```
+
+```{r ex1, exercise=TRUE}
+model <- lm(data=nycflights, ____)
+summary(model)
+```
+
+```{r ex1-solution}
+model <- lm(data=nycflights, air_time ~ distance)
+summary(model)
+```
+
+###
+
+```{r, echo=FALSE}
+ggplot(data=nycflights, aes(x=distance, y=air_time)) + 
+  geom_point() +
+  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
+```
+
+```{r mc1, echo=FALSE}
+question("Is there a correlation between flight distance and air time?",
+         answer("Yes", correct=TRUE),
+         answer("No"),
+         answer("Not sure"))
+```
+
+###
+
+Here is the model you should've gotten from your summary:
+
+$y = 18.36 + 0.126x + residuals$
+
+```{r mc2, echo=FALSE}
+question("How would you interpret the model parameters above?",
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 12.6 minutes"),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 0.126 minutes.", correct=TRUE),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 18.36 minutes."),
+         answer("For each one-mile increase in flight distance, the model predicts that the corresponding air time increases by 1.836 minutes."),
+         answer("Not sure"))
+```
+
+
+### Review: quantifying (un)certainty
+
+As we would expect, there is a strong correlation between flight distance and air time ($R^2$=0.97). The average increase of $0.126$ minutes is a point estimate based on a sample of $n=40$ flights. Given the model output above and any relevant R functions, construct a $95\%$ confidence interval to give an interval estimate of the true $\beta_1$:
+
+```{r ex2, exercise=TRUE}
+```
+
+```{r ex2-hint1}
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
+```
+
+```{r ex2-hint2}
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
+
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
+```
+
+```{r ex2-hint3}
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
+
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
+
+# To compute the critical t value, use the qt() function:
+t_crit <- qt(p=0.05/2, df=38)
+```
+
+```{r ex2-solution}
+# You have the point estimate, b1=0.126, and the model summary gives you the
+# standard error for this estimate: SE = 0.002978
+
+# Now for the degrees of freedom: you have n=40 samples, so df = n-2 = 38
+
+# To compute the critical t value, use the qt() function, and remember we are
+# computing a two-sided CI:
+t_crit <- qt(p=0.05/2, df=38)
+
+# Now compute the full interval:
+0.126 + c(-1,1)*t_crit*0.002978
+```
+
+
+## Predicting future values
+
+***TODO: add concept check MC questions***
+
+Now imagine you're flying direct from NYC to BOS - about 187 miles. Your model can predict how long this flight might take:
+
+$\hat{y} = 18.36 + (0.126\times187) = 41.92$ minutes
+
+But we know this model is based on our sample of 40 flights, and that the estimate might be different if we had generated the model from a different sample (this is called *sampling variability*). Another way to think about it is this: imagine we knew $\beta_0$ and $\beta_1$ exactly. Then we would know $y$, too, right? 
+
+###
+
+### Model-based analysis
+
+Well, no - we still don't know $\epsilon$, the `residuals` in the equation $y = \beta_0 + \beta_1x + residuals$. $\epsilon$ is a random variable, and we assume it has a normal distribution with mean 0 and variance $\sigma^2$. In the process of performing linear regression we estimate $\hat\sigma^2$, but there is still uncertainty inherent to the model.
+
+For example, there are two rows in the dataset corresponding to a flight distance of 529 miles:
+
+```{r}
+subset(nycflights, distance == 529)
+```
+
+Note how different the response values $y$ are! To visualize this, let's plot our regression line and the two `distance=529` points below: 
+
+```{r, echo=FALSE}
+x <- seq(100,1000)
+example <- data.frame(x)
+example$yhat <- 18.36 + 0.126*x
+
+subset <- subset(nycflights, distance == 529)  
+
+ggplot() +
+  geom_line(data=example, aes(x=x,y=yhat), color='blue') +
+  geom_point(data=subset, aes(x=distance, y=air_time)) +
+  xlim(c(100,1000))
+```
+
+The uncertainty here, shown by the marked difference between our predicted values (blue line) and the observed values (points), is determined by the `residuals` term in our model. In the next section we'll use different approaches to analyze this uncertainty. First, we'll computed bootstrapped estimates of the linear model coefficients, and then we'll discuss extrapolation. 
+
+
+## Bootstrap Simulation
+
+### 
+
+In this simulation, we'll use bootstrapping to take a closer look at sample variation (introduced above). The model you generated for flight distance vs air time, $y = 18.66 + 0.1269x + residuals$, was based on a sample of $n=40$ flights. If you had a slightly different sample, then the model would be different too. 
+
+Recall from Tutorial 5 the lesson on bootstrapping: from our data sample, we generated more data by sampling from the original dataset (under the null hypothesis) with replacement. If we repeat that many times for this example, we can show how the models change with each new sample set.
+
+
+### Computing Bootstrap Estimates
+
+***TODO: add concept check MC questions***
+
+First, let's fit a sequence of 100 bootstrap estimates for our intercept and slope parameters:
+
+```{r, echo=TRUE}
+# using infer package, as in tutorial 5
+# https://infer.netlify.app/articles/infer#introduction
+library(infer)
+
+# Generate fitted models from 100 bootstrapped estimates:
+boots <- nycflights |>
+  specify(air_time ~ distance) |>
+  generate(reps=100, type="bootstrap") |>
+  fit()
+
+head(boots)  # display the table of estimated parameters
+
+# Grab the parameters
+bIntercepts <- subset(data.frame(boots), term=="intercept")["estimate"]
+bSlopes <- subset(data.frame(boots), term=="distance")["estimate"]
+```
+
+###
+
+Now let's compute the predicted values for each bootstrapped model, so we can plot them and see how they differ:
+
+```{r, echo=TRUE}
+# Create a matrix to hold the predicted values
+bPredictions <- matrix(nrow=nrow(bIntercepts)*nrow(nycflights), ncol=5)
+colnames(bPredictions) <- c("distance", "yhat", "y", "residuals", "bootstrapLine")
+bPredictions <- data.frame(bPredictions)
+
+bPredictions$distance <- rep(nycflights$distance, nrow(bIntercepts)/nrow(nycflights))
+bPredictions$y <- rep(nycflights$air_time, nrow(bIntercepts)/nrow(nycflights))
+bPredictions$yhat <- bIntercepts$estimate + (bPredictions$distance * bSlopes$estimate)
+bPredictions$residuals <- bPredictions$yhat - bPredictions$y
+names <- seq(1:nrow(bIntercepts))
+bPredictions$bootstrapLine <- rep(names, nrow(nycflights))
+
+head(bPredictions)
+```
+
+Plot the boostrapped models overlaid with a scatterplot of the original data:
+
+```{r, echo=TRUE}
+ggplot() +
+  geom_line(data=bPredictions, aes(x=distance, y=yhat, color=factor(bootstrapLine)), alpha=0.6) +
+  geom_point(data=nycflights, aes(x=distance, y=air_time)) +
+  theme(legend.position = "none") 
+```
+
+###
+
+Now let's look at the boostrap models' residual standard error, and the standard error of each bootstrapped parameter:
+
+```{r, echo=TRUE}
+# Compute the SE for each parameter
+se_bInt <- sd(bIntercepts$estimate)
+se_bSlopes <- sd(bSlopes$estimate)
+
+# Compute the residual SE
+se_bResid <- sd(bPredictions$residuals)
+
+# Original model SE values:
+se_mInt <- summary(model)$coefficients[,2][[1]]
+se_mSlope <- summary(model)$coefficients[,2][[2]]
+se_mResid <- sd(summary(model)$residuals)
+
+# Create a table of values
+se_tab <- matrix(c(se_mInt, se_bInt, se_mSlope, se_bSlopes, se_mResid, se_bResid), 
+                 ncol=2, byrow=TRUE)
+colnames(se_tab) <- c("Original model", "Bootstraps")
+rownames(se_tab) <- c("Intercept SE", "Slope SE", "Residual SE")
+se_tab <- as.table(se_tab)
+print(se_tab)
+```
+
+###
+
+Note how the bootstrap standard error values are larger than the original model's. This extra uncertainty comes from our bootstrap resampling procedure. To be more concrete, we can examine the formula for the residual SE: for a chosen predictor value $x^*$, our prediction is given by $\hat{y}^* = \beta_0 + \beta_1x^*$, and
+
+$$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
+Let's look at each term in sequence:
+
+- $s_e^2$, the _variance of the residuals_, represents the uncertainty associated with the residuals
+- $\frac{s_e^2}{n}$ represents the average contribution to the variance of the residuals of each data pair $(x^*, \hat{y}^*)$
+- $(SE_{\beta_1})^2 \times (x^*-\bar{x})^2$: note that this term increases as the distance between $x^*$ and $\bar{x}$ increases, which means that our uncertainty increases as we move away from predicting values near the mean of $x$
+
+
+## Your turn!
+In this section, you'll repeat the bootstrap analysis on a dataset we've already seen. 
+
+###
+
+We return to the `possum` dataset from Tutorial 3, where we first reviewed how to find a line of best fit. Here's a scatterplot of the variables `total_l`, the total length in centimeters of a possum, vs `tail_l`, the length in centimeters of its tail:
+
+```{r, echo=TRUE}
+ggplot(data=possum, aes(x=tail_l, y=total_l)) +
+  geom_point()
+```
+
+Now load the data, fit a linear model, and output the model summary. Note the parameter and residual standard error here - we will return to these values later. 
+
+```{r ex3, exercise=TRUE}
+model <- ____
+summary(model)
+```
+
+```{r ex3-solution}
+model <- lm(data=possum, total_l ~ tail_l)
+summary(model)
+```
+
+***TODO: keep this part?***
+Take a subset of the data where `tail_l=38` and plot your model from above alongside this subset:
+
+```{r ex4, exercise=TRUE}
+subset <- subset(data=possum, ____)
+head(subset)
+
+# Generate x values for plotting
+x <- seq(32:42)
+
+# Predict y~x using model coefficients from before
+# TODO: leave these blank and ask them to extract the coeffs, so they learn how?
+ypred <- model$coefficients[[1]] + x * model$coefficients[[2]]
+
+# Add the x and predicted y values to a dataframe
+line <- data.frame(x)
+line$ypred <- ypred
+colnames(line) <- c("tail_l", "pred_total_l")
+
+ggplot() +
+  geom_point(data=subset, aes(x=____, y=____)) +
+  geom_line(data=line, aes(x=____, y=____), color='blue')
+```
+
+```{r ex4-solution}
+subset <- subset(possum, tail_l == 38)
+head(subset)
+
+# Generate x values for plotting
+x <- seq(32,42)
+
+# Predict y~x using model coefficients from before
+# TODO: leave these blank and ask them to extract the coeffs, so they learn how?
+ypred <- model$coefficients[[1]] + x * model$coefficients[[2]]
+
+# Add the x and predicted y values to a dataframe
+line <- data.frame(x)
+line$ypred <- ypred
+colnames(line) <- c("tail_l", "pred_total_l")
+
+# Plot
+ggplot() +
+  geom_point(data=subset, aes(x=tail_l, y=total_l)) +
+  geom_line(data=line, aes(x=tail_l, y=pred_total_l), color='blue')
+```
+
+Again, even if we knew the exact $\beta_0$ and $\beta_1$ terms, there is still uncertainty in our predictions of `total_l`.
+
+###
+
+Now, generate 500 bootstrapped estimates for the possum data:
+
+```{r ex5, exercise=TRUE}
+bootsp <- possum |> 
+  specify(___) |> 
+  generate(reps=500, type=___) |>
+  fit()
+
+# Grab the parameters
+pIntercepts <- subset(data.frame(bootsp), term==____)["estimate"]
+pSlopes <- subset(data.frame(bootsp), term==____)["estimate"]
+
+```
+
+```{r ex5-solution}
+bootsp <- possum |> 
+  specify(total_l ~ tail_l) |> 
+  generate(reps=500, type="bootstrap") |>
+  fit()
+
+# Grab the parameters
+pIntercepts <- subset(data.frame(bootsp), term=="intercept")["estimate"]
+pSlopes <- subset(data.frame(bootsp), term=="tail_l")["estimate"]
+```
+
+```{r, echo=FALSE}
+# Need to include this in a separate chunk or the below won't knit
+bootsp <- possum |> 
+  specify(total_l ~ tail_l) |> 
+  generate(reps=500, type="bootstrap") |>
+  fit()
+pIntercepts <- subset(data.frame(bootsp), term=="intercept")["estimate"]
+pSlopes <- subset(data.frame(bootsp), term=="tail_l")["estimate"]
+```
+
+```{r}
+head(bootsp)
+```
+
+```{r, echo=FALSE}
+# Compute predictions and residuals for the bootstrapped possum models
+# Hidden from students now but can show if desired
+
+# Create a matrix to hold the predicted values
+pPredictions <- matrix(nrow=nrow(pIntercepts)*nrow(possum), ncol=5)
+colnames(pPredictions) <- c("tail_l", "yhat", "y", "residuals", "bootstrapLine")
+pPredictions <- data.frame(pPredictions)
+
+pPredictions$tail_l <- rep(possum$tail_l, nrow(pIntercepts)/nrow(possum))
+pPredictions$y <- rep(possum$total_l, nrow(pIntercepts)/nrow(possum))
+pPredictions$yhat <- pIntercepts$estimate + (pPredictions$tail_l * pSlopes$estimate)
+pPredictions$residuals <- pPredictions$yhat - pPredictions$y
+names <- seq(1:nrow(pIntercepts))
+pPredictions$bootstrapLine <- rep(names, nrow(possum))
+
+head(pPredictions)
+```
+
+Plot the boostrapped models overlaid with a scatterplot of the original data:
+
+```{r, echo=TRUE}
+ggplot() +
+  geom_line(data=pPredictions, aes(x=tail_l, y=yhat, color=factor(bootstrapLine)), alpha=0.6) +
+  geom_point(data=possum, aes(x=tail_l, y=total_l)) +
+  theme(legend.position = "none") 
+```
+
+Note how different all of the lines are from each other!
+
+###
+
+```{r mc4, echo=FALSE}
+question("Do you expect the bootstrapped models for the possum data to have higher, lower, or the same standard errors than your baseline linear model?",
+         answer("The bootstrapped models should have higher standard error.", correct=TRUE),
+         answer("The bootstrapped models should have lower standard error."),
+         answer("The bootstrapped models should have the same standard error as my model."),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc5, echo=FALSE}
+question("How do you compute the standard error for each parameter?",
+         answer("Compute the standard deviation of the parameter estimates.", correct=TRUE),
+         answer("Compute the standard deviation of the model residuals."),
+         answer("Compute the mean of the parameter estimates."),
+         answer("Not sure"))
+```
+
+Compute $s_e^2$ for the slope and intercept parameters of your bootstrapped models:
+
+```{r ex6, exercise=TRUE}
+se_pInt <- ____
+se_pSlopes <- ____
+```
+
+```{r ex6-solution}
+se_pInt <- sd(pIntercepts$estimate)
+se_pSlopes <- sd(pSlopes$estimate)
+```
+
+And the residual SE:
+
+```{r ex7, exercise=TRUE}
+se_pResid <- ____
+```
+
+```{r ex7-solution}
+se_pResid <- sd(pPredictions$residuals)
+```
+
+And now we compare the standard error for our bootstrapped models vs our baseline model:
+
+```{r, echo=FALSE}
+se_pInt <- sd(pIntercepts$estimate)
+se_pSlopes <- sd(pSlopes$estimate)
+se_pResid <- sd(pPredictions$residuals)
+
+# Original model SE values:
+se_mInt <- summary(model)$coefficients[,2][[1]]
+se_mSlope <- summary(model)$coefficients[,2][[2]]
+se_mResid <- sd(summary(model)$residuals)
+
+# Create a table of values
+se_tab <- matrix(c(se_mInt, se_pInt, se_mSlope, se_pSlopes, se_mResid, se_pResid), 
+                 ncol=2, byrow=TRUE)
+colnames(se_tab) <- c("Original model", "Bootstraps")
+rownames(se_tab) <- c("Intercept SE", "Slope SE", "Residual SE")
+se_tab <- as.table(se_tab)
+print(se_tab)
+```
+
+
+## Extrapolation
+
+```{r, include=FALSE}
+# Simulate a dataset that makes extrapolation outside of a given range tricky
+x <- c(5,6,7,11,12,13,14)
+y <- c(8,12,11,21,23,26,25)
+observed <- data.frame(cbind(x,y))
+
+x <- c(3,3.5,4.5,15:20)
+y <- c(0,4,5,26,23,25,22,20,19)
+unobserved <- data.frame(cbind(x,y))
+```
+
+In this section, we'll look at the difference between _interpolation_ and _extrapolation_ in inference and prediction, and how to choose the correct approach. Below, you're given a dataframe called `observed` that contains all of the data you observe. How might you try to model these data?
+
+```{r, echo=FALSE}
+ggplot(data=observed, aes(x=x,y=y)) +
+  geom_point() +
+  xlim(c(0,20))
+```
+
+###
+
+Let's try fitting a linear model, in particular to fill the gap in the neighborhood of x=10. We call this _interpolation_: making predictions based on observed data on new values that are still within the observed range.
+
+```{r}
+ggplot(data=observed, aes(x=x,y=y)) +
+  geom_point() +
+  geom_smooth(method='lm', se=FALSE) +
+  xlim(c(0,20))
+```
+
+```{r, include=FALSE}
+observed$observed <- rep(TRUE, nrow(observed))
+unobserved$observed <- rep(FALSE, nrow(unobserved))
+fullData <- rbind(observed, unobserved)
+```
+
+###
+
+You're fairly confident that your model can predict the values around x=10, but what about x=0 or x=20? Since these values lie outside the observed range of your data, such a prediction task is called _extrapolation_. Say you make your extrapolations using the model based on observed data, and then new data comes in:
+
+```{r}
+ggplot(data=fullData, aes(x=x,y=y,color=observed)) +
+  geom_point() +
+  geom_smooth(data=observed, method='lm', formula=y~x, se=FALSE)
+```
+
+As you can see, the model based on observed data is not likely to extrapolate well if you want to predict values far outside the observed range. 
+
+
+## Your turn!
+
+First, we load the following dataset, which contains many observations of mammal size in different stages of the animals' lives. 
+
+```{r, echo=TRUE}
+# .csv file is tab-delimited, so need sep="\t" argument in function call
+mammals <- read.csv("data/sizeHistory.tsv", sep="\t")
+head(mammals)
+```
+
+###
+
+We will need to log-transform both the response and the independent variables in this dataset. If we want to model adult mass (`mass.g.`) vs newborn mass (`newborn.g.`), perform the log transformations below:
+
+```{r ex8, exercise=TRUE}
+mammals$logAdultMass <- _____
+
+mammals$logNewbornMass <- _____
+```
+
+```{r ex8-solution}
+mammals$logAdultMass <- log(mammals$mass.g.)
+mammals$logNewbornMass <- log(mammals$newborn.g.)
+```
+
+Create a scatterplot of the log-adult mass (`logAdultMass`) and newborn mass (`logNewbornMass`). 
+```{r ex9, exercise=TRUE}
+ggplot(data=____, aes(x=_____, y=_____)) +
+  _____
+```
+
+```{r ex9-solution}
+ggplot(data=mammals, aes(x=logNewbornMass, y=logAdultMass)) +
+  geom_point()
+```
+
+###
+
+Now, let's try to predict the log-adult mass of mammals with the following log-newborn masses:
+
+- 0.1 (remember that this is a log scale - this newborn is very small!)
+- 12.0 (newborn mass around $e^{12}$ grams, near the maximum observed)
+- 20 (newborn mass around $e^{20}$ grams, well beyond the maximum observed)
+
+First, create a linear regression model for the data and print the model summary:
+
+```{r ex10, exercise=TRUE}
+```
+
+```{r ex10-solution}
+model <- lm(data=mammals, logAdultMass ~ logNewbornMass)
+summary(model)
+```
+
+###
+
+Now take the model parameters and generate new predictions:
+
+```{r ex11, exercise=TRUE}
+# Grab the parameters from the model object
+intercept <- ____
+slope <- ____
+
+# Compute:
+yhat1 <- ____  # the first prediction, for x=0.1
+yhat2 <- ____  # the second prediction, for x=12.0
+yhat3 <- ____  # the third prediction, for x=20.0
+```
+
+```{r ex11-hint1}
+# Grab the parameters from the model object
+intercept <- model$coefficients[[1]]
+slope <- model$coefficients[[2]]
+```
+
+```{r ex11-solution}
+# Grab the parameters from the model object
+intercept <- model$coefficients[[1]]
+slope <- model$coefficients[[2]]
+
+# Compute:
+yhat1 <- intercept + slope*(0.1)   # the first prediction, for x=0.1
+yhat2 <- intercept + slope*(12.0)  # the second prediction, for x=12.0
+yhat3 <- intercept + slope*(20.0)  # the third prediction, for x=20.0
+```
+
+Recall our formula for the standard error of a prediction $\hat{y}^* = \beta_0 + \beta_1 x^*$ on a new value $x^*$:
+
+$$SE = \sqrt{s_e^2 +\frac{s_e^2}{n} + (SE_{\beta_1})^2 \times (x^*-\bar{x})^2}$$
+###
+
+```{r mc6, echo=FALSE}
+question("Which value of x* would you expect to have the highest value of SE?",
+         answer("x* = 0.1"),
+         answer("x* = 12.0"),
+         answer("x* = 20.0", correct=TRUE),
+         answer("Not sure"))
+```
+
+###
+
+Now we'll walk through computing the standard error for each of your 3 predictions above, step by step. To start, let's compute the first term, $s^2_e$
+
+```{r ex12, exercise=TRUE}
+# From your model, you can grab the variance of the residuals:
+se2 <- ____
+
+# How many observations do you have?
+n <- ____
+```
+
+```{r ex12-hint1}
+# From your model, you can grab the variance of the residuals:
+se2 <- var(model$residuals)
+```
+
+```{r ex12-hint2}
+# From your model, you can grab the variance of the residuals:
+se2 <- var(model$residuals)
+
+# How many observations do you have?
+n <- nrow(mammals)
+```
+
+###
+
+And now the second term, $\frac{s^2_e}{n}$, and $SE_{\beta_1}$:
+
+```{r, echo=TRUE}
+# Compute the average contribution of each observation to the variance
+se2_n <- se2 / n
+
+# Compute the SE of your slope parameter
+se_b1 <- summary(model)$coefficients[,2][[2]]
+```
+
+###
+
+Lastly, we need to compute $(x^*-\bar{x})^2$ for each value of $x^*$:
+
+```{r ex13, exercise=TRUE}
+# Compute xbar 
+xbar <- ____
+
+# Compute the squared distance between each new x* and the mean xbar
+
+```
+
+```{r ex13-solution}
+xs <- c(0.1, 12.0, 20.0)
+dev <- c(0.0, 0.0, 0.0)
+
+for(i in 1:length(xs)) {
+  dev[i] <- (xbar - xs[i])**2
+}
+```
+
+###
+
+Finally, put it all together to compute $SE$ from the formula:
+
+```{r ex14, exercise=TRUE}
+```
+
+```{r ex14-solution}
+for(i in 1:length(xs)) {
+  SE <- sqrt(se2 + se2_n + se_b1*dev[i])
+  print(SE)
+}
+```
+
+###
+
+```{r mc7, echo=FALSE}
+question("Which value of x* does have the highest value of SE?",
+         answer("x* = 0.1"),
+         answer("x* = 12.0"),
+         answer("x* = 20.0", correct=TRUE),
+         answer("Not sure"))
+```
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
