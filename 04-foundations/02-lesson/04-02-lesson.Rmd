@@ -16,7 +16,6 @@ library(tidyverse)
 library(infer)
 library(grid)
 library(gridExtra)
-library(emo)
 library(openintro)
 library(janitor)
 
@@ -641,9 +640,9 @@ Great work! You'll learn more about the distribution of statistics in the next l
 
 Previously, we used the difference in proportions to distinguish between the null statistic and the observed statistic. But what if we used the ratio of proportions instead of the difference? We can still perform inference in this case. We are still most interested in whether or not the observed statistic is different from the values obtained by the shuffling.
 
-* Difference in proportions: ${\hat p} - {p}$
+* Difference in proportions: ${\widehat p} - {p}$
 
-* Ratio $\frac{\hat p}{p}$
+* Ratio $\frac{\widehat p}{p}$
 
 * Interested in whether observed statistic is different from values obtained by shuffling
 

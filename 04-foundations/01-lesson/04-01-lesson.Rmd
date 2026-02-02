@@ -18,7 +18,6 @@ library(infer)
 library(kableExtra)
 library(grid)
 library(tidyverse)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -116,12 +115,6 @@ hash_encoder_ui <- {
 ```
 
 
-## Welcome to the tutorial!
-
-Hi and welcome to inference!
-
-We are assuming that you've already worked through the first few tutorials in this intro stats series. In this tutorial, you will be building on your previous work to now make inferential, instead of descriptive, claims based on the data at hand.
-
 ## Statistical Inference
 
 ### What is statistical inference?
@@ -212,12 +205,12 @@ The idea behind statistical inference is to understand samples from a hypothetic
 
 ![](images/lesson1_img3.png){ width=80% }
 
-$$\hat{p}_W - \hat{p}_E = \frac{2}{3} - \frac{2}{3} = 0$$
+$$\widehat{p}_W - \widehat{p}_E = \frac{2}{3} - \frac{2}{3} = 0$$
 
 ![](images/lesson1_img5.png){ width=80% }
-$$\hat{p}_W - \hat{p}_E = \frac{1}{3} - \frac{2}{3} = -\frac{1}{3}$$
+$$\widehat{p}_W - \widehat{p}_E = \frac{1}{3} - \frac{2}{3} = -\frac{1}{3}$$
 
-As a way of summarizing each of the null samples, we calculate one statistic from each sample. Here, the statistic is the difference in the proportion of West Coast people who prefer cola as compared with the proportion of East Coast people who prefer cola, where each of the sample proportions is denoted “$\hat{p}$”. The difference in $\hat{p}$s changes with each sample. First it is 0, then it is negative one third, and it will keep changing.
+As a way of summarizing each of the null samples, we calculate one statistic from each sample. Here, the statistic is the difference in the proportion of West Coast people who prefer cola as compared with the proportion of East Coast people who prefer cola, where each of the sample proportions is denoted “$\widehat{p}$”. The difference in $\widehat{p}$s changes with each sample. First it is 0, then it is negative one third, and it will keep changing.
 
 ### Understanding the null distribution
 
@@ -228,7 +221,7 @@ gives information about whether the observed data are inconsistent with
 the null hypothesis.
 
 
-The original sample proportions are $\hat{p}_{East}$ of 0.82 and $\hat{p}_{West}$ of 0.73. A difference of -0.09. 
+The original sample proportions are $\widehat{p}_{East}$ of 0.82 and $\widehat{p}_{West}$ of 0.73. A difference of -0.09. 
 
 *Original data*
 
@@ -419,7 +412,7 @@ soda |>
 
 After grouping by the `location` variable, `summarize()` calculates the proportion of each coast that prefers cola. 
 
-Note that `drink` equals “Cola” produces a vector of TRUEs and FALSEs, which R then coerces to ones (TRUE) and zeros (FALSE) when the `mean()` function is applied. Since a TRUE (one) represents an individual who prefers cola, the average of these ones and zeros represents the proportion of individuals who prefer cola.
+Note that the code `drink == "Cola"` produces a vector of `TRUE`s and `FALSE`s, which R then coerces to ones (TRUE) and zeros (FALSE) when the `mean()` function is applied. Since a TRUE (one) represents an individual who prefers cola, the average of these ones and zeros represents the proportion of individuals who prefer cola.
 
 `summarize()` is used a second time to find the difference in proportion of cola preference across the two coastal groups. The `diff()` function is applied across the two coastal groups because the data have been summarized by location (East and West). 
 
@@ -581,7 +574,7 @@ ggplot(NHANES, aes(x = SleepHrsNight, color = SleepTrouble)) +
 ```
 
 
-Great work!  Notice that the warning message for the densities and the grey portions of the bars both indicate a large number of missing observations in the dataset.  If this were your dataset, it would be important to stop here and consider the cause of the missingness.  For the tutorial, we will now proceed without worrying about the missing observations.
+Great work!  Notice that the grey portions of the bars indicate a large number of missing observations in the dataset.  If this were your dataset, it would be important to stop here and consider the cause of the missingness.  For the tutorial, we will now proceed without worrying about the missing observations.
 
 ### Calculating statistic of interest
 
@@ -1295,13 +1288,6 @@ ggplot() +
 ```
 
 Note that the `NHANES` data is thought to be a good representative sample of the US population. That means the conclusions from the `NHANES` data can be applied to the larger US population. Unfortunately, here there is nothing to report; the conclusion was that there was an inability to reject the null hypothesis. So, in this case, there is no claim that can be generalized to a larger population.
-
-OK, now that we've covered the basics, let's move on to completing a full hypothesis test on actual data.
-    
-    
-    
-
-
 
 
 ## Submit
