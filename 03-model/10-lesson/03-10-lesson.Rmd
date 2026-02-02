@@ -14,7 +14,6 @@ library(learnr)
 library(openintro)
 library(Stat2Data)
 library(tidyverse)
-library(emo)
 library(modelr)
 library(plotly)
 library(broom)
@@ -149,22 +148,24 @@ Multiple regression can be an effective technique for understanding how a respon
 
 One quick technique for jump-starting EDA is to examine all of the pairwise scatterplots in your data. This can be achieved using the `pairs()` function. Look for variables in the `nyc` data set that are strongly correlated, as those relationships will help us check for **multicollinearity** later on.
 
-Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
+**Exercise:**
 
+Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
 
 ```{r ex1, exercise=TRUE}
 
 ```
 
-```{r ex1-hint}
- The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
-```
+<details>
+<summary>**Hint**</summary>
+The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
+</details>
 
-```{r ex1-solution}
-nyc |>
-  select(-Restaurant) |>
-  pairs()
-```
+<!-- ```{r ex1-solution} -->
+<!-- nyc |> -->
+<!--   select(-Restaurant) |> -->
+<!--   pairs() -->
+<!-- ``` -->
 
 ```{r mc1}
 question("Which pairs of variables appear to be strongly correlated?",
@@ -182,6 +183,8 @@ Based on your knowledge of the restaurant industry, do you think that the qualit
 
 On your own, interpret these coefficients and examine the fit of the model. What does the coefficient of `Food` mean in plain English? "Each additional rating point of food quality is associated with a..."
 
+**Exercise:**
+
 - Use `ggplot` to make a scatter plot for `Price` as a function of `Food`. 
 - Use `lm()` to fit a simple linear regression model for `Price` as a function of `Food`.
 
@@ -193,23 +196,23 @@ On your own, interpret these coefficients and examine the fit of the model. What
 
 ```
 
-```{r ex2-hint-1}
-ggplot(data = nyc, aes(x = Food, y = Price)) +
-  geom_point()
-```
+<!-- ```{r ex2-hint-1} -->
+<!-- ggplot(data = nyc, aes(x = Food, y = Price)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex2-hint-2}
-lm(Price ~ Food, data = nyc)
-```
+<!-- ```{r ex2-hint-2} -->
+<!-- lm(Price ~ Food, data = nyc) -->
+<!-- ``` -->
 
-```{r ex2-solution}
-# Price by Food plot
-ggplot(data = nyc, aes(x = Food, y = Price)) +
-  geom_point()
+<!-- ```{r ex2-solution} -->
+<!-- # Price by Food plot -->
+<!-- ggplot(data = nyc, aes(x = Food, y = Price)) + -->
+<!--   geom_point() -->
 
-# Price by Food model
-lm(Price ~ Food, data = nyc)
-```
+<!-- # Price by Food model -->
+<!-- lm(Price ~ Food, data = nyc) -->
+<!-- ``` -->
 
 ## Incorporating another variable
 
@@ -265,6 +268,8 @@ In real estate, a common mantra is that the three most important factors in dete
 
 Let's expand our model into a parallel slopes model by including the `East` variable in addition to `Food`. 
 
+**Exercise:**
+
 * Use `lm()` to fit a parallel slopes model for `Price` as a function of `Food` and `East`. 
 * Interpret the coefficients and the fit of the model. 
 * Can you explain the meaning of the coefficient on `East` in simple terms? Did the coefficient on `Food` change from the previous model? If so, why? Did it change by a lot or just a little? 
@@ -273,22 +278,23 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 
 ```
 
-```{r ex3-hint}
-*Hint:* What is the difference between the coefficients that are in both models?
-```
+<details>
+<summary>**Hint**</summary>
+What is the difference between the coefficients that are in both models?
+</details>
 
-```{r ex3-solution}
-lm(Price ~ Food + East, data = nyc)
-```
+<!-- ```{r ex3-solution} -->
+<!-- lm(Price ~ Food + East, data = nyc) -->
+<!-- ``` -->
 
 ### 
 
 ```{r mc2}
-question("Identify the statement that is *FALSE*:",
+question("Identify all statments that are *TRUE*:",
   answer("Each additional rating point of food quality is associated with a $2.88 increase in the expected price of meal, after controlling for location.", correct = TRUE),
   answer("The premium for an Italian restaurant in NYC associated with being on the east side of 5th Avenue is $1.46, after controlling for the quality of the food.
 ", correct = TRUE),
-  answer("The change in the coefficient of food from $2.94 in the simple linear model to $2.88 in this model has profound practical implications for restaurant owners.", correct = TRUE),
+  answer("The change in the coefficient of food from $2.94 in the simple linear model to $2.88 in this model could have practical implications for restaurant owners.", correct = TRUE),
 allow_retry=TRUE
 )
 ```
@@ -300,10 +306,6 @@ One reason that many people go to a restaurant - apart from the food - is that t
 Multiple regression gives us a way to reason about these questions. Fit the model with `Food` and `Service` and interpret the coefficients and fit. Did the coefficient on `Food` change from the previous model? What do the coefficients on `Food` and `Service` tell you about how these restaurants set prices? 
 
 Next, let's visually assess our model using `plotly`. The `x` and `y` vectors, as well as the `plane` matrix, have been created for you.
-
-- Use `lm()` to fit a multiple regression model for `Price` as a function of `Food` and `Service`.
-- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food` and `Service` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
-- Use `add_surface()` to draw a plane through the cloud of points using the object `plane`.
 
 ```{r ex4-setup}
 mod <- lm(Price ~ Food + Service, data = nyc)
@@ -325,6 +327,12 @@ plane <- tidy_planes |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
+**Exercise:**
+
+- Use `lm()` to fit a multiple regression model for `Price` as a function of `Food` and `Service`.
+- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food` and `Service` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
+- Use `add_surface()` to draw a plane through the cloud of points using the object `plane`.
+
 ```{r ex4, exercise=TRUE}
 # fit model
 
@@ -338,22 +346,23 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) 
 ```
 
-```{r ex4-hint}
- Remember `add_surface()`?
-```
+<details>
+<summary>**Hint**</summary>
+Remember `add_surface()`?
+</details>
 
-```{r ex4-solution}
-# fit model
-lm(Price ~ Food + Service, data = nyc)
+<!-- ```{r ex4-solution} -->
+<!-- # fit model -->
+<!-- lm(Price ~ Food + Service, data = nyc) -->
 
-# draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
-  add_markers() 
+<!-- # draw 3D scatterplot -->
+<!-- p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |> -->
+<!--   add_markers()  -->
 
-# draw a plane
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
-```
+<!-- # draw a plane -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE)  -->
+<!-- ``` -->
 
 ## Higher dimensions
 
@@ -418,6 +427,8 @@ We have explored models that included the quality of both food and service, as w
 
 Examine the coefficients closely. Do they make sense based on what you understand about these data so far? How did the coefficients change from the previous models that you fit?
 
+**Exercise:**
+
 - Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `Service`, and `East` from the dataset `nyc`.
 
 ```{r ex5, exercise=TRUE}
@@ -425,14 +436,14 @@ Examine the coefficients closely. Do they make sense based on what you understan
 
 ```
 
-```{r ex5-hint}
-lm(Price ~ ___ + ___ + ___, data = nyc)
-```
+<!-- ```{r ex5-hint} -->
+<!-- lm(Price ~ ___ + ___ + ___, data = nyc) -->
+<!-- ``` -->
 
-```{r ex5-solution}
-# Price by Food and Service and East
-lm(Price ~ Food + Service + East, data = nyc)
-```
+<!-- ```{r ex5-solution} -->
+<!-- # Price by Food and Service and East -->
+<!-- lm(Price ~ Food + Service + East, data = nyc) -->
+<!-- ``` -->
 
 ### Interpretation of location coefficient
 
@@ -444,8 +455,6 @@ lm(Price ~ Food + Service + East, data = nyc)
 
 Reason about the magnitude of the `East` coefficient.
 
-*Hint:* Does being on the East side increase or decrease the price of a meal?
-
 ```{r mc3}
 question("Which of the following statements is **FALSE**?",
   answer("The premium for being on the East side of 5th Avenue is just less than a dollar, after controlling for the quality of food and service.", message = "This message is TRUE"),
@@ -455,6 +464,11 @@ question("Which of the following statements is **FALSE**?",
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+Does being on the East side increase or decrease the price of a meal?
+</details>
+
 ### Impact of location
 
 The impact of location brings us to a modeling question: should we keep this variable in our model? In a later tutorial, you will learn how we can conduct formal hypothesis tests to help us answer that question. In this tutorial, we will focus on the size of the effect. Is the impact of location big or small? 
@@ -462,9 +476,6 @@ The impact of location brings us to a modeling question: should we keep this var
 One way to think about this would be in terms of the practical significance. Is the value of the coefficient large enough to make a difference to your average person? The units are in dollars so in this case this question is not hard to grasp. 
 
 Another way is to examine the impact of location in the context of the variability of the other variables. We can do this by building our parallel planes in 3D and seeing how far apart they are. Are the planes close together or far apart? Does the `East` variable clearly separate the data into two distinct groups? Or are the points all mixed up together?
-
-- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food`, `Service`, and `East` by mapping the `z` variable to the response and the `x` and `y` variables to the numeric explanatory variables. Use color to indicate the value of `East`. Place `Food` on the x-axis and `Service` on the y-axis.
-- Use `add_surface()` (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects `plane0` and `plane1`.
 
 ```{r ex6-setup}
 mod <- lm(Price ~ Food + Service + East, data = nyc)
@@ -496,6 +507,11 @@ col1 <- c('#BF382A', '#0C4B8E')
 col3 <- colorRamp(c("orange"))
 ```
 
+**Exercise:**
+
+- Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food`, `Service`, and `East` by mapping the `z` variable to the response and the `x` and `y` variables to the numeric explanatory variables. Use color to indicate the value of `East`. Place `Food` on the x-axis and `Service` on the y-axis.
+- Use `add_surface()` (twice) to draw two planes through the cloud of points, one for restaurants on the West side and another for restaurants on the East side. Use the objects `plane0` and `plane1`.
+
 ```{r ex6, exercise=TRUE}
 # draw 3D scatterplot
 p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
@@ -507,26 +523,29 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
-```{r ex6-hint}
- In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
-```
+<details>
+<summary>**Hint**</summary>
+In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
+</details>
 
-```{r ex6-solution}
-# draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
-  add_markers(color = ~factor(East)) 
+<!-- ```{r ex6-solution} -->
+<!-- # draw 3D scatterplot -->
+<!-- p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |> -->
+<!--   add_markers(color = ~factor(East))  -->
 
-# draw two planes
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
-  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
-```
+<!-- # draw two planes -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE) -->
+<!-- ``` -->
 
 ### Full model
 
 One variable we haven't considered is `Decor`. Do people, on average, pay more for a meal in a restaurant with nicer decor? If so, does it still matter after controlling for the quality of food, service, and location? 
 
 By adding a third numeric explanatory variable to our model, we lose the ability to visualize the model in even three dimensions. Our model is now a hyperplane -- or rather, parallel hyperplanes -- and while we won't go any further with the geometry, know that we can continue to add as many variables to our model as we want. As humans, our spatial visualization ability taps out after three numeric variables (maybe you could argue for four, but certainly no further), but neither the mathematical equation for the regression model, nor the formula specification for the model in R, is bothered by the higher dimensionality. 
+
+**Exercise:**
 
 Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `Service`, `Decor`, and `East` using the dataset `nyc`.
 
@@ -535,17 +554,15 @@ Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `
 
 ```
 
-```{r ex7-hint, exercise=TRUE}
-lm(Price ~ ___ + ___ + ___ + ___, data = nyc)
-```
+<!-- ```{r ex7-hint} -->
+<!-- lm(Price ~ ___ + ___ + ___ + ___, data = nyc) -->
+<!-- ``` -->
 
-```{r ex7-solution}
-lm(Price ~ Food + Service + East + Decor, data = nyc)
-```
+<!-- ```{r ex7-solution} -->
+<!-- lm(Price ~ Food + Service + East + Decor, data = nyc) -->
+<!-- ``` -->
 
 Notice the dramatic change in the value of the `Service` coefficient. 
-
-*Hint:* If the coefficient on `Service` changes so much, how likely is it that any interpretation relying on the estimate is valid?
 
 ```{r mc4}
 question("Which of the following interpretations is invalid?
@@ -558,6 +575,10 @@ question("Which of the following interpretations is invalid?
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+If the coefficient on `Service` changes so much, how likely is it that any interpretation relying on the estimate is valid?
+</details>
 
 ## Submit
 

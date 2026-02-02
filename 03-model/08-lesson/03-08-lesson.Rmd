@@ -15,7 +15,6 @@ library(openintro)
 library(tidyverse)
 library(broom)
 library(modelr)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -113,7 +112,9 @@ We are going to use two data sets.
 
 2. In your exercises you will work with `mariokart`. The data were collected in early October 2009 from an eBay auction for the Nintendo Wii game Mario Kart. `mariokart` has 143 observations with 12 variables. For details see the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
 
-As in the other lessons, the `openintro` and `tidyverse` packages are already pre-loaded. Tidyverse is itself a collection of R packages designed for data science. The most essential eight packages are loaded together with `library(tidyverse)` automatically. When we use other packages, we will load them explicitly in the appropriate chunks.
+As in the other lessons, the `openintro` and `tidyverse` packages are already pre-loaded. 
+<!-- Tidyverse is itself a collection of R packages designed for data science. The most essential eight packages are loaded together with `library(tidyverse)` automatically.  -->
+When we use other packages, we will load them explicitly in the appropriate chunks.
 
 ## Adding a numerical explanatory variable
 
@@ -123,7 +124,7 @@ Thus far, we've only considered multiple regression models with one numeric expl
 
 ### Adding a second numeric explanatory variable
 
-We are going to model the birthweight (`bwt`) of babies born in San Francisco between 1960 and 1967 as a function of their pregnancy’s length of `gestation` (in weeks) and the mother’s `age` (in years). 
+We are going to model the birth weight (`bwt`) of babies born in San Francisco between 1960 and 1967 as a function of their pregnancy’s length of `gestation` (in weeks) and the mother’s `age` (in years). 
 
 As a refresher, let us have a look at the data.
 
@@ -134,13 +135,13 @@ glimpse(babies)
 At the beginning of the upcoming chapters of this lesson, we will provide introductory information in two different modes: mathematical as formula and syntactical as R code snippets.
 
 
-- Mathematical: 
+#### Mathematical: 
 
 Mathematically, adding a second numeric explanatory variable is trivial---we just add another term to our model.
 
-$$ \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age $$
+$$ \widehat{\mathrm{bwt}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} $$
 
-- Syntactical: 
+#### Syntactical: 
 
 The syntax for fitting this model in R is similarly trivial---we simply extend the formula to incorporate both the `gestation` and `age` variables, just as we did before.
 
@@ -176,18 +177,20 @@ data_space <- ggplot(babies, aes(x = gestation, y = age)) +
 data_space
 ```
 
-It is difficult to see but you may note in the resulting graph that the blue points tend to get lighter with increasing gestation, reflecting an increase in birthweight.
+It is difficult to see but you may note in the resulting graph that the blue points tend to get lighter with increasing gestation, reflecting an increase in birth weight.
 
 
 ### Tiling the plane
 
-Another (better) way to visualize a 3D model is to tile the plane. We will create a 2D plot that covers all combinations of our two explanatory variables and then use color for tiles in the _background_ to reflect the corresponding fitted values. 
+Another (better) way to visualize a 3D model is to tile the plane using a [heatmap](https://en.wikipedia.org/wiki/Heat_map). We will create a 2D plot that covers all combinations of our two explanatory variables and then use color for tiles in the _background_ to reflect the corresponding fitted values. 
+Hence, the heatmap will illustrate how the model output changes over different combinations of the explanatory variables. 
 
-We will need two steps to create a data frame of all possible combinations of `gestation` and `age` values, along with the model prediction for each.
+We will need to create the heatmap in three steps.
+The first two steps are to create a data frame of all possible combinations of `gestation` and `age` values, along with the model prediction for each.
 
-1. Firstly, we create a grid of values using the `data_grid()` function. With the `seq_range` function, we specify the spaces in the sequence of our variables. Using the parameter `by = 1` means that we want to produce all possible combinations. Both functions are part of the `modelr` package, which is not part of the `tidyverse` and must be loaded separately.
+**Step 1:** First, we create a grid of values using the `data_grid()` function. With the `seq_range` function, we specify the spaces in the sequence of our variables. Using the parameter `by = 1` means that we want to produce all possible combinations. Both functions are part of the `modelr` package, which is not part of the `tidyverse` and must be loaded separately.
 
-2. Secondly, we feed those generated grid values into our model using the `broom` package. In this case, we can't use the `data` argument as we had done previously. Our data are not the same as those used to fit the model object but come from the `data_grid()` function. So we must use the `newdata` argument.
+**Step 2:** Second, we feed those generated grid values into our model using the `broom` package. In this case, we can't use the `data` argument as we had done previously. Our data are not the same as those used to fit the model object but come from the `data_grid()` function. So we must use the `newdata` argument.
 
 
 ```{r ex3-babies-tiling-plane, echo=TRUE, exercise.setup="ex2-babies-data-space", exercise=TRUE}
@@ -213,15 +216,13 @@ glimpse(bwt_hats)
 
 ```
 
-```{r sandbox-solution}
-x <- length(unique(grid$gestation)) 
-y <- length(unique(grid$age))
-x * y
-```
+<!--  ```{r sandbox-solution} -->
+<!--  x <- length(unique(grid$gestation))  -->
+<!--  y <- length(unique(grid$age)) -->
+<!--  x * y -->
+<!--  ``` -->
 
-3. Thirdly, we use the `geom_tile()` function from the `ggplot2` package to superimpose these values on our data space. Setting the `alpha` argument to 0.5 allows us to see both the actual observations (as points) and the model predictions (as a smooth surface). 
-
-
+**Step 3:** Finally, we use the `geom_tile()` function from the `ggplot2` package to superimpose these values on our data space. Setting the `alpha` argument to 0.5 allows us to see both the actual observations (as points) and the model predictions (as a smooth surface). 
 
 
 ```{r ex4-babies-model-space, echo=TRUE, exercise=TRUE, exercise.setup="ex3-babies-tiling-plane"}
@@ -235,8 +236,8 @@ Note how the color of the tiles lightens as you get closer to the upper right co
 
 ### 3D visualization
 
-
-A perhaps more natural way to visualize a multiple regression model is as a plane through a cloud of points in three dimensions. Here, we use the [plotly package](https://plotly.com/r/) to illustrate our model for the birthweight of babies. 
+An alternative way to visualize a multiple regression model is as a plane through a cloud of points in three dimensions. 
+Here, we use the [plotly package](https://plotly.com/r/) to illustrate our model for the birth weight of babies. 
 
 Our approach is similar to the previous one.
 
@@ -246,7 +247,7 @@ Our approach is similar to the previous one.
 
 3. This is an additional step: We build the regression plane as a matrix of the unique values of both variables as we had done previously in the sandbox and extract (`pull`) the vector of the `.fitted` value from our model. We need these data for the next step of the visualization.
 
-4. Instead of `ggplot2`, we use the `plotly` package for the visualization. The syntax of the `plot_ly` function is  similar to `ggplot.` In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. 
+4. Instead of `ggplot2`, we use the `plotly` package for the visualization. The syntax of the `plot_ly` function is  similar to `ggplot`. In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. 
 
 
 ```{r ex5-babies-plotly, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE, message=FALSE, exercise.lines=27}
@@ -291,15 +292,17 @@ Note how the plane cuts through the data points. The residual associated with ea
 
 ## Your turn
 
+**Exercise:**
+
 Now you will fit a multiple linear regression model (MLR model) yourself. The dataset `mariokart` you are going to use is already loaded in your workspace. Have a first look with `glimpse()` at the data:
 
 ```{r ex0-mariokart-glimpse, exercise=TRUE}
 ___(___)
 ```
 
-```{r ex0-mariokart-glimpse-solution}
-glimpse(mariokart)
-```
+<!--  ```{r ex0-mariokart-glimpse-solution} -->
+<!--  glimpse(mariokart) -->
+<!--  ``` -->
 
 
 ### Fitting a MLR model
@@ -308,9 +311,9 @@ In terms of the R code, fitting a MLR model is easy: Simply add variables to the
 
 In a parallel slopes model, we had two explanatory variables: one was numeric and one was categorical. Here, we will allow both explanatory variables to be numeric.
 
+**Exercise:**
 
-- Fit a multiple linear regression model for total price as a function of the duration of the auction and the starting price.
-
+Fit a multiple linear regression model for total price as a function of the duration of the auction and the starting price.
 If you don't remember the variable names look at the previous exercise or at the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
 
 
@@ -319,27 +322,25 @@ If you don't remember the variable names look at the previous exercise or at the
 lm(___ ~ ___ + ___, data = ___)
 ```
 
-```{r ex1-mariokart-hint}
-# Fit the model using duration and starting price
-lm(total_pr ~ ___ + ___, data = mariokart)
-```
+<!-- ```{r ex1-mariokart-hint} -->
+<!-- # Fit the model using duration and starting price -->
+<!-- lm(total_pr ~ ___ + ___, data = mariokart) -->
+<!-- ``` -->
 
-```{r ex1-mariokart-solution}
-# Fit the model using duration and starting price
-lm(total_pr ~ duration + start_pr, data = mariokart)
-```
+<!--  ```{r ex1-mariokart-solution} -->
+<!--  # Fit the model using duration and starting price -->
+<!--  lm(total_pr ~ duration + start_pr, data = mariokart) -->
+<!--  ``` -->
 
 
 ### Tiling the plane
 
 
-One method for visualizing a multiple linear regression model is to create a [heatmap](https://en.wikipedia.org/wiki/Heat_map) of the fitted values in the plane defined by the two explanatory variables. This heatmap will illustrate how the model output changes over different combinations of the explanatory variables. 
+Recall the steps to create a heatmap visualizion of the multiple regression model:
 
-This is a multistep process:
-
-- First, create a grid of the possible pairs of values of the explanatory variables. The grid should be over the actual range of the data present in each variable. We've done this for you and stored the result as a data frame called `grid`.
-- Use `augment()` with the `newdata` argument to find the $\hat{y}$'s corresponding to the values in `grid`.
-- Add these to the `data_space` plot by using the `fill` aesthetic and `geom_tile()`.
+1. Create a grid of the possible pairs of values of the explanatory variables. The grid should be over the actual range of the data present in each variable. We've done this for you and stored the result as a data frame called `grid`.
+2. Use `augment()` with the `newdata` argument to find the $\widehat{y}$'s corresponding to the values in `grid`.
+3. Add these to the `data_space` plot by using the `fill` aesthetic and `geom_tile()`.
 
 ```{r ex2-mariokart-setup}
 mariokart <- filter(mariokart, total_pr < 100)
@@ -355,6 +356,8 @@ grid <- mariokart |>
   )
 ```
 
+**Exercise:**
+
 The model object `mod` is already in your workspace.
 
 - Use `augment()` to create a `data.frame` that contains the values the model outputs for each row of `grid`.
@@ -369,28 +372,33 @@ data_space +
   geom_tile(data = ____, aes(___),____)
 ```
 
-```{r ex2-mariokart-hint-1}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
-```
+<!-- ```{r ex2-mariokart-hint-1} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
+<!-- ``` -->
 
-```{r ex2-mariokart-hint-2}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
+<details>
+<summary>**Hint**</summary>
+You can get predictions using `augment(mod, newdata=variable_name)`. 
+</details>
 
-# tile the plane
-data_space + 
-  geom_tile(data = price_hats, aes(___), alpha = ___)
-```
+<!-- ```{r ex2-mariokart-hint-2} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
 
-```{r ex2-mariokart-solution}
-# add predictions to grid
-price_hats <- augment(mod, newdata = grid)
+<!-- # tile the plane -->
+<!-- data_space +  -->
+<!--   geom_tile(data = price_hats, aes(___), alpha = ___) -->
+<!-- ``` -->
 
-# tile the plane
-data_space + 
-  geom_tile(data = price_hats, aes(fill = .fitted), alpha = 0.5)
-```
+<!-- ```{r ex2-mariokart-solution} -->
+<!-- # add predictions to grid -->
+<!-- price_hats <- augment(mod, newdata = grid) -->
+<!--  -->
+<!-- # tile the plane -->
+<!-- data_space +  -->
+<!--   geom_tile(data = price_hats, aes(fill = .fitted), alpha = 0.5) -->
+<!-- ``` -->
 
 ### Models in 3D
 
@@ -452,6 +460,8 @@ Much like `ggplot()`, the `plot_ly()` function will allow you to create a plot o
 
 Note that `plot_ly` uses the pipe (`|>`) operator to chain commands together.
 
+**Exercise:**
+
 - Run the `plot_ly` command to draw 3D scatterplot for `total_pr` as a function of `duration` and `start_pr` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis.
 - Use `add_surface()` to draw a plane through the cloud of points by setting `z = ~plane`.
 
@@ -468,34 +478,34 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~_____, showscale = FALSE)
 ```
 
-```{r ex3-mariokart-hint-1}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-hint-1} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-```
+<!-- ``` -->
 
-```{r ex3-mariokart-hint-2}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-hint-2} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers() 
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers()  -->
+<!-- ``` -->
 
 
-```{r ex3-mariokart-solution}
-# load plotly package
-library(plotly) 
+<!-- ```{r ex3-mariokart-solution} -->
+<!-- # load plotly package -->
+<!-- library(plotly)  -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers() 
-  
-# draw the plane
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE)
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers()  -->
+
+<!-- # draw the plane -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) -->
+<!-- ``` -->
 
 ## Conditional interpretation of coefficients
 
@@ -505,7 +515,7 @@ What do the coefficients in a multiple regression model mean?
 
 ### Two slope coefficients
 
-Consider the fitted coefficients for our model for the birthweight of babies shown below. 
+Consider the fitted coefficients for our model for the birth weight of babies shown below. 
 
 ```{r ex6-babies-coef, exercise=TRUE}
 lm(bwt ~ gestation + age, data = babies)
@@ -521,13 +531,13 @@ Note that in this case both slopes are positive, but have different magnitudes.
 model_space
 ```
 
-Remember: When we depicted our above model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birthweights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
+Remember: When we depicted our above model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birth weights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
 
 ### Tiled plane plus first slope
 
-For a 30-year-old mother, the increase in expected birthweight is 0.47 ounces per day, and this can be viewed on the plot as the rate of color change as you move horizontally through the plot along a straight line. It is in this sense that the coefficient of gestation is a slope. 
+For a 30-year-old mother, the increase in expected birth weight is 0.47 ounces per day, and this can be viewed on the plot as the rate of color change as you move horizontally through the plot along a straight line. It is in this sense that the coefficient of gestation is a slope. 
 
-However, this rate of change is constant across mothers of all ages. It doesn't matter whether you are 20, 30, or 40. While the expected birthweight does depend on the mother's age, the rate of change in birthweight with respect to gestational length does not depend on the the mother's age. 
+However, this rate of change is constant across mothers of all ages. It doesn't matter whether you are 20, 30, or 40. While the expected birth weight does depend on the mother's age, the rate of change in birth weight with respect to gestational length does not depend on the the mother's age. 
 
 
 ```{r ex8-babies-model-hline, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
@@ -535,15 +545,15 @@ model_space +
   geom_hline(yintercept = 30, color = "red")
 ```
 
-Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birthweight, while holding age constant.
+Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birth weight, while holding age constant.
 
 ### Tiled plane plus second slope
 
-Similarly, at the typical gestational length of 40 weeks (or 280 days), the expected birthweight increases at a rate of 0.17 ounces per year of the mother's age. That is, our model predicts that the birthweight of a 36-year-old mother is about one-sixth of an ounce heavier than the birthweight of a 35-year-old mother, when both mothers carry full term. But again, that rate of change is the same irrespective of the gestational length, so we would expect the same difference for babies born at 35 weeks, 40 weeks, and 42 weeks. 
+Similarly, at the typical gestational length of 40 weeks (or 280 days), the expected birth weight increases at a rate of 0.17 ounces per year of the mother's age. That is, our model predicts that the birth weight of a 36-year-old mother is about one-sixth of an ounce heavier than the birth weight of a 35-year-old mother, when both mothers carry full term. But again, that rate of change is the same irrespective of the gestational length, so we would expect the same difference per year for babies born at 35 weeks, 40 weeks, and 42 weeks. 
 
-So the coefficient of 0.17 ounces per year is the slope of the plane for a fixed length of gestation. Again, since this slope is the same for all gestational lengths, we can interpret this coefficient as the effect of the mother's age on birthweight, while holding gestational length constant.
+So the coefficient of 0.17 ounces per year is the slope of the plane for a fixed length of gestation. Again, since this slope is the same for all gestational lengths, we can interpret this coefficient as the effect of the mother's age on birth weight, while holding gestational length constant.
 
-Recapitulating we can say: Whenever you interpret coefficients from a multiple regression model, be sure to always include a phrase to the effect of "holding x constant." Another good alternative is "after controlling for x." This information is crucial to having a valid understanding of a regression model.
+**Recapitulating we can say: Whenever you interpret coefficients from a multiple regression model, be sure to always include a phrase to the effect of "holding x constant." Another good alternative is "after controlling for x." This information is crucial to having a valid understanding of a regression model.**
 
 
 ```{r ex9-babies-model-vline, exercise=TRUE, exercise.setup="ex8-babies-model-hline"}
@@ -551,43 +561,39 @@ model_space +
   geom_vline(xintercept = 280, color = "red")
 ```
 
-It's also apparent from the plot that the colours change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation is bigger than the coefficient on age.
+It's also apparent from the plot that the colors change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation times the range of gestation times is bigger than the coefficient on age
+times the range of ages. 
 
 ### Coefficient interpretation
 
 Now, you might be tempted to think that bigger coefficients are always more important, but this is not true. The value of the coefficients depend on the units of the explanatory variables. 
+Recall the model you fit for the `babies`, incorporating both the `gestation` and `age` variables:
 
-Let's fit again our `babies` model, incorporating both the `gestation` and `age` variables, just as we did before.
-
-```{r ex6-babies2, exercise=TRUE}
-lm(___ ~ ___ + ___, data = ___)
-```
-
-
-```{r ex6-babies2-solution}
+```{r echo=FALSE}
 lm(bwt ~ gestation + age, data = babies)
 ```
 
 In this case, one variable is in the units of days (of gestational length), while the other is in the units of years (of mother's age). They are not directly comparable.
 
-Now it is your turn to look at the `mariokart` data set.
-
 ## Your turn
+
+Now it is your turn to look at the `mariokart` data set.
 
 ### Coefficient magnitude
 
-As a repetition fit again a multiple linear regression model with the `mariokart` data set for total price (`total_pr`) as a function of the `duration` of the auction and the starting price (`start_pr`).
+**Exercise:**
 
+Let's again fit a multiple linear regression model with the `mariokart` data set for total price (`total_pr`) as a function of the `duration` of the auction and the starting price (`start_pr`).
 
 ```{r ex4-mariokart, exercise=TRUE}
 # Fit the model using duration and starting price
 lm(formula = ___ ~ ___ + ___, data = ___)
 ```
 
-```{r ex4-mariokart-solution}
-# Fit the model using duration and starting price
-lm(formula = total_pr ~ duration + start_pr, data = mariokart)
-```
+<!-- ```{r ex4-mariokart-solution} -->
+<!-- # Fit the model using duration and starting price -->
+<!-- lm(formula = total_pr ~ duration + start_pr, data = mariokart) -->
+<!-- ``` -->
 
 The coefficients from our model for the total auction price of `mariokart` as a function of auction duration and starting price are shown above. A colleague claims that these results imply that the duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
 
@@ -605,13 +611,15 @@ question("This interpretation is false because.",
 
 ### Practicing interpretation
 
-You fit a multiple regression model for the total auction price of an item in the `mariokart` data set as a function of the starting price and the duration of the auction. You computed the coefficients. Now choose the correct interpretation of the `duration` variable.
+<!-- You fit a multiple regression model for the total auction price of an item in the `mariokart` data set as a function of the starting price and the duration of the auction. You computed the coefficients.  -->
+
+Now choose the correct interpretation of the `duration` variable.
 
 
 ```{r mc2}
 question("This interpretation is correct …",
-  answer("For each additional day the auction lasts, the expected final price declines by $1.51, after controlling for starting price."),
-  answer("For each additional dollar of starting price, the expected final price increases by $0.23, after controlling for the duration of the auction.", correct = TRUE, message="Remember, the inclusion of another variable in your model is sometimes referred to as 'controlling for' that variable."),
+  answer("For each additional day the auction lasts, the expected final price declines by $1.51, after controlling for starting price.", correct = TRUE, message="Remember, the inclusion of another variable in your model is sometimes referred to as 'controlling for' that variable."),
+  answer("For each additional dollar of starting price, the expected final price increases by $0.23, after controlling for the duration of the auction."),
   answer("The duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger."),
   answer("The average auction lasts 51 days."),
   allow_retry=TRUE
@@ -625,15 +633,15 @@ question("This interpretation is correct …",
 
 ### How could we forget about smoking?
 
-- Mathematical:
+#### Mathematical:
 
 $$
-    \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age + \hat{\beta}_3 \cdot smoke
+    \widehat{\mathrm{bwt}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} + \widehat{\beta}_3 \cdot \mathrm{smoke}
 $$
 
-- Syntactical:
+#### Syntactical:
 
-No study of birthweight is complete without some discussion of the effect of smoking, which is known to have all kinds of undesirable health consequences. Mothers in the babies data set have their smoking status recorded as a binary variable: either she was or was not a smoker. 
+No study of birth weight is complete without some discussion of the effect of smoking, which is known to have all kinds of undesirable health consequences. Mothers in the babies data set have their smoking status recorded as a binary variable: either she was or was not a smoker. 
 
 ```{r ex10-babies-smoking, exercise=TRUE}
 lm(bwt ~ gestation + age + smoke, data = babies)
@@ -709,10 +717,10 @@ Once again, we can then used `plotly` to create a 3D image of our model in the d
 
 The interpretations that we developed previously still hold---we just need to think carefully about how they apply to our new model. The coefficients on gestation and age still reflect slopes. And since the planes are parallel, both slopes are the same in both planes. The coefficient on smoke is the distance between the two planes, and this distance is constant across all possible values of gestation and age. In this sense, we are modeling the effect of smoking as being the same regardless of gestational length and the mother's age. However, we have estimated the size of that effect in the context of gestational length and the mother's age. 
 
-The coefficient of gestation is 0.45 ounces per day, which is only slightly less than it was in our previous model that did not consider smoking. Our interpretation is that each additional day of gestation was associated with an increase in expected birthweight of 0.45 ounces, after controlling for the mother's age and smoking status. Each additional year of the mother's age was associated with an increase in expected birthweight of just 0.11 ounces per year, after controlling for gestational length and the mother's smoking status. Note that the effect of the mother's age on birthweight appears lower than in the previous model. 
+The coefficient of gestation is 0.45 ounces per day, which is only slightly less than it was in our previous model that did not consider smoking. Our interpretation is that each additional day of gestation was associated with an increase in expected birth weight of 0.45 ounces, after controlling for the mother's age and smoking status. Each additional year of the mother's age was associated with an increase in expected birth weight of just 0.11 ounces per year, after controlling for gestational length and the mother's smoking status. Note that the effect of the mother's age on birth weight appears lower than in the previous model. 
 
 
-Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounces. Thus, our model predicts that mothers who smoke will deliver babies that weight 8 ounces less, on average, than mothers of the same age and gestational length who don't smoke. That is, the negative effect of smoking on expected birthweight is 8 ounces (or half a pound), after controlling for gestational length and the mother's age. This is a *huge* effect compared to the influence of the other two variables we have considered.
+Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounces. Thus, our model predicts that mothers who smoke will deliver babies that weight 8 ounces less, on average, than mothers of the same age and gestational length who don't smoke. That is, the negative effect of smoking on expected birth weight is 8 ounces (or half a pound), after controlling for gestational length and the mother's age. This is a *huge* effect compared to the influence of the other two variables we have considered.
 
 ## Your turn
 
@@ -747,7 +755,7 @@ plane1 <- tidy_planes |>
 
 Draw a 3D plot for the `mariokart` model. Once again we have stored the `x` and `y` vectors for you. Since we now have two planes, there are matrix objects `plane0` and `plane1` stored for you as well.
 
-**Instructions**
+**Exercise:**
 
 - Apply `plot_ly` to draw 3D scatterplot for the mariokart model, Use `total_pr` as a function of `duration`, `start_pr`, and `cond` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis. Use color to represent `cond`.
 - Use `add_surface()` (twice) to draw two planes through the cloud of points, one for new MarioKarts and another for used ones. Use the objects `plane0` and `plane1`.
@@ -767,35 +775,35 @@ p |>
 ```
 
 
-```{r ex5-mariokart-hint-1}
-# load plotly
-library(plotly)
-```
+<!-- ```{r ex5-mariokart-hint-1} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
+<!-- ``` -->
 
 
-```{r ex5-mariokart-hint-2}
-# load plotly
-library(plotly)
+<!-- ```{r ex5-mariokart-hint-2} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers(color = ~cond) 
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers(color = ~cond)  -->
+<!-- ``` -->
 
 
-```{r ex5-mariokart-solution}
-# load plotly
-library(plotly)
+<!-- ```{r ex5-mariokart-solution} -->
+<!-- # load plotly -->
+<!-- library(plotly) -->
 
-# draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
-  add_markers(color = ~cond) 
-  
-# draw two planes
-p |>
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
-  add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
-```
+<!-- # draw the 3D scatterplot -->
+<!-- p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |> -->
+<!--   add_markers(color = ~cond)  -->
+
+<!-- # draw two planes -->
+<!-- p |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |> -->
+<!--   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE) -->
+<!-- ``` -->
 
 
 By including the duration, starting price, and condition variables in our model, we now have two explanatory variables and one categorical variable. Our model now takes the geometric form of two parallel planes!
@@ -805,23 +813,26 @@ The first plane corresponds to the model output when the condition of the item i
 
 ### Parallel plane interpretation
 
-Calculate the coefficients from the `mariokart` parallel planes: You already used all the needed information in the previous exercise when you drew the scatterplot.
+**Exercise:**
+
+Now fit a linear model the response `total_pr` and explanatory variabels `duration`, `start_pr`, and `cond` 
+using the `mariokart` data. 
 
 
 ```{r ex6-mariokart, exercise=TRUE}
 lm(formula = ___ ~ ___ + ___ + ___, data = ___)
 ```
 
-```{r ex6-mariokart-solution}
-lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart)
-```
+<!-- ```{r ex6-mariokart-solution} -->
+<!-- lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart) -->
+<!-- ``` -->
 
-The coefficients from our parallel planes model is shown below.
-Choose the right interpretation of $\beta_3$ (the coefficient on `condUsed`):
+<!-- The coefficients from our parallel planes model is shown below. -->
+<!-- Choose the right interpretation of $\beta_3$ (the coefficient on `condused`): -->
 
 
 ```{r mc3}
-question("Choose the right interpretation of beta the coefficient on `condUsed`",
+question("Choose the right interpretation of the estimated coefficient for `condused`",
   answer("The expected premium for new (relative to used) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", correct = TRUE),
   answer("The expected premium for used (relative to new) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", message="Wrong reference level. The reference level specified needs to be kept in mind when interpreting factor coefficients."),
   answer("For each additional day the auction lasts, the expected final price declines by $8.95, after controlling for starting price and condition.", message="Wrong coefficient"), 
@@ -833,15 +844,17 @@ question("Choose the right interpretation of beta the coefficient on `condUsed`"
 
 ### Adding more variables
 
-- Mathematical:
+#### Mathematical
 
 $$
-    \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age + \hat{\beta}_3 \cdot smoke + $$
-$$+ \hat{\beta}_4 \cdot height + \hat{\beta}_5 \cdot weight + 
-    \hat{\beta}_6 \cdot parity
+\begin{align}
+    \mathrm{\widehat{bwt}} &= \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{gestation} + \widehat{\beta}_2 \cdot \mathrm{age} + \widehat{\beta}_3 \cdot \mathrm{smoke} \\
+    &~~~+ \widehat{\beta}_4 \cdot \mathrm{height} + \widehat{\beta}_5 \cdot \mathrm{weight} + 
+    \widehat{\beta}_6 \cdot \mathrm{parity}
+    \end{align}
 $$
 
-- Syntactical:
+#### Syntactical
 
 By now, you may have caught on to the fact that there are no mathematical or syntactical hurdles to adding more variables to a multiple regression model. You can add as many terms as you want and R will happily fit the model for you. 
 
@@ -850,7 +863,7 @@ lm(bwt ~ gestation + age + smoke + height + weight + parity,
                data = babies)
 ```
 
-In this case we added explanatory variables for the mother's height and weight, and a variable called parity that denotes whether this child was her first pregnancy. It seems reasonable to think that any of these variables might play a role in determining a child's birthweight, and so there may be valid scientific reasons for including any or all of these variables in our model. 
+In this case we added explanatory variables for the mother's height and weight, and a variable called parity that denotes whether this child was her first pregnancy. It seems reasonable to think that any of these variables might play a role in determining a child's birth weight, and so there may be valid scientific reasons for including any or all of these variables in our model. 
 
 In R, you can use the dot operator in a formula to mean *all other variables in the data.frame*. 
 
@@ -869,22 +882,24 @@ We can of course employ tricks like mapping variables to color, creating small m
 
 ### Interpretation in large models
 
-The interpretation of the coefficients in larger models remains the same. We can still think of the coefficients on numeric explanatory variables as being slopes, and we can still think of the coefficients on categorical explanatory variables as being intercepts. The main thing we have to be careful about is remembering to include language specifying the other variables in the model. Here, our main finding would likely be that the expected birthweight of babies born to mothers who smoke is 8.4 ounces lower than mothers who don't, after controlling for gestational length, and her age, height, weight, and whether she had previous pregnancies.
+The interpretation of the coefficients in larger models remains the same. We can still think of the coefficients on numeric explanatory variables as being slopes, and we can still think of the coefficients on categorical explanatory variables as being intercepts. The main thing we have to be careful about is remembering to include language specifying the other variables in the model. Here, our main finding would likely be that the expected birth weight of babies born to mothers who smoke is 8.4 ounces lower than mothers who don't, after controlling for gestational length, and her age, height, weight, and whether she had previous pregnancies.
 
 ## Your turn
 
 ### Interpretation of coefficient in a big model
 
-This time you will throw even more variables into your `mariokart` model, including the number of bids in each auction (`nBids`) and the number of `wheels`. 
+**Exercise:**
+
+This time you will throw even more variables into your `mariokart` model, including the number of bids in each auction (`n_bids`) and the number of `wheels`. 
 
 ```{r ex7-mariokart, exercise=TRUE}
 lm(formula = ___ ~ ___ + ___ + ___ + ___ + ___, data = ___)
 ```
 
 
-```{r ex7-mariokart-solution}
-lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart)
-```
+<!-- ```{r ex7-mariokart-solution} -->
+<!-- lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart) -->
+<!-- ``` -->
 
 Unfortunately this makes a full visualization of our model impossible, but we can still interpret the coefficients. 
 
@@ -897,9 +912,6 @@ question("Choose the correct interpretation of the coefficient on the number of 
   allow_retry=TRUE
 )
 ```
-
-
-
 ## Submit
 
 ```{r, echo=FALSE, context="server"}

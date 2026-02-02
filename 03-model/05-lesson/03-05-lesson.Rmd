@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 5 - Model fit"
+title: "Regression modeling: 5 - Assessing model fit"
 output:
   learnr::tutorial:
     progressive: true
@@ -15,7 +15,6 @@ library(broom)
 library(tidyverse)
 library(openintro)
 library(Lahman)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -272,22 +271,23 @@ ggplot(data = possum, aes(y = total_l, x = tail_l)) +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-### Null (average) model
+### Base (average) model
 
 It's hard to compare $10 to 3.5 centimeters. Which is "bigger"? What would be nice is if we had a way to compare the quality of a model's fit that was unitless. To do so, it is helpful to think about a benchmark.
 
 If you had to predict the body length of a possum, and you didn't have any information about that particular possum, what would your prediction be? Let's pause for a second and think.
 
-A sensible choice would be the average length of all possum. And in fact, if you have to make the same prediction for every possum, the average is the *best* number you can pick. We can think about this as a model where $\hat{y}$ (the predicted value of $y$) is equal to $\bar{y}$ (the average value of $y$).
+A sensible choice would be the average length of all possum. And in fact, if you have to make the same prediction for every possum, the average is the *best* number you can pick. We can think about this as a model where $\widehat{y}$ (the predicted value of $y$) is equal to $\bar{y}$ (the average value of $y$).
 
-### Visualization of null model
+### Visualization of base model
 
-This model is often called the **null model**. This model makes sense to use as a benchmark, since it doesn't require any insight to make, and yet there is no reasonable model that could be any worse. It looks like this:
+This model is often called the **base model** (or **null model**, but we prefer to avoid the hypothesis testing baggage of the "null" terminology).
+This model corresponds to a regression model without any predictors, so it makes sense to use as a benchmark: it doesn't require any insight to make and is a direct simplification of the model of interest (which *does* have the predictor `total_l`). The following code fits the model without any predictors and plots the residuals:
 
-```{r possum-null}
-null_mod <- lm(total_l ~ 1, data = possum)
+```{r possum-base}
+base_mod <- lm(total_l ~ 1, data = possum)
 
-null_mod |>
+base_mod |>
   augment() |>
   mutate(tail_l = possum$tail_l) |>
   ggplot(aes(x = tail_l, y = total_l)) +
@@ -298,16 +298,16 @@ null_mod |>
   geom_point()
 ```
 
-### SSE of the null model
+### SSE of the base model
 
-We can fit the null model in R using `lm()`, but including only the constant 1 as our explanatory variable. This results in an SSE value of 1913.826.
+We can fit the base model in R using `lm()`, but including only the constant 1 as our explanatory variable. This results in an SSE value of 1913.826.
 
-```{r possum-null-summary}
-possum_null <- lm(total_l ~ 1, data = possum)
+```{r possum-base-summary}
+possum_base <- lm(total_l ~ 1, data = possum)
 ```
 
 ```{r, echo = TRUE}
-null_mod |>
+base_mod |>
   augment(possum) |>
   summarize(SST = sum(.resid^2))
 ```
@@ -324,7 +324,7 @@ total_tail_mod |>
 
 ### Coefficient of determination
 
-The ratio of the SSE for our model to the SSE for the null model is a quantification of the variability explained by our model. More specifically, the SSE for the null model is often called SST, for the *total* sum of the squares. This is a measure of the variability in the response variable.
+The ratio of the SSE for our model to the SSE for the base model is a quantification of the variability explained by our model. More specifically, the SSE for the base model is often called SST, for the *total* sum of the squares. This is a measure of the variability in the response variable.
 
 By building a regression model, we hope to explain some of that variability. The portion of the SST that is *not* explained by our model is the SSE. These ideas are captured by this formula for the "coefficient of determination," usually referred to as $R^2$.
 
@@ -341,9 +341,35 @@ We have already seen a connection between the value of the correlation between $
 
 Why then, do we need both concepts? Correlation is strictly a bivariate quantity, it can only be between a single response and a single explanatory variable. However, regression is a much more flexible modeling framework. Each regression model has its own value of $R^2$, but in future lessons you will learn how such models can incorporate many explanatory variables, unlike correlation.
 
-The $R^2$ gives us a numerical measurement of the strength of fit of our linear regression relative to a null model based on the average of the response variable ($\hat{y}_{null} = \bar{y}$).
+The $R^2$ gives us a numerical measurement of the strength of fit of our linear regression relative to a base model based on the average of the response variable ($\widehat{y}_{base} = \bar{y}$).
 
-The null model has an $R^2$ of zero because $SSE = SST$. That is, since the fitted values ($\hat{y}_{null}$) are all equal to the average ($\bar{y}$), the residual for each observation is the distance between that observation and the mean of the response. Since we can always fit the null model, it serves as a baseline against which all other models will be compared.
+The base model has an $R^2$ of zero because $SSE = SST$. That is, since the fitted values ($\widehat{y}_{base}$) are all equal to the average ($\bar{y}$), the residual for each observation is the distance between that observation and the mean of the response. Since we can always fit the base model, it serves as a baseline against which all other models will be compared.
+
+
+### Use $R^2$, not correlation
+
+As a rule, correlation gives too optimistic picture of the strength of the association:
+
+```{r correlation-r-squared-plot, echo=FALSE}
+df <- data.frame(
+  y = seq(-1, 1, length.out = 200)
+) |>
+  transform(x = y^2)
+
+ggplot(df, aes(x = y, y = x)) +
+  geom_line() +
+  labs(x = "r", y = expression(R^2))
+```
+
+For example, a correlation of -0.5 corresponds to $R^2 = 0.25$. Even a seemingly strong correlation of $0.7$ corresponds to an $R^2$ value of 
+less than 0.5 ($R^2 = 0.49$). 
+So, in summary $R^2$ has the following benefits compared to $r$:
+
+1. $R^2$ has a clear statistical interpretation in terms of proportion of explained variance whereas $r$ does not.
+2. $R^2$ is applicable to scenarios multiple predictors or even when using more complex models like neural networks. 
+3. $R^2$ gives a more accurate numerical summary of the strength of the association, whereas $r$ overstaets the association.
+
+Therefore, **you should always use $R^2$ rather than $r$**. 
 
 ### Summary
 
@@ -365,12 +391,11 @@ summary(books_mod)
 
 ### Over-reliance on $R^2$
 
-While $R^2$ is certainly a useful and ubiquitous measure of model fit, it is not the be-all-and-end-all of statistical modeling. A high $R^2$ alone doesn't mean that you have a "good" model, and low $R^2$ doesn't mean that you have a lousy model. A model with a high $R^2$ may be overfit, or it may violate the conditions for inference that we will discuss in a later lesson. A model with a low $R^2$ can still provide substantial insight into a complex problem.
+While $R^2$ is certainly a useful and ubiquitous measure of model fit, it is not the be-all-and-end-all of statistical modeling. A high $R^2$ alone doesn't mean that you have a "good" model, and low $R^2$ doesn't mean that you have a lousy model. A model with a high $R^2$ may be overfit, or it may violate the conditions for inference that we will discuss later lesson. A model with a low $R^2$ can still provide substantial insight into a complex problem.
 
 We'll close by invoking the words of famed statistician George Box:
 
 > "Essentially, all models are wrong, but some are useful".
-
 
 Now it's time for you to assess model fit on your own.
 
@@ -576,7 +601,7 @@ mod_slg_obp |>
 
 ### Influence
 
-As noted previously, observations of high leverage may or may not be *influential*. The influence of an observation depends not only on its leverage, but also on the magnitude of its residual. Recall that while leverage only takes into account the explanatory variable ($x$), the residual depends on the response variable ($y$) and the fitted value ($\hat{y}$).
+As noted previously, observations of high leverage may or may not be *influential*. The influence of an observation depends not only on its leverage, but also on the magnitude of its residual. Recall that while leverage only takes into account the explanatory variable ($x$), the residual depends on the response variable ($y$) and the fitted value ($\widehat{y}$).
 
 Influential points are likely to have high leverage and deviate from the general relationship between the two variables. We measure influence using Cook's distance, which incorporates both the leverage and residual of each observation.
 
@@ -786,7 +811,6 @@ summary(mod_cleaner)
 summary(mod_original)
 
 ```
-
 
 
 ## Submit

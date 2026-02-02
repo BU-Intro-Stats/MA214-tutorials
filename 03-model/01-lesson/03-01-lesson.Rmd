@@ -14,7 +14,6 @@ library(tidyverse)
 library(openintro)
 library(grid)
 library(png)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE,
                       fig.align = "center",
@@ -157,56 +156,56 @@ ggplot(data = possum, aes(y = total_l, x = tail_l)) +
 
 Note that the names of the axis labels must include quotations (`""`), indicating to `ggplot()` that these are names **not** variables.
 
-## Connection to boxplots
+<!-- ## Connection to boxplots -->
 
-Since you already know how a boxplot can illustrate the relationship between a numerical response variable and a **categorical** explanatory variable, it may be helpful to think of a scatterplot as a continuous generalization of side-by-side boxplots.
+<!-- Since you already know how a boxplot can illustrate the relationship between a numerical response variable and a **categorical** explanatory variable, it may be helpful to think of a scatterplot as a continuous generalization of side-by-side boxplots. -->
 
-- Can think of boxplots as scatterplots...
-    - ...but with discretized explanatory variable
+<!-- - Can think of boxplots as scatterplots... -->
+<!--     - ...but with discretized explanatory variable -->
 
-- The `cut()` function allows for us to discretize a continuous variable
-    - Choose appropriate number of "boxes"
+<!-- - The `cut()` function allows for us to discretize a continuous variable -->
+<!--     - Choose appropriate number of "boxes" -->
 
-### Discretized scatterplot
+<!-- ### Discretized scatterplot -->
 
-We can connect these ideas by discretizing our explanatory variable. This can be achieved in R using the `cut()` function, which takes a numeric variable and chops it into a specified number of discrete chunks. The `breaks` argument specifies the number of chunks.
+<!-- We can connect these ideas by discretizing our explanatory variable. This can be achieved in R using the `cut()` function, which takes a numeric variable and chops it into a specified number of discrete chunks. The `breaks` argument specifies the number of chunks. -->
 
-Here, we are creating a new variable named `tail_cut` from using the `cut()` function on the original `tail_l` variable. We are then saving this new variable back into the original `possum` dataset.
+<!-- Here, we are creating a new variable named `tail_cut` from using the `cut()` function on the original `tail_l` variable. We are then saving this new variable back into the original `possum` dataset. -->
 
-```{r cut, echo = TRUE}
-possum <- possum |>
-  mutate(tail_cut = cut(tail_l, breaks = 5))
-```
+<!-- ```{r cut, echo = TRUE} -->
+<!-- possum <- possum |> -->
+<!--   mutate(tail_cut = cut(tail_l, breaks = 5)) -->
+<!-- ``` -->
 
-We can then plot the relationship between total length and the new `tail_cut` variable. What we've done is gathered up all of the data points in these bins and plotted them in a vertical line, rather than at their original tail length value.
+<!-- We can then plot the relationship between total length and the new `tail_cut` variable. What we've done is gathered up all of the data points in these bins and plotted them in a vertical line, rather than at their original tail length value. -->
 
-```{r 5, message=FALSE, echo = TRUE}
-ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
-  geom_point()
-```
+<!-- ```{r 5, message=FALSE, echo = TRUE} -->
+<!-- ggplot(data = possum, aes(y = total_l, x = tail_cut)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-### Boxplot
+<!-- ### Boxplot -->
 
-This type of dotplot is not standard. What is more common is to create side-by-side boxplots of the distribution of these points. If we change from `geom_point()` to `geom_boxplot()`, we will get this more "standard" visualization.
+<!-- This type of dotplot is not standard. What is more common is to create side-by-side boxplots of the distribution of these points. If we change from `geom_point()` to `geom_boxplot()`, we will get this more "standard" visualization. -->
 
-```{r 6, message=FALSE, echo = TRUE}
-ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
-  geom_boxplot()
-```
+<!-- ```{r 6, message=FALSE, echo = TRUE} -->
+<!-- ggplot(data = possum, aes(y = total_l, x = tail_cut)) + -->
+<!--   geom_boxplot() -->
+<!-- ``` -->
 
-A notable attribute of a scatterplot is its connection to the raw data. A boxplot, however, is wholly disconnected from the raw data, only plotting summaries of the data. To re-forge this connection, we can overlay the original data points on top of the boxplots, by simply adding another layer to our `ggplot()`!
+<!-- A notable attribute of a scatterplot is its connection to the raw data. A boxplot, however, is wholly disconnected from the raw data, only plotting summaries of the data. To re-forge this connection, we can overlay the original data points on top of the boxplots, by simply adding another layer to our `ggplot()`! -->
 
-Let's walk through a few parts of the code below. First, we have added `alpha = 0` to the boxplots, so that the "outlier" points are not plotted (we don't want to plot them twice). The `geom_jitter()` function instead of the `geom_point()` function, since the points are being plotted on top of each other. You can think of jittering as taking the overplotted graph (where the points are overlapping) and giving it a tiny shake. Jittering will move the points a little bit side-to-side and up-and-down, but their position from the original plot won't dramatically change.
+<!-- Let's walk through a few parts of the code below. First, we have added `alpha = 0` to the boxplots, so that the "outlier" points are not plotted (we don't want to plot them twice). The `geom_jitter()` function instead of the `geom_point()` function, since the points are being plotted on top of each other. You can think of jittering as taking the overplotted graph (where the points are overlapping) and giving it a tiny shake. Jittering will move the points a little bit side-to-side and up-and-down, but their position from the original plot won't dramatically change. -->
 
-```{r boxdot, echo = TRUE}
-ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
-  geom_boxplot(outlier.alpha = 0) +
-  geom_jitter(color = "sky blue", width = 0.2)
-```
+<!-- ```{r boxdot, echo = TRUE} -->
+<!-- ggplot(data = possum, aes(y = total_l, x = tail_cut)) + -->
+<!--   geom_boxplot(outlier.alpha = 0) + -->
+<!--   geom_jitter(color = "sky blue", width = 0.2) -->
+<!-- ``` -->
 
-Now we can see the original data points, and the boxplots of the different tail length groups. We can see that overall, as the median tail length increases the body length also increases.
+<!-- Now we can see the original data points, and the boxplots of the different tail length groups. We can see that overall, as the median tail length increases the body length also increases. -->
 
-Now it's time for you to get some practice making scatterplots.
+<!-- Now it's time for you to get some practice making scatterplots. -->
 
 ## Your turn!
 
@@ -225,51 +224,51 @@ Using the `ncbirths` dataset, use `ggplot()` to make a scatterplot visualizing t
  In the `ggplot()` map `weeks` to the `x` aesthetic and `weight` to the `y` aesthetic. Remember to use the `ncbirths` dataset!
 ```
 
-```{r ex1-solution}
-# Scatterplot of weight vs. weeks
-ggplot(data = ncbirths, aes(x = weeks, y = weight)) +
-  geom_point()
-```
+<!-- ```{r ex1-solution} -->
+<!-- # Scatterplot of weight vs. weeks -->
+<!-- ggplot(data = ncbirths, aes(x = weeks, y = weight)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-### Boxplots as discretized/conditioned scatterplots
+<!-- ### Boxplots as discretized/conditioned scatterplots -->
 
-If it is helpful, you can think of boxplots as scatterplots for which the variable on the x-axis has been discretized.
+<!-- If it is helpful, you can think of boxplots as scatterplots for which the variable on the x-axis has been discretized. -->
 
-The `cut()` function takes two arguments: the continuous variable you want to discretize and the number of `breaks` that you want to make in that continuous variable in order to discretize it.
+<!-- The `cut()` function takes two arguments: the continuous variable you want to discretize and the number of `breaks` that you want to make in that continuous variable in order to discretize it. -->
 
-First, we will make a new variable, named `weeks_cut`, which discretizes the original `weeks` variable. We will use the `cut()` function, specifying four breaks.
+<!-- First, we will make a new variable, named `weeks_cut`, which discretizes the original `weeks` variable. We will use the `cut()` function, specifying four breaks. -->
 
-```{r cut-ex, exercise = TRUE}
-ncbirths <- ncbirths |>
-  mutate(weeks_cut = cut(___, breaks = ___))
-```
+<!-- ```{r cut-ex, exercise = TRUE} -->
+<!-- ncbirths <- ncbirths |> -->
+<!--   mutate(weeks_cut = cut(___, breaks = ___)) -->
+<!-- ``` -->
 
-```{r cut-ex-hint}
- The `cut()` function should cut the `weeks` variable into 4 different categories.
-```
+<!-- ```{r cut-ex-hint} -->
+<!--  The `cut()` function should cut the `weeks` variable into 4 different categories. -->
+<!-- ``` -->
 
-Next, using the new `weeks_cut` variable, make side-by-side boxplots illustrating how the birth weight of these babies varies according to the number of weeks of gestation.
+<!-- Next, using the new `weeks_cut` variable, make side-by-side boxplots illustrating how the birth weight of these babies varies according to the number of weeks of gestation. -->
 
-```{r ex2-setup}
-ncbirths <- ncbirths |>
-  mutate(weeks_cut = cut(weeks, breaks = 4))
-```
+<!-- ```{r ex2-setup} -->
+<!-- ncbirths <- ncbirths |> -->
+<!--   mutate(weeks_cut = cut(weeks, breaks = 4)) -->
+<!-- ``` -->
 
-```{r ex2, exercise = TRUE}
-ggplot(data = ___,
-       aes(x = ___, y = ___)) +
-  ___
-```
+<!-- ```{r ex2, exercise = TRUE} -->
+<!-- ggplot(data = ___, -->
+<!--        aes(x = ___, y = ___)) + -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex2-hint}
- In the plot `x` is `weeks_cut` and `y` is `weight` from the `ncbirths` dataset.
-```
+<!-- ```{r ex2-hint} -->
+<!--  In the plot `x` is `weeks_cut` and `y` is `weight` from the `ncbirths` dataset. -->
+<!-- ``` -->
 
-```{r ex2-solution}
-ggplot(data = ncbirths,
-       aes(x = weeks_cut, y = weight)) +
-  geom_boxplot()
-```
+<!-- ```{r ex2-solution} -->
+<!-- ggplot(data = ncbirths, -->
+<!--        aes(x = weeks_cut, y = weight)) + -->
+<!--   geom_boxplot() -->
+<!-- ``` -->
 
 ## Characterizing bivariate relationships
 
@@ -306,8 +305,9 @@ Here we see a negative, slightly non-linear relationship between sign legibility
 This relationship may be a good candidate for fitting a regression model, but the curvature in the relationship deserves attention. Indeed, very few relationships will be truly "linear," but it is our responsibility to assess if it is reasonable to assume if a relationship is linear "enough."
 
 ```{r img1, echo=FALSE, out.width=300}
-knitr::include_graphics("http://bolt.mph.ufl.edu/files/2012/07/images-mod2-scatterplot4.gif
-")
+# http://bolt.mph.ufl.edu/files/2012/07/images-mod2-scatterplot4.gif
+# source: https://stats.libretexts.org/Bookshelves/Applied_Statistics/Biostatistics_-_Open_Learning_Textbook/Unit_1:_Exploratory_Data_Analysis/Case_Q-Q
+knitr::include_graphics("images/images-mod2-scatterplot4.gif")
 ```
 
 ### NIST
@@ -364,15 +364,15 @@ ggplot(data = mammals, aes(x = ___, y = ___)) +
   geom_point()
 ```
 
-```{r ex3-hint-2}
-ggplot(data = mammals, aes(x = body_wt, y = ___)) +
-  geom_point()
-```
+<!-- ```{r ex3-hint-2} -->
+<!-- ggplot(data = mammals, aes(x = body_wt, y = ___)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex3-solution}
-ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
-  geom_point()
-```
+<!-- ```{r ex3-solution} -->
+<!-- ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ###
 
@@ -388,16 +388,15 @@ ggplot(data = mlbbat10, aes(x = ___, y = ___)) +
   geom_point()
 ```
 
-```{r ex4-hint-2}
-ggplot(data = mlbbat10, aes(x = obp, y = ___)) +
-  geom_point()
-```
+<!-- ```{r ex4-hint-2} -->
+<!-- ggplot(data = mlbbat10, aes(x = obp, y = ___)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-
-```{r ex4-solution}
-ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
-  geom_point()
-```
+<!-- ```{r ex4-solution} -->
+<!-- ggplot(data = mlbbat10, aes(x = obp, y = slg)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ###
 
@@ -410,24 +409,24 @@ Next, using the `bdims` dataset, create a scatterplot illustrating how a person'
 ```
 
 ```{r ex5-hint-1}
-ggplot(data = bdims, aes(x = ___, y = ___, color = ___)_ +
+ggplot(data = bdims, aes(x = ___, y = ___, color = as.factor(sex)) +
   geom_point()
 ```
 
-```{r ex5-hint-2}
-ggplot(data = bdims, aes(x = hgt, y = ___, color = ___)_ +
-  geom_point()
-```
+<!-- ```{r ex5-hint-2} -->
+<!-- ggplot(data = bdims, aes(x = hgt, y = ___, color = ___)_ + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex5-hint}
-ggplot(data = bdims, aes(x = hgt, y = wgt, color = ___)_ +
-  geom_point()
-```
+<!-- ```{r ex5-hint} -->
+<!-- ggplot(data = bdims, aes(x = hgt, y = wgt, color = ___)_ + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex5-solution}
-ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
-  geom_point()
-```
+<!-- ```{r ex5-solution} -->
+<!-- ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ###
 
@@ -437,20 +436,20 @@ Finally, using the `smoking` dataset, create a scatterplot illustrating how the 
 
 ```
 
-```{r ex6-hint-1}
-ggplot(data = smoking, aes(x = ___, y = ___)) +
-  geom_point()
-```
+<!-- ```{r ex6-hint-1} -->
+<!-- ggplot(data = smoking, aes(x = ___, y = ___)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex6-hint-2}
-ggplot(data = smoking, aes(x = age, y = ___)) +
-  geom_point()
-```
+<!-- ```{r ex6-hint-2} -->
+<!-- ggplot(data = smoking, aes(x = age, y = ___)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
-```{r ex6-solution}
-ggplot(data = smoking, aes(x = age, y = amt_weekdays)) +
-  geom_point()
-```
+<!-- ```{r ex6-solution} -->
+<!-- ggplot(data = smoking, aes(x = age, y = amt_weekdays)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ### Characterizing scatterplots
 
@@ -494,11 +493,11 @@ Fist, let's use the `coord_trans()` function to modify our original scatterplot,
  The function you want to use is `coord_trans()`!
 ```
 
-```{r ex7-solution}
-ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
-  geom_point() +
-  coord_trans(x = "log10", y = "log10")
-```
+<!-- ```{r ex7-solution} -->
+<!-- ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) + -->
+<!--   geom_point() + -->
+<!--   coord_trans(x = "log10", y = "log10") -->
+<!-- ``` -->
 
 ###
 
@@ -515,11 +514,34 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
  Add in the `scale_x_log10()` and `scale_y_log10()` to transform the x- and y-axis!
 ```
 
-```{r ex8-solution}
-ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
+<!-- ```{r ex8-solution} -->
+<!-- ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) + -->
+<!--   geom_point() + -->
+<!--   scale_x_log10() + -->
+<!--   scale_y_log10() -->
+<!-- ``` -->
+
+
+### Exploring different scalings
+
+Now, using the `mlbbat10` dataset, explore whether using the `scale_x_log10()` and `scale_y_log10()` functions (or just one of them),
+results in the scatterplot of on-base percentage (`obp`) versus slugging percentage (`slg`) is most linear. 
+
+```{r ex8b, exercise = TRUE}
+ggplot(data = mlbbat10, aes(x = ___, y = ___)) +
   geom_point() +
-  scale_x_log10() +
-  scale_y_log10()
+  ___ 
+```
+
+### 
+```{r mc-ex8b}
+question("Which rescaling gives the most linear relationship?",
+  answer("log scale for `obp` only", message = "Hmm...did you try all the transformations?"),
+  answer("log scale for `slg` only", message = "this is very nonlinear!"),
+  answer("log scale for `obp` and `slg`", correct = TRUE, message = "The scatterplot shows the strongest linear relationship!"),
+  answer("no rescaling", message = "It's pretty good. But is it the best?"),
+  allow_retry = TRUE
+)
 ```
 
 ## Outliers
@@ -591,24 +613,18 @@ ggplot(ab_gt_200, aes(x = ___, y = ___)) +
 ```
 
 ```{r ex9-hint-1}
-mlbbat10 |>
-  filter(at_bat >= 200)
+filter the at_bat variable
 ```
 
-```{r ex9-hint-2}
-ggplot(ab_gt_200, aes(x = obp, y = slg)) +
-  geom_point()
-```
+<!-- ```{r ex9-solution} -->
+<!-- # Filter for AB greater than or equal to 200 -->
+<!-- ab_gt_200 <- mlbbat10 |> -->
+<!--   filter(at_bat >= 200) -->
 
-```{r ex9-solution}
-# Filter for AB greater than or equal to 200
-ab_gt_200 <- mlbbat10 |>
-  filter(at_bat >= 200)
-
-# Scatterplot of slg vs. obp
-ggplot(ab_gt_200, aes(x = obp, y = slg)) +
-  geom_point()
-```
+<!-- # Scatterplot of slg vs. obp -->
+<!-- ggplot(ab_gt_200, aes(x = obp, y = slg)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ###
 
@@ -622,17 +638,28 @@ ab_gt_200 <- mlbbat10 |>
 ```
 
 ```{r ex10, exercise = TRUE}
+# Identify the outlying player
 ab_gt_200 |>
   filter(___)
 ```
 
-```{r ex10-solution}
-# Identify the outlying player
-ab_gt_200 |>
-  filter(obp < 0.2)
+<!-- ```{r ex10-solution} -->
+<!-- # Identify the outlying player -->
+<!-- ab_gt_200 |> -->
+<!--   filter(obp < 0.2) -->
+<!-- ``` -->
+
+###
+
+```{r mc-ex10}
+question("Who is the outlying player?",
+  answer("P Feliz", message = "Nope"),
+  answer("B Wood", correct = TRUE, message = "You got it!"),
+  answer("J Mathis", message =  "Nope"),
+  answer("A Moore", message =  "Nope"),
+  allow_retry = TRUE
+)
 ```
-
-
 
 ## Submit
 

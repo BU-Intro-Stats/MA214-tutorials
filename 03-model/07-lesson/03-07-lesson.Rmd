@@ -15,7 +15,6 @@ library(learnr)
 library(openintro)
 library(tidyverse)
 library(broom)
-library(emo)
 library(mosaicData)
 
 # knitr options ----------------------------------------------------------------
@@ -124,13 +123,13 @@ ggplot(data = mpg, aes(x = displ, y = hwy, color = factor(year))) +
   geom_segment(data = filter(augment(mod), hwy <= 25 & displ > 6.1 & displ < 7), 
                aes(xend = displ, yend = .fitted, color = `factor(year)`), 
                arrow = arrow(length = unit(0.3,"cm")), 
-               size = 1) + 
+               linewidth = 1) + 
   geom_point()
 ```
 
 One of the most natural questions we might have about our model is: "how well does it fit?" We measure this by computing---for each observation---the difference between the actual value of the response variable and the fitted value from our model. This distance is called a **residual**. Residuals for two observations are illustrated in this plot with vertical arrows. Just as in simple linear regression, the model fitting procedure will automatically minimize the length of those arrows across all of the points. 
 
-In a parallel slopes model, our model is represented by two lines, but only one of the lines is relevant for each observation. In the plot, the green points---each corresponding to a car made in 2008---are compared to the green line, and the orange points---each corresponding to a car made in 1999---are compared to the orange line. 
+In a parallel slopes model, our model is represented by two lines, but only one of the lines is relevant for each observation. In the plot, the green points---each corresponding to a car made in 2008---are compared to the green line, and the red points---each corresponding to a car made in 1999---are compared to the red line. 
 
 Note that this necessarily makes our parallel slopes model more flexible than a simple linear regression model. The two lines are constrained to be parallel, but we still have two instead of one. If the best fit occurs when the two lines are very close together, then the coefficient of the categorical variable will be very small, and the parallel slopes model will be very similar to the simple linear regression model.
 
@@ -140,14 +139,12 @@ The coefficient of determination---usually called R-squared or $R^2$---carries o
 
 In general, a higher $R^2$ may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$. Thus, model fits in multiple regression are often compared using the adjusted $R^2$ value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$, adjusted $R^2$ will not necessarily increase as new explanatory variables are added---it could go up or down.
 
-To summarize:
 
-- $R^2 = 1 - \frac{SSE}{SST}$ 
-- $SSE$ gets smaller as $\Rightarrow R^2$ increases 
-- As $p$ (number of explanatory variables) increases $R^2$ will always increase (or stay the same)
-- To adjust for an increasing $R^2$ use: $R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1}$ 
 
 ### Fitted values
+
+Retrieving the fitted values produced by our model can be done in two different ways. The `predict()` function will return the fitted values as a vector, while the `augment()` function from the broom package will return a data.frame that contains the original observations, the fitted values, the residuals, and several other diagnostic computations. 
+
 
 ```{r eval=FALSE, echo=TRUE}
 # returns a vector
@@ -159,10 +156,7 @@ predict(mod)
 augment(mod)
 ``` 
 
-
-Retrieving the fitted values produced by our model can be done in two different ways. The `predict()` function will return the fitted values as a vector, while the `augment()` function from the broom package will return a data.frame that contains the original observations, the fitted values, the residuals, and several other diagnostic computations. 
-
-Since this tutorial uses the tidyverse, we will generally prefer the latter method. 
+Since this tutorial uses the tidyverse, we will generally prefer `augment`. 
 
 Another important bit of functionality is the ability to make out-of-sample predictions. This means using our model to make predictions about observations that were not part of the data set on which the model was fit.
 
@@ -198,7 +192,7 @@ augment(mod, newdata = new_obs)
 
 
 
-To figure this out, we can simply input the values of the explanatory variables. In this case, my car has a 1.8 liter engine. We can create a new data.frame with the information, and then feed it to `predict()` or `augment()` using the newdata argument. Either function will return a predicted mileage of 30.18 mpg. This is slightly less than the manufacturer's reported 33 mpg, giving us a residual of 2.82 mpg.
+To figure this out, we can simply input the values of the explanatory variables. In this case, my car has a 1.8 liter engine. We can create a new dataframe with the information, and then feed it to `predict()` or `augment()` using the `newdata` argument. Either function will return a predicted mileage of 30.18 mpg. This is slightly less than the manufacturer's reported 33 mpg, giving us a residual of 2.82 mpg.
 
 ### $R^2$ vs. adjusted $R^2$
 
@@ -216,6 +210,15 @@ $$
     R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} \,,
 $$
 
+### 
+
+So, in summary, the key points about $R^2$ and adjusted $R^2$ are:
+
+- $R^2 = 1 - \frac{SSE}{SST}$
+- As $SSE$ decreases, $R^2$ increases
+- When $p$ (number of explanatory variables) increases, $SSE$ decreases (or, at least, doesn't increase)
+- So, as $p$ increase, $R^2$ will always increase (or stay the same)
+- To adjust for the number of explanatory variables, use $R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1}$ 
 
 
 ## Your turn
@@ -223,6 +226,8 @@ $$
 ### Model Fit
 
 Now try it for yourself. The model `mod` from the `mariokart` data set is already in your workspace.
+
+**Exercise:**
 
 - Use `mutate()` to add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` to the `mariokart` data set. Save the new dataframe as `mariokart_noisy`.
 - The first argument of `lm()` is a formula involving the variables `total_pr`, `wheels`, `cond`, and `noise`.
@@ -246,50 +251,68 @@ mod2 <- ____
 _____(____)
 ```
 
-```{r ex1-hint-1}
-# R^2 and adjusted R^2
-summary(mod)
-```
 
-```{r ex1-hint-2}
-# add random noise
-mariokart_noisy <- mariokart |>
-  mutate(noise = rnorm(n = nrow(mariokart)))
-```
+<details>
+<summary>**Hint 1**</summary>
+You can get a summary of the model with `summary()`. What output does `summary()` give you? 
+</details>
 
-```{r ex1-hint-3}
-# compute new model
-mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
-```
+<details>
+<summary>**Hint 2**</summary>
+Recall that the syntax for `mutate()` is `mutate(new_column = function(existing_column))`. You can add noise with this - try using `rnorm()` to generate random variables. 
+</details>
 
-```{r ex1-solution}
-# R^2 and adjusted R^2
-summary(mod)
+<details>
+<summary>**Hint 3**</summary>
+When computing a new model, be careful to use your new dataset `mariokart_noisy`, not the original dataset, and add the noise variable to the model.
+</details>
 
-# add random noise
-mariokart_noisy <- mariokart |>
-  mutate(noise = rnorm(n = nrow(mariokart)))
-  
-# compute new model
-mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
 
-# new R^2 and adjusted R^2
-summary(mod2)
-```
+<!-- ```{r ex1-hint-1} -->
+<!-- # R^2 and adjusted R^2 -->
+<!-- summary(mod) -->
+<!-- ``` -->
+
+<!-- ```{r ex1-hint-2} -->
+<!-- # add random noise -->
+<!-- mariokart_noisy <- mariokart |> -->
+<!--   mutate(noise = rnorm(n = nrow(mariokart))) -->
+<!-- ``` -->
+
+<!-- ```{r ex1-hint-3} -->
+<!-- # compute new model -->
+<!-- mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy) -->
+<!-- ``` -->
+
+<!-- ```{r ex1-solution} -->
+<!-- # R^2 and adjusted R^2 -->
+<!-- summary(mod) -->
+<!--  -->
+<!-- # add random noise -->
+<!-- mariokart_noisy <- mariokart |> -->
+<!--   mutate(noise = rnorm(n = nrow(mariokart))) -->
+<!--    -->
+<!-- # compute new model -->
+<!-- mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy) -->
+<!--  -->
+<!-- # new R^2 and adjusted R^2 -->
+<!-- summary(mod2) -->
+<!-- ``` -->
 
 ### Prediction
 
 Once we have fit a regression model, we can use it to make predictions for unseen observations or retrieve the fitted values. Here, we explore two methods for doing the latter. 
 
-A traditional way to return the fitted values (i.e. the $\hat{y}$'s) is to run the `predict()` function on the model object. This will return a vector of the fitted values. Note that `predict()` will take an optional `newdata` argument that will allow you to make predictions for observations that are not in the original data. 
+A traditional way to return the fitted values (i.e. the $\widehat{y}$'s) is to run the `predict()` function on the model object. This will return a vector of the fitted values. Note that `predict()` will take an optional `newdata` argument that will allow you to make predictions for observations that are not in the original data. 
 
-A newer alternative is the `augment()` function from the **broom** package, which returns a `data.frame` with the response variable ($y$), the relevant explanatory variables (the $x$'s), the fitted value ($\hat{y}$) and some information about the residuals ($e$). `augment()` will also take a `newdata` argument that allows you to make predictions.
+A newer alternative is the `augment()` function from the **broom** package, which returns a `data.frame` with the response variable ($y$), the relevant explanatory variables (the $x$'s), the fitted value ($\widehat{y}$) and some information about the residuals ($e$). `augment()` will also take a `newdata` argument that allows you to make predictions.
+
+**Exercise:**
 
 The fitted model `mod` is already in your environment.
 
 - Compute the fitted values of the model as a vector using `predict()`.
 - Compute the fitted values of the model as one column in a `data.frame` using `augment()`.
-
 
 ```{r ex2-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
@@ -309,13 +332,13 @@ You can get predictions with `predict(mod)`, and `augment()` works similarly as 
 </details>
 
 
-```{r ex2-solution}
-# return a vector
-predict(mod)
+<!-- ```{r ex2-solution} -->
+<!-- # return a vector -->
+<!-- predict(mod) -->
 
-# return a data frame
-augment(mod)
-```
+<!-- # return a data frame -->
+<!-- augment(mod) -->
+<!-- ``` -->
 
 
 ## Understanding Interaction
@@ -334,16 +357,16 @@ Thus far we have considered models where the regression lines were constrained t
 ### Adding interaction terms
 
 $$
-    \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot is\_newer + \hat{\beta}_3 \cdot displ \cdot is\_newer
+    \widehat{\mathrm{mpg}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{displ} + \widehat{\beta}_2 \cdot \mathrm{is\_newer} + \widehat{\beta}_3 \cdot \mathrm{displ} \cdot \mathrm{is\_newer}
 $$
 
 - For older cars 
 
-$$ \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ $$ 
+$$ \widehat{\mathrm{mpg}} = \widehat{\beta}_0 + \widehat{\beta}_1 \cdot \mathrm{displ} $$ 
 
 - For newer cars, 
 
-$$ \hat{mpg} = (\hat{\beta}_0 + \hat{\beta}_2) + (\hat{\beta}_1 + \hat{\beta}_3) \cdot displ $$ 
+$$ \widehat{\mathrm{mpg}} = (\widehat{\beta}_0 + \widehat{\beta}_2) + (\widehat{\beta}_1 + \widehat{\beta}_3) \cdot \mathrm{displ} $$ 
 
 Mathematically, we achieve this by adding yet another term to our model. This third explanatory variable is the product of `displ` and `is_newer`, and it is called an **interaction** term. 
 
@@ -389,16 +412,16 @@ Suppose that after going apple picking you have 12 apples left over. You decide 
 Consider the following models:
 
 $$
-    rot = \beta_0 + \beta_1 \cdot t + \beta_2 \cdot temp \,,
+    \mathrm{rot} = \beta_0 + \beta_1 \cdot t + \beta_2 \cdot \mathrm{temp} \,,
 $$
 
 and 
 
 $$
-    rot = \beta_0 + \beta_1 \cdot t + \beta_2 \cdot temp + \beta_3 \cdot temp \cdot t \,,
+    \mathrm{rot} = \beta_0 + \beta_1 \cdot \mathrm{t} + \beta_2 \cdot \mathrm{temp} + \beta_3 \cdot \mathrm{temp} \cdot \mathrm{t} \,,
 $$
 
-where $t$ is time, measured in weeks, and $temp$ is a binary variable indicating either cool or warm. 
+where `t` is time, measured in weeks, and `temp` is a binary variable indicating either cool or warm. 
 
 If you decide to keep the interaction term present in the second model, you are implicitly assuming that:
 
@@ -428,10 +451,11 @@ lm(y ~ x + z + x:z, data = mydata)
 
 will do the trick. The use of the colon (`:`) here means that the interaction between $x$ and $z$ will be a third term in the model.
 
+**Exercise:**
+
 The data frame `mariokart` is already loaded in your workspace.
 
 - Use `lm()` to fit a model for the price of a MarioKart as a function of its condition and the duration of the auction, *with interaction*.
-
 
 Include the term `cond:duration` in your formula to model the interaction of condition and duration.
 
@@ -445,16 +469,18 @@ Include the term `cond:duration` in your formula to model the interaction of con
 To include an interaction effect of variable A and B, use `A:B`.
 </details>
 
-```{r ex3-solution}
-# include interaction
-lm(total_pr ~ duration + cond + cond:duration, data = mariokart)
-```
+<!-- ```{r ex3-solution} -->
+<!-- # include interaction -->
+<!-- lm(total_pr ~ duration + cond + cond:duration, data = mariokart) -->
+<!-- ``` -->
 
 ### Visualizing interaction models
 
 Interaction allows the slope of the regression line in each group to vary. In this case, this means that the relationship between the final price and the length of the auction is moderated by the condition of each item. 
 
 Interaction models are easy to visualize in the data space with **ggplot2** because they have the same coefficients as if the models were fit independently to each group defined by the level of the categorical variable. In this case, new and used MarioKarts each get their own regression line. To see this, we can set an aesthetic (e.g. `color`) to the categorical variable, and then add a `geom_smooth()` layer to overlay the regression line for each color.
+
+**Exercise:**
 
 The dataset `mariokart` is already loaded in your workspace.
 
@@ -473,12 +499,12 @@ ggplot(___, aes(___)) +
 Define groups using the color `aes`thetic in the ggplot call.
 </details>
 
-```{r ex4-solution}
-# interaction plot
-ggplot(mariokart, aes(y = total_pr, x = duration, color = cond)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-```
+<!-- ```{r ex4-solution} -->
+<!-- # interaction plot -->
+<!-- ggplot(mariokart, aes(y = total_pr, x = duration, color = cond)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_smooth(method = "lm", se = FALSE) -->
+<!-- ``` -->
 
 ## Simpson's Paradox
 
@@ -581,6 +607,8 @@ slr
 
 Our simple linear regression model is misleading, in that it suggests a negative relationship between final auction price and duration. However, *for the used* MarioKarts, the relationship is positive.
 
+**Exercise:**
+
 The object `slr` is already defined for you.
 
 - Fit a simple linear regression model for final auction price (`total_pr`) as a function of duration (`duration`).
@@ -600,13 +628,13 @@ slr + aes(___)
 You can add layers to an existing plot with `+`.
 </details>
 
-```{r ex5-solution}
-# model with one slope
-lm(formula = total_pr ~ duration, data = mariokart)
+<!-- ```{r ex5-solution} -->
+<!-- # model with one slope -->
+<!-- lm(formula = total_pr ~ duration, data = mariokart) -->
 
-# plot with two slopes
-slr + aes(color = cond)
-```
+<!-- # plot with two slopes -->
+<!-- slr + aes(color = cond) -->
+<!-- ``` -->
 
 
 ## Submit
