@@ -1,0 +1,503 @@
+---
+title: "Bayesian Foundations: 1 - Review"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+#devtools::install_github("rundel/learnrhash")
+#devtools::install_git("git@github.com:rundel/learnrhash.git")
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(grid)
+library(png)
+library(ggplot2)
+#library(emo)
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      message = FALSE,
+                      warning = FALSE)
+tutorial_options(exercise.eval = FALSE)
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
+```
+
+## Welcome
+
+In this tutorial, we'll take a quick break from modeling to review probabilities, events, and conditional probability. This will help us build up a foundation for thinking of statistical problems in a Bayesian way. 
+
+
+## Probability Review
+
+Interpreting probability in a Bayesian way may be new to you (at least in Statistics classes). Consider the classic setting of flipping a fair coin. Then the probability of getting heads is $1/2$, and the probability of getting tails is also $1/2$. There are (at least) two ways of interpreting this probability:
+
+1. If we flip the coin over and over, we will get heads roughly $1/2$ the time, and tails roughly $1/2$ the time.
+2. The two outcomes (heads and tails) are equally likely.
+
+###
+
+The former interpretation is often attributed to a *Frequentist* way of thinking, while the second is more *Bayesian*. 
+
+For another example, say that two students are preparing for a test and guessing at their probability of passing. The first student is very confident in their preparation, and says that their probability of passing is 0.9. The second student feels less confident, and says 0.6. 
+
+###
+
+A Frequentist interpretation says that, if the students could each take the exam many times over and over again, they would pass 90% or 60% of the time, respectively. 
+
+###
+
+In fact, there's an even stricter interpretation: assuming the students can only take the exam once, this is a binary event --- so their probability of passing is either 0 or 1. That is, both students are wrong!
+
+This may raise some eyebrows for you (or not). Do you find this way of thinking about probabilities intuitive?
+
+###
+
+On the other hand, a more Bayesian interpretation of the probabilities says that the first student is much more likely to pass than to fail, and the second student is only a bit more likely to pass than to fail. 
+
+Their estimates of these probabilities are based on how much they've each prepared for the exam, what they know about the class, the professor, and/or the exam itself, and how they think they'll be evaluated. In other words, the students each have some prior knowledge and they each make an informed guess based on that knowledge. This, in essence, is the Bayesian approach to statistics. More on that in a bit!
+
+###
+
+These are just two ways of interpreting probabilities. Which one feels more intuitive to you will depend on how you think, and you may even use one or the other (or both) when approaching different problems. You'll notice that the Frequentist philosophy is more explicitly taught in Statistics classes, including in this one (so far!). Starting from now, we will explore the Bayesian way. 
+
+## Big Picture
+
+In the exam example above, we introduced the idea of a "Bayesian approach" to statistical problems. Let's describe this approach in more detail. 
+
+Imagine that you are one of the two students studying for an exam. Say that, for the same class, you already took one other exam and you passed with a grade of 80%. Let's call this your _prior_: given your typical study methods, you can confidently pass an exam for this class. 
+
+###
+
+Now, you sit for the exam, and unfortunately it goes poorly. You missed something in your preparations or just had a bad day, and when you get the grade back it is now a 60%. Still a pass, but much lower than you had hoped. Here's your _new data_: in your most recent exam, you performed worse than before.
+
+###
+
+Your class has one more exam left in the semester. Given your past two performances, you know you can do well on the material in the beginning of the class, but you'll need to review the second exam material. You make a plan to adjust your study methods and take care of yourself outside of class, and you hope to get at least a 75% on the final exam. This is your _posterior_. 
+
+###
+
+This method of building up knowledge (prior -> data -> posterior) is the nature of Bayesian analysis (see the figure below).
+
+![Figure 1: Bayesian knowledge-building at work. Source: BayesRules! (Chapter 1.1)](./bayes_diagram.png)
+
+In the coming sections we will formalize these ideas in terms of statistical objects like probabilities and distributions. But first, let's continue the review.
+
+
+## Events Review
+
+Often when we study a problem in statistics, we are interested in an _outcome_. For example, we may want to know how likely an event is to happen or not happen. One such problem might go something like this: say that a given disease affects $0.5%$ of the US population. A test is developed to detect the disease, and experiments say that the test gives false positives $3%$ of the time, and false negatives $2%$ of the time. Then we can write out the events like this:
+
+$$\mathbb{P}(FP) = 0.03, \quad \mathbb{P}(FN) = 0.02, \quad \text{and} \quad \mathbb{P}(D) = 0.005$$
+where $D$ is the event that a random person has the disease, $FP$ is the event that the diagnostic test returns a _false positive_ result (where the result is positive but the patient in fact does not have the disease), and $FN$ is the event that the test returns a _false negative_ (where the result is negative but the patient does in fact have the disease). 
+
+###
+
+Using conditional probability, we can express the events $FP$ and $FN$ as
+
+$$FP = P|D^c \quad \text{and} \quad FN = N|D$$
+where $P$ and $N$ are positive and negative test results, respectively. 
+
+###
+
+From the information given by the problem, we can also determine the probabilities of other events in the _sample space_, the full space of possibilities. 
+
+###
+
+```{r mc1}
+question("Which of the following is the correct description of the event FP^c (the complement of event FP)?",
+         answer("FP^c is the same thing as FN (false negative)"),
+         answer("FP^c is when the diagnostic test gives a negative result, and the patient does *not* have the disease (true negative)", correct=TRUE),
+         answer("FP^c is when the diagnostic test gives a negative result."),
+         answer("FP^c is when the diagnostic test gives a positive result."),
+         answer("Not sure"))
+```
+
+###
+
+```{r mc2}
+question("Which of the following is the correct description of the event FN^c (the complement of event FN)?",
+         answer("FN^c is the same thing as FP (false positive)"),
+         answer("FN^c is when the diagnostic test gives a positive result, and the patient does in fact have the disease (true positive)", correct=TRUE),
+         answer("FN^c is when the diagnostic test gives a negative result."),
+         answer("FN^c is when the diagnostic test gives a positive result."),
+         answer("Not sure"))
+```
+
+###
+
+And finally, we also have
+
+$$D^c = \{\text{a random person in the US does not have the disease}\}$$
+Which has probability...
+
+```{r mc3}
+question("What is the probability of the event D^c (the complement of event D)?",
+         answer("1-0.005, or 0.995", correct=TRUE),
+         answer("0.005"),
+         answer("0.03"),
+         answer("Not sure"))
+```
+
+
+## Conditional Probability and Bayes' Rule Review 
+
+Now we'll extend the example. Say that a patient goes to the doctor for the diagnostic test and receives a positive test result. We want to work out: what is the probability that the patient truly has the disease? In other words, we need to compute the probability of the conditional event $D|P$.
+
+###
+
+Recall that the _conditional probability_ of an event A _given_ B, is
+
+$$\mathbb{P}(A|B) = \frac{\mathbb{P}(A\cap B)}{\mathbb{P}(B)}$$ 
+
+Similarly, we have that the conditional probability of an event B given A is
+
+$$\mathbb{P}(B|A) = \frac{\mathbb{P}(A\cap B)}{\mathbb{P}(A)}$$ 
+
+Notice that we have $\mathbb{P}(A\cap B)$ in the numerator for both quantities, so we can solve for it to get 
+
+$$\mathbb{P}(A|B)\mathbb{P}(B) = \mathbb{P}(A\cap B) = \mathbb{P}(B|A)\mathbb{P}(A)$$
+
+And substitute back into the first equation to get
+
+$$\mathbb{P}(A|B) = \frac{\mathbb{P}(B|A)\mathbb{P}(A)}{\mathbb{P}(B)}$$
+
+###
+
+So, back to the problem at hand. We want to determine $\mathbb{P}(D|P)$, where event P is the positive test result. But what is $\mathbb{P}(P)$?
+
+###
+
+The key to answering the above question is the Law of Total Probability. First, note that our disease sample space can be *partitioned* into two *disjoint*, *mutually exclusive*, and *exhaustive* events: $D$ and $D^c$. Why are these two events mutually exclusive and exhaustive?
+
+###
+
+Now, the Law of Total Probability states that
+
+$$\mathbb{P}(P) = \mathbb{P}(P \cap D) + \mathbb{P}(P \cap D^c) = \mathbb{P}(P|D)\mathbb{P}(D) + \mathbb{P}(P|D^c)\mathbb{P}(D^c)$$
+where the second line follows from applying the rules of conditional probability.
+
+###
+
+Now, what is $\mathbb{P}(P|D)$, or in other words the probability of a _true positive_ test result?
+
+```{r mc4}
+question("How else can you express the event TP, or equivalently, P|D?",
+         answer("TP (true positive) is the same as P."),
+         answer("TP (true positive) can also be expressed as FN^c, the complement of FN (false negative).", correct=TRUE), 
+         answer("TP (true positive) can also be expressed as FP^c, the complement of FP (false positive)."),
+         answer("Not sure"))
+```
+
+###
+
+Now we can compute $\mathbb{P}(TP)$:
+
+```{r mc5}
+question("What is the probability of TP?",
+         answer("TP (true positive) is 1-0.03 = 0.97."),
+         answer("The probability of TP (true positive) is 0.005."),
+         answer("The probability of TP (true positive) is 1-0.02 = 0.98.", correct=TRUE), 
+         answer("The probability of TP (true positive) is 1-0.005 = 0.995."),
+         answer("Not sure"))
+```
+
+###
+
+Finally, we can put the pieces together and solve our problem:
+
+$$\mathbb{P}(D|P) = \frac{\mathbb{P}(P|D)\mathbb{P}(D)}{\mathbb{P}(P)} = \frac{\mathbb{P}(TP)\mathbb{P}(D)}{\mathbb{P}(TP)\mathbb{P}(D) + \mathbb{P}(FP)\mathbb{P}(D^c)} \\ = \frac{(1-0.02)(0.005)}{(1-0.02)(0.005) + (0.03)(1-0.005)} = 0.141$$
+
+Let's look more closely at this result. We have a test that on the surface appears to be highly accurate (only a $3\%$ false positive rate), and yet the probability of a patient having the disease given a positive test result is only about $14\%$. This is very counter-intuitive! 
+
+###
+
+The crux of this problems lies in the low prevalence of the disease in a general population (recall that our $\mathbb{P}(D)$ was just $0.005$). 
+
+Another way of expressing this probability is to say that $50$ out of every $10,000$ people have the disease, while $9,950$ do not. Say that all $10,000$ people get tested. Then, of the $50$ people who have the disease, there are $50\times(1-0.02)=49$ (true) positive test results - one person's disease was missed by the test. 
+
+On the other hand, of the $9,950$ people who do not have the disease, $9,950\times0.03=298.5$ will have (false) positive test results. 
+
+In total, there will be $49 + 298.5 = 347.5$ positive test results, but only $50$ truly have the disease. Thus, we can express $\mathbb{P}(D|P)$ as
+
+$$\mathbb{P}(D|P) = \frac{49}{49 + 298.5} = 0.141$$
+which is the answer we got before. 
+
+
+## Your Turn! 
+
+### False Positive Paradox
+
+In this section, you will repeat the previous exercise in a new problem to explore what is known as the False Positive Paradox. Imagine we have the same setup, except this time we are dealing with a disease that is far more prevalent in the general population: $\mathbb{P}(D) = 0.4$. The other givens are the same, namely $\mathbb{P}(FP) = 0.03$ and $\mathbb{P}(FN) = 0.02$. As before, you'll have to use conditional probability, Bayes' Rule, and the Law of Total Probability. 
+
+We'll use R this time, so let's store our known quantities into variables:
+
+```{r, echo=TRUE, include=TRUE}
+probD <- 0.4     # probability of the event D, general disease prevalence
+probFP <- 0.03   # probability of the event FP = P | D^c
+probFN <- 0.02   # probability of the event FN = N | D
+```
+
+###
+
+First, what is the probability that a random person in the population does not have the disease, $\mathbb{P}(D^c)$? Fill in your answer in the R code chunk below:
+
+```{r ex1, exercise=TRUE}
+probDc <- ____   # probability of D^c
+```
+
+```{r ex1-hint-1}
+probDc <- 1 - probD
+```
+
+```{r ex1-solution}
+probDc <- 0.6
+```
+
+```{r echo=FALSE, include=FALSE}
+# Need this chunk in order for the document to knit
+probDc <- 0.6
+```
+
+###
+
+Now, what is the probability of a positive test result given that the patient does have the disease (true positive), $\mathbb{P}(P|D) = \mathbb{P}(TP)$?
+
+```{r ex2, exercise=TRUE}
+probTP <- ____
+```
+
+```{r ex2-hint-1}
+# Hint: what is the complement of the event TP?
+# Or in other words, the complement of the event P|D? 
+# (Try negating each part and see if you find something familiar)
+
+probTP <- 1 - ____   
+```
+
+```{r ex2-solution}
+probTP <- 1 - probFN
+print(probTP)
+```
+
+```{r echo=FALSE, include=FALSE}
+# Need this for the document to knit
+probTP <- 1 - probFN
+```
+
+###
+
+```{r mc6}
+question("What is the event P|D?",
+         answer("P|D is the event that the patient gets a positive test result, given that they do have the disease. This is also known as a TP (true positive).", correct=TRUE),
+         answer("P|D is the event that we need to solve for using Bayes' Rule."),
+         answer("Not sure"))
+```
+
+```{r mc7}
+question("What is the event P|D^c?",
+         answer("P|D^c is the event that the patient gets a positive test result, given that they do *not* have the disease. This is also known as a FP (false positive).", correct=TRUE),
+         answer("P|D^c is the event that we need to solve for using Bayes' Rule."),
+         answer("Not sure"))
+```
+
+###
+
+Now, we need to compute the denominator of Bayes' Rule using the Law of Total Probability. Do this in the R chunk below to get a value for $\mathbb{P}(P)$:
+
+```{r ex3, exercise=TRUE}
+probP <- ____
+```
+
+```{r ex3-hint-1}
+# Hint: can you think of a partition in our problem?
+
+# probP <- ____
+```
+
+```{r ex3-hint-2}
+# Hint: can you think of a partition in our problem?
+# Hint: the partition is D and D^c. 
+
+# probP <- (____)*probD + (____)*probDc
+```
+
+```{r ex3-hint-3}
+# Hint: can you think of a partition in our problem?
+# Hint: the partition is D and D^c. 
+# Hint: what are the events we have that are conditioned on D and D^c?
+
+# probP <- (____)*probD + (____)*probDc
+```
+
+```{r ex3-solution}
+# Hint: can you think of a partition in our problem?
+# Hint: the partition is D and D^c. 
+# Hint: what are the events we have that are conditioned on D and D^c?
+# Hint: the conditional events are P|D (TP) and P|D^c (FP). Then the 
+# Law of Total Probability gives:
+
+probP <- (probTP)*probD + (probFP)*probDc
+```
+
+```{r echo=FALSE, include=FALSE}
+# Need this for the document to knit
+probP <- (probTP)*probD + (probFP)*probDc
+```
+
+###
+
+Finally, fill in the expression below using Bayes' Rule to get a value for $\mathbb{P}(D|P)$:
+
+```{r ex4, exercise=TRUE}
+probDgivenP <- ____
+```
+
+```{r ex4-hint-1}
+# Hint: what does the equation of Bayes' Rule say, if we're trying to find
+# the probability of event D|P?
+
+# probDgivenP <- ____
+```
+
+```{r ex4-hint-2}
+# Hint: what does the equation of Bayes' Rule say, if we're trying to find
+# the probability of event D|P?
+# Hint: the numerator is probability(P|D) * probability(D), and the denominator
+# is probablity(P)
+# Hint: what did we say was probability(P|D)?
+
+# probDgivenP <- ____
+```
+
+```{r ex4-solution}
+# Hint: what does the equation of Bayes' Rule say, if we're trying to find
+# the probability of event D|P?
+# Hint: the numerator is probability(P|D) * probability(D), and the denominator
+# is probability(P)
+# Hint: what did we say was probability(P|D)?
+
+probDgivenP <- (probTP * probD) / probP
+print(probDgivenP)
+```
+
+###
+
+This time with a much more prevalent disease, we got a rate $\mathbb{P}(D|P)=0.956$ - even though the accuracy of the test itself did not change!
+
+### More Practice
+
+Let's say you have 3 bags, each of which contains $100$ marbles, broken down by color in these ways:
+
+- Bag 1 has $75$ red and $25$ blue marbles
+- Bag 2 has $60$ red and $40$ blue marbles
+- Bag 3 has $45$ red and $55$ blue marbles
+
+You play the following game: first choose a bag at random and then choose a marble from that bag, also at random. Say that in one go, the marble you got was red.
+
+```{r mc8}
+question("Intuitively, what do you think is the most likely bag from which you got the red marble?",
+         answer("Bag 1", correct=TRUE),
+         answer("Bag 2"),
+         answer("Bag 3"),
+         answer("Not sure"))
+```
+
+```{r mc9}
+question("Given that you got a red marble, what is the probability that you chose bag 1?",
+         answer("1/3 = 0.33333"),
+         answer("5/12 = 0.41667", correct=TRUE),
+         answer("8/12 = 0.66667"),
+         answer("Not sure"))
+```
+
+###
+
+A family has two children. Say that each child is a boy or a girl with equal probability. We choose one of them at random and find out that she is a girl. 
+
+```{r mc10}
+question("What is the probability that both children are girls? Hint: it may help to list out the outcomes in the sample space.",
+         answer("1/4 = 0.25"),
+         answer("1/3 = 0.33"),
+         answer("1/2 = 0.50", correct=TRUE),
+         answer("Not sure"))
+```
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
