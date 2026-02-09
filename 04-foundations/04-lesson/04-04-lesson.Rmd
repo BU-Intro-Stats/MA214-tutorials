@@ -15,7 +15,6 @@ library(kableExtra)
 library(tidyverse)
 library(infer)
 library(openintro)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -191,7 +190,7 @@ quiz(
 
 With hypothesis testing, it is important to understand how samples from a null population vary. We repeatedly sample from a null population, which gives a sense for the variability of the statistic under the random chance model.
 
-Note that the *statistic* at hand is $\hat{p}$, which is the proportion of successes in the _sample_. The *parameter*, on the other hand, is the proportion of successes in the _population_.
+Note that the *statistic* at hand is $\widehat{p}$, which is the proportion of successes in the _sample_. The *parameter*, on the other hand, is the proportion of successes in the _population_.
 
 In contrast, with confidence intervals, there is no null population. Instead, we need to understand how samples from the population of interest vary. 
 
@@ -201,7 +200,7 @@ We expect the sample statistic to vary around the parameter, but how far is the 
 
 Bootstrapping repeatedly samples from the sample in order to estimate the variability of the statistic. Each time we resample, the data are sampled from the original data with replacement. It turns out that the process of resampling from the original sample is an excellent approximation for sampling from a population!
 
-We call the bootstrapped statistic $\hat{p}^*$, which is the proportion of successes in the resample.
+We call the bootstrapped statistic $\widehat{p}^*$, which is the proportion of successes in the resample.
 
 ### Polling
 
@@ -219,7 +218,7 @@ The original sample showed 4 of 7 who plan to vote for candidate X, or 57.1%. Wh
 
 ![](images/lesson4_img3.png){ width=80% }
 
-By repeating the resampling process many times, the resampled proportions give a measure of how $\hat{p}$ varies. 
+By repeating the resampling process many times, the resampled proportions give a measure of how $\widehat{p}$ varies. 
 
 
 ### Standard error
@@ -243,15 +242,15 @@ ex1_props |>
   summarize(sd(prop_yes))
 ```
 
-### Variability of $\hat{p}$ from the sample (bootstrapping)
+### Variability of $\widehat{p}$ from the sample (bootstrapping)
 
-To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. As a way of trying to measure the variability of $\hat{p}$ we have set up a scenario, again, totally unrealistic, where we are taking many samples from the same population. For each of the samples, $\hat{p}$ is calculated. The standard error is exactly the number we need to know and is calculated to be 0.087. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population.
+To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. As a way of trying to measure the variability of $\widehat{p}$ we have set up a scenario, again, totally unrealistic, where we are taking many samples from the same population. For each of the samples, $\widehat{p}$ is calculated. The standard error is exactly the number we need to know and is calculated to be 0.087. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population.
 
-It turns out that the variability of the statistic $\hat{p}$ can be measured without taking repeated samples from the population. Instead, we take repeated samples from the original observed data.
+It turns out that the variability of the statistic $\widehat{p}$ can be measured without taking repeated samples from the population. Instead, we take repeated samples from the original observed data.
 
 Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical.
 
-Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide.
+Notice that the resampled $\widehat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide.
 
 ```{r eval = TRUE}
 # Generate 1000 resamples of one poll
@@ -276,11 +275,11 @@ To investigate how much the estimates of a population proportion change from sam
 
 In the first experiment, you will simulate repeated samples from a population. In the second, you will choose a single sample from the first experiment and repeatedly resample from that sample: a method called *bootstrapping*. More specifically:
 
-**Experiment 1**: Assume the true proportion of people who will vote for Candidate X is 0.6.  Repeatedly sample 30 people from the population and measure the variability of $\hat{p}$ (the *sample* proportion).  
+**Experiment 1**: Assume the true proportion of people who will vote for Candidate X is 0.6.  Repeatedly sample 30 people from the population and measure the variability of $\widehat{p}$ (the *sample* proportion).  
 
-**Experiment 2**: Take *one* sample of size 30 from the same population. Repeatedly sample 30 people (with replacement!) from the original sample and measure the variability of $\hat{p}^*$ (the *resample* proportion).
+**Experiment 2**: Take *one* sample of size 30 from the same population. Repeatedly sample 30 people (with replacement!) from the original sample and measure the variability of $\widehat{p}^*$ (the *resample* proportion).
 
-It's important to realize that the first experiment relies on knowing the population and is typically impossible in practice. The second relies only on the sample of data and is therefore easy to implement for any statistic. Fortunately, as you will see, the variability in $\hat{p}$, or the proportion of "successes" in a sample, is approximately the same whether we sample from the population or resample from a sample.
+It's important to realize that the first experiment relies on knowing the population and is typically impossible in practice. The second relies only on the sample of data and is therefore easy to implement for any statistic. Fortunately, as you will see, the variability in $\widehat{p}$, or the proportion of "successes" in a sample, is approximately the same whether we sample from the population or resample from a sample.
 
 We have created 1000 random samples, each of size 30, from the population. The resulting data frame, `all_polls`, is available in your workspace. Take a look before getting started.
 
@@ -332,7 +331,7 @@ ex1_props
 - Select one poll from which to resample, as `one_poll`.
     - Filter out data for every poll except the first poll. That is, only keep `poll` when `poll` equals `1`.
     - Select the `vote` column.
-- Compute $\hat{p}^*$ for each resampled poll, as `ex2_props`, using tolls from the infer package.
+- Compute $\widehat{p}^*$ for each resampled poll, as `ex2_props`, using tolls from the infer package.
     - Specify the `response` as `vote`. The `success` value is `"yes"`.
     - Generate `1000` replicates of type `"bootstrap"`.
     - Calculate the `"prop"`ortion summary statistic.
@@ -405,8 +404,8 @@ ex2_props <- one_poll |>
  (3)
 
 
-- Using `ex1_props`, calculate the variability of $\hat{p}$. In the call to `summarize()`, set `variability` to the standard deviation, `sd()`, of `stat`.
-- Do the same with `ex2_props` to calculate the variability of $\hat{p}^*$.
+- Using `ex1_props`, calculate the variability of $\widehat{p}$. In the call to `summarize()`, set `variability` to the standard deviation, `sd()`, of `stat`.
+- Do the same with `ex2_props` to calculate the variability of $\widehat{p}^*$.
 - Again, because you are looking for an interval estimate, you have not made a hypothesis claim about the proportion (thus, there is no `hypothesize()` step needed in the infer pipeline).
 
 
@@ -459,9 +458,9 @@ ex2_props |>
 
 Great work! The variability in the proportion of "successes" in a sample is approximately the same whether we sample from the population or resample from a sample.
 
-### Visualizing the variability of $\hat{p}$
+### Visualizing the variability of $\widehat{p}$
 
-In order to compare the variability of the sampled $\hat{p}$ and $\hat{p}^*$ values in the previous exercises, it is valuable to visualize their distributions. To recall, the exercises walked through two different experiments for investigating the variability of $\hat{p}$ and $\hat{p}^*$:
+In order to compare the variability of the sampled $\widehat{p}$ and $\widehat{p}^*$ values in the previous exercises, it is valuable to visualize their distributions. To recall, the exercises walked through two different experiments for investigating the variability of $\widehat{p}$ and $\widehat{p}^*$:
 
 * **Experiment 1**: Sample ($n = 30$) repeatedly from an extremely large population (gold standard, but unrealistic)
 * **Experiment 2**: Resample ($n = 30$) repeatedly with replacement from a single sample of size 30
@@ -518,11 +517,11 @@ ggplot(both_ex_props, aes(stat, color = experiment)) +
   geom_density(bw = 0.1)
 ```
 
-Note that the curves are quite similar in shape. The sampled $\hat{p}$ values are centered around the true (typically **unknown** parameter) parameter (green); the resampled $\hat{p}^*$ values are centered around the estimate from the very first poll (red). Great work!
+Note that the curves are quite similar in shape. The sampled $\widehat{p}$ values are centered around the true (typically **unknown** parameter) parameter (green); the resampled $\widehat{p}^*$ values are centered around the estimate from the very first poll (red). Great work!
 
 ### Always resample the original number of observations
 
-In the bootstrap examples, exactly 30 observations have been repeatedly resampled from the original sample.  The choice of 30 was given because the original sample had 30 observations.  If we had resampled 3 observations instead, the resampled $\hat{p}^*$ value could have ranged from 0 to 1 (producing a much larger $SE(\hat{p}^*)$ than desired).  If we had resampled 300 observations instead, the resampled $\hat{p}^*$ value would have been close to the same number each time (producing a much smaller $SE(\hat{p}^*)$ than desired).
+In the bootstrap examples, exactly 30 observations have been repeatedly resampled from the original sample.  The choice of 30 was given because the original sample had 30 observations.  If we had resampled 3 observations instead, the resampled $\widehat{p}^*$ value could have ranged from 0 to 1 (producing a much larger $SE(\widehat{p}^*)$ than desired).  If we had resampled 300 observations instead, the resampled $\widehat{p}^*$ value would have been close to the same number each time (producing a much smaller $SE(\widehat{p}^*)$ than desired).
 
 ```{r quiz_3}
 question("Generally, if $n$ represents the size of the original sample, how many observations should we resample with replacement when bootstrapping?",
@@ -530,18 +529,18 @@ question("Generally, if $n$ represents the size of the original sample, how many
   allow_retry = TRUE,
   answer("Resample fewer than $n$ observations because otherwise every sample will include the same observations.", message = "Incorrect.  The resamples are done *with replacement*, so no matter the sample size, the resample will have different observations than the original sample.  Additionally, you want to mimic the process of sampling from a population.  So the variability of the resamples should be the same size as the variability of the original sample."),
   answer("Resample exactly $n$ observations so that we have the exact same observations as the original sample.", message = "Incorrect.  The resamples are done *with replacement*, so no matter the sample size, the resample will have different observations than the original sample."),
-  answer("Resample exactly $n$ observations because then the variability of $\\hat{p}^*$ will be most similar / representative of the original sampling process.", correct = TRUE),
+  answer("Resample exactly $n$ observations because then the variability of $\\widehat{p}^*$ will be most similar / representative of the original sampling process.", correct = TRUE),
   answer("Resample more than $n$ observations in order to minimize the variability.", message = "Incorrect. You want to mimic the process of sampling from a population.  So the variability should be based on resamples of the same size as the original sample.")
 )
 ```
 
 
-## Variability in $\hat{p}$
+## Variability in $\widehat{p}$
 
 
-Remember the goal of creating a confidence interval is to find a range of plausible values for the true population parameter. The observed statistic is a good estimate, but it is impossible to know whether it is one of the $\hat{p}$ values, which is very close to the true parameter or whether it is one of the $\hat{p}$ values, which is in the tail of the distribution of observed statistics. We won't know how far away the statistic is from the parameter just by looking at the sample of data.  We can however, get a sense for the distance between the statistic ($\hat{p}$) and the parameter (p) by looking at how much the re-sampled proportions ($\hat{p}^*$) vary.
+Remember the goal of creating a confidence interval is to find a range of plausible values for the true population parameter. The observed statistic is a good estimate, but it is impossible to know whether it is one of the $\widehat{p}$ values, which is very close to the true parameter or whether it is one of the $\widehat{p}$ values, which is in the tail of the distribution of observed statistics. We won't know how far away the statistic is from the parameter just by looking at the sample of data.  We can however, get a sense for the distance between the statistic ($\widehat{p}$) and the parameter (p) by looking at how much the re-sampled proportions ($\widehat{p}^*$) vary.
 
-The image below shows that the re-sampled proportions center around $\hat{p}$, but the true proportion may be one of the values near $\hat{p}$ (red) or one of the values in the tail (blue).
+The image below shows that the re-sampled proportions center around $\widehat{p}$, but the true proportion may be one of the values near $\widehat{p}$ (red) or one of the values in the tail (blue).
 
 ```{r}
 set.seed(4747)
@@ -564,13 +563,13 @@ ggplot() +
 ```
 
 
-The variability of the $\hat{p}$ statistics gives a measure for how far apart any given observed $\hat{p}$ and the parameter are expected to be. 
+The variability of the $\widehat{p}$ statistics gives a measure for how far apart any given observed $\widehat{p}$ and the parameter are expected to be. 
 
 
-### Standard error of $\hat{p}$
+### Standard error of $\widehat{p}$
 
 
-Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\hat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\hat{p}$ values from the population.
+Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\widehat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\widehat{p}$ values from the population.
 
 ```{r, fig.width=8}
 data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
@@ -602,9 +601,9 @@ ggplot() +
 
 Lucky for us that bootstrapping works because in real life we only have one dataset!
 
-We can use the value of the standard error to count the number of sample $\hat{p}$s, which are close to the parameter.
+We can use the value of the standard error to count the number of sample $\widehat{p}$s, which are close to the parameter.
 
-It turns out that because the distribution of $\hat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\hat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions.
+It turns out that because the distribution of $\widehat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\widehat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions.
 
 ```{r, fig.width=8}
 data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
@@ -637,7 +636,7 @@ ggplot() +
 
 Note that in the exercises, we refer to the intervals created from the empirical rule as t-intervals. The “t” is simply the label that statisticians use and we provide that label here for you in case you want to learn more about these types of intervals in future tutorials.
 
-Here, in red, we see all the sample $\hat{p}$ values that are close to the true parameter. If our data is one of the red dots, our confidence interval will correctly capture the true parameter.
+Here, in red, we see all the sample $\widehat{p}$ values that are close to the true parameter. If our data is one of the red dots, our confidence interval will correctly capture the true parameter.
 
 ```{r, fig.width=6}
 set.seed(4747)
@@ -669,7 +668,7 @@ ggplot() +
 
 Many statistics we use in data analysis (including both the sample average and sample proportion) have nice properties that are used to better understand the population parameter(s) of interest.  
 
-One such property is that if the variability of the sample proportion (called the *standard error*, or $SE$) is known, then approximately 95% of $\hat{p}$ values (from different samples) will be within $2SE$ of the true population proportion.
+One such property is that if the variability of the sample proportion (called the *standard error*, or $SE$) is known, then approximately 95% of $\widehat{p}$ values (from different samples) will be within $2SE$ of the true population proportion.
 
 To check whether that holds in the situation at hand, let's go back to the polls generated by taking many samples from the same population.
 
@@ -741,8 +740,8 @@ Great work! In this example, it looks like 96.6% are within 2 standard errors of
 
 The previous exercises told you two things:  
 
-1. You can measure the variability associated with $\hat{p}$ by resampling from the original sample.  
-2. Once you know the variability of $\hat{p}$, you can use it as a way to measure how far away the true proportion is.  
+1. You can measure the variability associated with $\widehat{p}$ by resampling from the original sample.  
+2. Once you know the variability of $\widehat{p}$, you can use it as a way to measure how far away the true proportion is.  
 
 Note that the *rate* of closeness (here 95%) refers to how often a sample is chosen so that it is close to the population parameter. You won't ever know if a particular dataset is close to the parameter or far from it, but you do know that over your lifetime, 95% of the samples you collect should give you estimates that are within $2SE$ of the true population parameter.
 
@@ -750,8 +749,8 @@ The votes from a single poll, `one_poll`, and the data from 1000 bootstrap resam
 
 As in the previous exercise, when discussing the variability of a statistic, the number is referred to as the *standard error*.
 
-- Calculate $\hat{p}$ and assign the result to `p_hat`. In the call to `summarize()`, calculate `stat` as the `mean()` of `vote`s that equal `"yes"`.
-- Find an interval of values that are plausible for the true parameter by calculating $\hat{p} \pm 2SE$.
+- Calculate $\widehat{p}$ and assign the result to `p_hat`. In the call to `summarize()`, calculate `stat` as the `mean()` of `vote`s that equal `"yes"`.
+- Find an interval of values that are plausible for the true parameter by calculating $\widehat{p} \pm 2SE$.
     - The `lower` bound of the confidence interval is `p_hat` minus twice the standard error of `stat`. Use `sd()` to calculate the standard error.
     - The `upper` bound is `p_hat` plus twice the standard error of `stat`.
 
@@ -816,11 +815,11 @@ Remember that a confidence level describes how likely you are to have gotten a s
 
 ### Bootstrap percentile interval
 
-The main idea in the previous exercise was that the distance between the original sample $\hat{p}$ and the resampled (or bootstrapped) $\hat{p}^*$ values gives a measure for how far the original $\hat{p}$ is from the true population proportion.  
+The main idea in the previous exercise was that the distance between the original sample $\widehat{p}$ and the resampled (or bootstrapped) $\widehat{p}^*$ values gives a measure for how far the original $\widehat{p}$ is from the true population proportion.  
 
-The same variability can be measured through a different mechanism.  As before, if $\hat{p}$ is sufficiently close to the true parameter, then the resampled (or bootstrapped) $\hat{p}^*$ values will vary in such a way that they overlap with the true parameter.  
+The same variability can be measured through a different mechanism.  As before, if $\widehat{p}$ is sufficiently close to the true parameter, then the resampled (or bootstrapped) $\widehat{p}^*$ values will vary in such a way that they overlap with the true parameter.  
 
-Instead of using $\pm 2 SE$ as a way to measure the middle 95% of the sampled $\hat{p}$ values, you can find the middle of the resampled $\hat{p}^*$ values by removing the upper and lower 2.5%.  Note that this second method of constructing bootstrap intervals also gives an intuitive way for making 90% or 99% confidence intervals as well as 95% intervals.
+Instead of using $\pm 2 SE$ as a way to measure the middle 95% of the sampled $\widehat{p}$ values, you can find the middle of the resampled $\widehat{p}^*$ values by removing the upper and lower 2.5%.  Note that this second method of constructing bootstrap intervals also gives an intuitive way for making 90% or 99% confidence intervals as well as 95% intervals.
 
 The bootstrapped resamples, `one_poll_boot`, and the proportion of yes votes, `p_hat` are available in your workspace.
 
@@ -844,7 +843,7 @@ one_poll_boot <- one_poll |>
  (1)
 
 - Run the code to remind yourself of the t-interval from the previous exercise.
-- Calculate the `95` percent interval of the bootstrapped $\hat{p}^*$ values contained in `one_poll_boot`.
+- Calculate the `95` percent interval of the bootstrapped $\widehat{p}^*$ values contained in `one_poll_boot`.
     - Summarize to calculate the lower end at the 2.5% `quantile()` of `stat` by setting `p` to `0.025`.
     - Calculate the upper 97.5% `quantile()` in a similar way.
 
@@ -981,11 +980,11 @@ Excellent! Again, the same caveat applies: because the two intervals were create
 
 ### Creating CIs
 
-By using the bootstrapped $\hat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X.
+By using the bootstrapped $\widehat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X.
 
 The first interval was based on the empirical rule, which extended two standard errors from the sample proportion to create the interval.
 
-The second interval used the natural variability of the resampled $\hat{p}$ values to characterize the distance from the true parameter. Remember, as in previous exercises, the quantile function finds the value which gives 2.5% of the bootstrapped proportions below and the value which gives 97.5% of the bootstrapped proportions below.
+The second interval used the natural variability of the resampled $\widehat{p}$ values to characterize the distance from the true parameter. Remember, as in previous exercises, the quantile function finds the value which gives 2.5% of the bootstrapped proportions below and the value which gives 97.5% of the bootstrapped proportions below.
 
 We can see that the two intervals are different because they used different methods, but they are consistent because they are based on the same observations.
 
@@ -1020,7 +1019,7 @@ one_poll_boot |>
 
 Remember that the goal is to find an interval estimate of the parameter: the true proportion who will vote for candidate X, when the only information is the sample, which gives the proportion of individuals in the data who will vote for candidate X.
 
-Ideas about the variability of $\hat{p}^*$ are used to estimate how far the observed $\hat{p}$ was from the population proportion.
+Ideas about the variability of $\widehat{p}^*$ are used to estimate how far the observed $\widehat{p}$ was from the population proportion.
 
 Because we don't know whether the sample is close to the population or far from it, we don't know whether the confidence interval actually captures the true parameter. To that end, we interpret the interval using a confidence percentage. That is, we say _*we are 95% confident that the true proportion of people planning to vote for candidate X is between 0.536 and 0.864*_.
 
@@ -1032,7 +1031,7 @@ In this lesson, we have provided two ways for creating bootstrap confidence inte
 
 These methods work for __any__ statistic and parameter, as long as the following technical conditions hold: (1) the distribution of the statistic is reasonably symmetric and bell-shaped, (2) the sample size is reasonably large, and (3) the sample was representative of the population. 
 
-A plot of the bootstrap $\hat{p}^*$ values will give a good indication for whether the technical conditions are valid.
+A plot of the bootstrap $\widehat{p}^*$ values will give a good indication for whether the technical conditions are valid.
 
 Both the bootstrap t-confidence interval and the bootstrap percentile interval measured the variability of the resampled proportions. And both methods will be used in later tutorials, along with more advanced methods, to find intervals for other parameters.
 
@@ -1130,15 +1129,15 @@ Notice how the resampled interval with size 300 was way too small and the resamp
 ### Sample proportion value effects on bootstrap CIs
 
 
-One additional element that changes the width of the confidence interval is the sample parameter value, $\hat{p}$.  
-Generally, when the true parameter is close to 0.5, the standard error of $\hat{p}$ is larger than when the true parameter is closer to 0 or 1.  When calculating a bootstrap t-confidence interval, the standard error controls the width of the CI, and here (given a true parameter of 0.8) the sample proportion is higher than in previous exercises, so the width of the confidence interval will be narrower.
+One additional element that changes the width of the confidence interval is the sample parameter value, $\widehat{p}$.  
+Generally, when the true parameter is close to 0.5, the standard error of $\widehat{p}$ is larger than when the true parameter is closer to 0 or 1.  When calculating a bootstrap t-confidence interval, the standard error controls the width of the CI, and here (given a true parameter of 0.8) the sample proportion is higher than in previous exercises, so the width of the confidence interval will be narrower.
 
 - The function `calc_p_hat()` is shown in the script, and can be used to calculate the sample proportions.
 - The `calc_t_conf_int()` function from the previous exercise has been updated to now use any value of `p_hat` as an argument! Read the function and try to understand what it's doing. 
 - Run the code to calculate the bootstrap t-confidence interval for the original population.
 - Consider a new population where the true parameter is 0.8, saved as the dataset `one_poll_0.8`. 
-- Calculate $\hat{p}$ of this new sample, using the same technique as with the original dataset. Assign it to the variable `p_hat_0.8`.
-- Find the bootstrap t-confidence interval using the new bootstrapped data, `one_poll_boot_0.8`, and the new $\hat{p}$. *Notice that it is narrower than previously calculated.*
+- Calculate $\widehat{p}$ of this new sample, using the same technique as with the original dataset. Assign it to the variable `p_hat_0.8`.
+- Find the bootstrap t-confidence interval using the new bootstrapped data, `one_poll_boot_0.8`, and the new $\widehat{p}$. *Notice that it is narrower than previously calculated.*
 
 
 ```{r bootstrap_ci_2-setup}
@@ -1252,7 +1251,7 @@ Most scientists use 95% intervals to quantify their uncertainty about an estimat
 
 There are studies, however, which warrant either stricter or more lenient confidence intervals (and subsequent error rates).
 
-The previous bootstrapped $\hat{p}^*$ values have been loaded for you and are available in `one_poll_boot`.
+The previous bootstrapped $\widehat{p}^*$ values have been loaded for you and are available in `one_poll_boot`.
 
 
 
@@ -1371,7 +1370,7 @@ Estimation is used to understand the value of a population parameter.
 
 > What proportion of the voters will select candidate X?
 
-Using measures of variability of the statistic, we can estimate how far $\hat{p}$ is from the true proportion. In particular, the variability of $\hat{p}$ can be measured using resamples from the original data. This process is called bootstrapping.
+Using measures of variability of the statistic, we can estimate how far $\widehat{p}$ is from the true proportion. In particular, the variability of $\widehat{p}$ can be measured using resamples from the original data. This process is called bootstrapping.
 
 ![](images/lesson4_img10.png){ width=80% }
 

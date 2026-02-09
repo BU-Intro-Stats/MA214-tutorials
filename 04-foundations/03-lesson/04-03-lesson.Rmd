@@ -14,7 +14,6 @@ library(learnr)
 library(kableExtra)
 library(tidyverse)
 library(infer)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -544,7 +543,7 @@ Recall that the decision being made controls the Type I error rate, that is the 
 
 ![](images/lesson3_img2.png){ width=80% }
 
-The logic of hypothesis testing shares many key elements with the US judicial system. The jury does not know whether the defendant committed the crime, but they must decide whether or not to convict the individual. The jury is presented with evidence, akin to data, and asked whether the evidence is consistent with innocence. If the evidence is outside of what would be expected, the defendant is charged with a crime.
+The logic of hypothesis testing shares many key elements with the US judicial system. The jury does not know whether the defendant committed the crime, but they must decide whether or not to convict the individual. The jury is presented with evidence, akin to data, and asked whether the evidence is consistent with innocence. If the evidence is outside of what would be expected, the defendant is convicted of a crime.
 
 
 ### Different choice of error rate
