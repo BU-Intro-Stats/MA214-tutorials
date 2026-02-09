@@ -956,7 +956,7 @@ So how well did our model perform? One common way of assessing performance of mo
 
 <!-- Thus, our overall accuracy was 79 out of 103, or about 77%.  -->
 
-```{r mc2}
+```{r mc3}
 question("What is the overall accuracy of the model?",
   answer("71 out of 91, or about 78%."),
   answer("8 out of 12, or about 67%."),
