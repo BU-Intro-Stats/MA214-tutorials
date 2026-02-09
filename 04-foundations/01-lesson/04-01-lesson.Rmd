@@ -673,6 +673,7 @@ Hint: `dim(x)` gives the full dimensions of object `x`. If `x` has n rows and m 
 <!-- dim(homes) -->
 <!-- ``` -->
 
+
 **Exercise**
 
 Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
@@ -882,6 +883,7 @@ Refer to the example above, replacing the variable names with the variables in y
 
 
 Great work! Notice that you went through three sequential steps:  
+
 (1) the response and explanatory variables were defined by the `specify()` command, 
 (2) the independence null hypothesis was set, and 
 (3) you successfully shuffled the response variable, `HomeOwn`, ten times.
@@ -947,6 +949,7 @@ The function `calculate()` takes input like: `calculate(stat="[statistic of inte
 <!-- # Print results to console -->
 <!-- homeown_perm -->
 <!-- ``` -->
+
 
 **Exercise**
 
