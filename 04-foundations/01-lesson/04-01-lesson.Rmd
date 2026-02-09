@@ -470,8 +470,6 @@ Throughout this lesson, you will use the [NHANES](https://CRAN.R-project.org/pac
 
 Before moving on to investigate particular variables, you'll have an opportunity to briefly explore the data in this exercise.
 
- (1)
-
 **Exercise**
 
 Use the `names()` function to list the variables included in the `NHANES` data frame from the [NHANES](https://CRAN.R-project.org/package=NHANES) package. (Click the link for more info.)
@@ -486,8 +484,6 @@ Use the `names()` function to list the variables included in the `NHANES` data f
 <!-- # What are the variables in the `NHANES` dataset? -->
 <!-- names(NHANES) -->
 <!-- ``` -->
-
- (2)
 
 **Exercise**
 
@@ -527,8 +523,6 @@ ggplot(___, aes(x = ___, fill = ___)) +
 <!--   geom_bar(position = "fill") + -->
 <!--   ylab("Relative frequencies") -->
 <!-- ``` -->
-
- (3)
 
 **Exercise**
 
@@ -599,13 +593,11 @@ fruits %in% c("banana", "cherry")
 mean(fruits %in% c("banana", "cherry"))
 ```
 
- (1)
-
 The dplyr, ggplot2, infer, and NHANES packages have been loaded for you.
 
 **Exercise**
 
-- From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to the dataset named `homes`. Then, find the number of rows and columns in `homes` with `dim()`.
+From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to the dataset named `homes`. Then, find the number of rows and columns in `homes` with `dim()`.
 
 ```{r statistic_of_interest, exercise=TRUE}
 homes <- NHANES |>
@@ -676,11 +668,9 @@ ___(___)
 <!-- dim(homes) -->
 <!-- ``` -->
 
-(2)
-
 **Exercise**
 
-- Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
+Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
 1. Using the `homes` dataset, group by `Gender`.
 2. Summarize the proportion of individuals who own a home. *Note that this will calculate proportions for both genders since you've grouped by the `Gender` variable in the line before it.*  You can calculate the proportion by finding the `mean()` of the observations that equal `"Own"` in the `HomeOwn` variable.
 3. Finally, summarize the observed difference in proportions using the `diff()` function to calculate the difference in male and female home ownership.
@@ -773,18 +763,21 @@ homes <- NHANES |>
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
- (1)
-
 **Exercise**
 
-- Using the infer framework, step through specifying the null model and then performing 10 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups:
-- `specify()` that the relationship of interest is `HomeOwn` vs. `Gender` and a success in this context is homeownership, set `success` to `"Own"`.
+Using the infer framework, step through specifying the null model and then performing 10 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups:
+
+- `specify()` that the relationship of interest is `HomeOwn` vs. `Gender` and a success in this context is homeownership, set `success` to `"Own"`;
+- `hypothesize()` that the null is true where `null = "independence"` (gender and homeownership are not related); and finally
+- `generate()` ten permutations; set `reps` to 10.
 
 
 ```{r null_model, exercise=TRUE}
 # Specify variables
 homeown_perm <- homes |>
-  ___(___ ~ ___, success = "___")
+  ___(___ ~ ___, success = "___") |>
+  hypothesize(null = "independence") |> 
+  ___(reps = ___, type = "permute") 
 
 # Print results to console
 homeown_perm
@@ -803,24 +796,20 @@ homeown_perm
 <!-- homeown_perm -->
 <!-- ``` -->
 
- (2)
+<!-- **Exercise** -->
 
-**Exercise**
-
-- Using the infer framework:
-    - `specify()` has been done for you.
-    - `hypothesize()` that the null is true where `null = "independence"` (gender and homeownership are not related).
+<!-- `specify()` has been done for you. Using the infer framework,  -->
 
 
-```{r null_model2, exercise=TRUE}
-# Hypothesize independence
-homeown_perm <- homes |>
-  specify(HomeOwn ~ Gender, success = "Own") |>
-  ___(null = "___")  
+<!-- ```{r null_model2, exercise=TRUE} -->
+<!-- # Hypothesize independence -->
+<!-- homeown_perm <- homes |> -->
+<!--   specify(HomeOwn ~ Gender, success = "Own") |> -->
+<!--   ___(null = "___")   -->
 
-# Print results to console
-homeown_perm
-```
+<!-- # Print results to console -->
+<!-- homeown_perm -->
+<!-- ``` -->
 
 <!-- ```{r null_model2-hint} -->
 <!--  `hypothesize(null = "independence")` -->
@@ -836,27 +825,25 @@ homeown_perm
 <!-- homeown_perm -->
 <!-- ``` -->
 
- (3)
+<!-- **Exercise** -->
 
-**Exercise**
-
-- Using the infer framework:
-    - `specify()` has been done for you.
-    - `hypothesize()` has been done for you.
-    - `generate()` ten permutations; set `reps` to 10.
+<!-- Using the infer framework: -->
+<!--     - `specify()` has been done for you. -->
+<!--     - `hypothesize()` has been done for you. -->
+<!--     - `generate()` ten permutations; set `reps` to 10. -->
 
 
-```{r null_model3, exercise=TRUE}
-# Perform 10 permutations
-homeown_perm <- homes |>
-  specify(HomeOwn ~ Gender, success = "Own") |>
-  hypothesize(null = "independence") |> 
-  ___(reps = ___, type = "permute") 
+<!-- ```{r null_model3, exercise=TRUE} -->
+<!-- # Perform 10 permutations -->
+<!-- homeown_perm <- homes |> -->
+<!--   specify(HomeOwn ~ Gender, success = "Own") |> -->
+<!--   hypothesize(null = "independence") |>  -->
+<!--   ___(reps = ___, type = "permute")  -->
 
 
-# Print results to console
-homeown_perm
-```
+<!-- # Print results to console -->
+<!-- homeown_perm -->
+<!-- ``` -->
 
 <!-- ```{r null_model3-hint} -->
 <!--  `generate(reps = 10, type = "permute")` -->
@@ -942,19 +929,23 @@ homeown_perm
 
 Using `homeown_perm`, plot the 100 differences in proportions using `geom_dotplot`. Adjust the size of the dots by setting `binwidth` to `0.001` in your call to `geom_dotplot()`.
 
-
 ```{r randomized_statistics2, exercise=TRUE}
-# Perform 100 permutations
-homeown_perm <- homes |>
-  specify(HomeOwn ~ Gender, success = "Own") |>
-  hypothesize(null = "independence") |> 
-  generate(reps = 100, type = "permute") |> 
-  calculate(stat = "diff in props", order = c("male", "female"))
-  
-# Dotplot of 100 permuted differences in proportions
-ggplot(___, aes(x = stat)) + 
-  ___(___)
+ggplot(___, aes(x = stat)) +
+  geom_dotplot(___)
 ```
+
+<!-- ```{r randomized_statistics2, exercise=TRUE} -->
+<!-- # Perform 100 permutations -->
+<!-- homeown_perm <- homes |> -->
+<!--   specify(HomeOwn ~ Gender, success = "Own") |> -->
+<!--   hypothesize(null = "independence") |>  -->
+<!--   generate(reps = 100, type = "permute") |>  -->
+<!--   calculate(stat = "diff in props", order = c("male", "female")) -->
+
+<!-- # Dotplot of 100 permuted differences in proportions -->
+<!-- ggplot(___, aes(x = stat)) +  -->
+<!--   ___(___) -->
+<!-- ``` -->
 
 <!-- ```{r randomized_statistics2-hint} -->
 <!-- ggplot(___, aes(x = stat)) +  -->
