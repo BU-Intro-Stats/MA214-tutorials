@@ -610,6 +610,11 @@ homes <- NHANES |>
 ___(___)
 ```
 
+<details>
+<summary>**Hint**</summary>
+Hint: `dim(x)` gives the full dimensions of object `x`. If `x` has n rows and m columns, the output will be `[1] n m`.
+</details>
+
 <!-- ```{r statistic_of_interest-hint-1} -->
 <!-- homes <- NHANES |> -->
 <!--   # Select Gender and HomeOwn -->
@@ -672,8 +677,8 @@ ___(___)
 
 Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
 1. Using the `homes` dataset, group by `Gender`.
-2. Summarize the proportion of individuals who own a home. *Note that this will calculate proportions for both genders since you've grouped by the `Gender` variable in the line before it.*  You can calculate the proportion by finding the `mean()` of the observations that equal `"Own"` in the `HomeOwn` variable.
-3. Finally, summarize the observed difference in proportions using the `diff()` function to calculate the difference in male and female home ownership.
+2. Summarize the proportion of individuals who own a home. *Note that this will calculate proportions for both genders since you've grouped by the `Gender` variable in the line before it.*
+3. Finally, summarize the observed difference in proportions using `diff()` on the calculate proportion.
 
 
 ```{r statistic_of_interest2, exercise=TRUE}
@@ -693,6 +698,16 @@ diff_orig <- homes |>
 # See the result
 diff_orig
 ```
+
+<details>
+<summary>**Hint 1**</summary>
+In steps 2 and 3, you should be using `summarize()` to summarize the data. 
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+In step 2, try taking the `mean()` of observations with `"Own"` to calculate the proportion. 
+</details>
 
 <!-- ```{r statistic_of_interest2-hint-1} -->
 <!-- diff_orig <- homes |>    -->
@@ -746,7 +761,7 @@ This exercise will demonstrate the first three steps from the infer package:
 Using these steps in the context of creating a randomization distribution, looks
 like the following: 
 
-```{r, eval = FALSE}
+```{r, eval=FALSE, include=TRUE, echo=TRUE}
 dataset_name |>
   specify(response_variable ~ explanatory_variable,
           success = "[what value of the explanatory variable is a success]") |> 
@@ -765,11 +780,11 @@ homes <- NHANES |>
 
 **Exercise**
 
-Using the infer framework, step through specifying the null model and then performing 10 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups:
+Using the infer framework, step through specifying the null model and then performing 10 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups.
 
-- `specify()` that the relationship of interest is `HomeOwn` vs. `Gender` and a success in this context is homeownership, set `success` to `"Own"`;
-- `hypothesize()` that the null is true where `null = "independence"` (gender and homeownership are not related); and finally
-- `generate()` ten permutations; set `reps` to 10.
+<!-- - `specify()` that the relationship of interest is `HomeOwn` vs. `Gender` and a success in this context is homeownership, set `success` to `"Own"`; -->
+<!-- - `hypothesize()` that the null is true where `null = "independence"` (gender and homeownership are not related); and finally -->
+<!-- - `generate()` ten permutations; set `reps` to 10. -->
 
 
 ```{r null_model, exercise=TRUE}
@@ -782,6 +797,11 @@ homeown_perm <- homes |>
 # Print results to console
 homeown_perm
 ```
+
+<details>
+<summary>**Hint**</summary>
+Refer to the example above, replacing the variable names with the variables in your homes dataset. The syntax will be the same.
+</details>
 
 <!-- ```{r null_model-hint} -->
 <!--  `specify()` takes a formula, `HomeOwn ~ Gender`, and `success` is `"Own"`. -->
@@ -871,14 +891,14 @@ Great work! Notice that you went through three sequential steps:
 
 By permuting the home ownership variable multiple times, you generate differences in proportions that are consistent with the assumption that the variables are unrelated.  The statistic of interest is the difference in proportions given by `stat = "diff in props"`.  After calculating the randomized statistics, you will plot them in a dotplot.
 
-This exercise shows all four steps from the infer package:
+<!-- This exercise shows all four steps from the infer package: -->
 
-1. `specify()` will specify the response and explanatory variables.
-2. `hypothesize()` will declare the null hypothesis.
-3. `generate()` will generate resamples, permutations, or simulations.
-4. `calculate()` will calculate summary statistics.
+<!-- 1. `specify()` will specify the response and explanatory variables. -->
+<!-- 2. `hypothesize()` will declare the null hypothesis. -->
+<!-- 3. `generate()` will generate resamples, permutations, or simulations. -->
+<!-- 4. `calculate()` will calculate summary statistics. -->
 
-Each step will be covered throughout the tutorial; in this exercise you'll write code for `calculate()`.
+<!-- Each step will be covered throughout the tutorial; in this exercise you'll write code for `calculate()`. -->
 
 The dplyr, ggplot2, NHANES, and infer packages have been loaded for you. Repeat the permuting and plotting with 100 differences in proportions generated by shuffling the `HomeOwn` variable.
 
@@ -889,25 +909,28 @@ homes <- NHANES |>
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
- (1) 
 
 **Exercise**
 
-- Using the infer framework, step through specifying the null model and then performing 100 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups:
-    + `specify()`, `hypothesize()`, and  `generate()` have been done for you.
-    + `calculate()` the `stat`istic `"diff in props"` with the order of `c("male", "female")`, telling `R` that the female proportion should be subtracted from the male proportion.
+Using the `homeown_perm` permutations you generated above, `calculate()` the statistic `"diff in props"` with the order of `c("male", "female")`. Setting the order in this way tells `R` that the female proportion should be subtracted from the male proportion.
+
+<!-- - Using the infer framework, step through specifying the null model and then performing 100 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups: -->
+<!--     + `specify()`, `hypothesize()`, and  `generate()` have been done for you. -->
+<!--     + `calculate()` the `stat`istic `"diff in props"` with the order of `c("male", "female")`, telling `R` that the female proportion should be subtracted from the male proportion. -->
 
 ```{r randomized_statistics, exercise=TRUE}
-# Perform 100 permutations
-homeown_perm <- homes |>
-  specify(HomeOwn ~ Gender, success = "Own") |>
-  hypothesize(null = "independence") |> 
-  generate(reps = 100, type = "permute") |> 
+# Calculate the statistic
+homeown_perm <- homeown_perm |>
   ___(___, order = ___)
   
 # Print results to console
 homeown_perm
 ```
+
+<details>
+<summary>**Hint**</summary>
+The function `calculate()` takes input like: `calculate(stat="[statistic of interest]")`. What's your statistic of interest here?
+</details>
 
 <!-- ```{r randomized_statistics-hint} -->
 <!--  `calculate(stat = "diff in props", order = c("male", "female"))` -->
@@ -984,12 +1007,7 @@ The dplyr, ggplot2, NHANES, and infer packages have been loaded for you.
 
 **Exercise**
 
-* Generate 1000 differences in proportions by shuffling the `HomeOwn` variable using the infer syntax.  Recall the infer syntax:  
-    + `specify()` that the relationship of interest is `HomeOwn` vs. `Gender` and a success in this context is homeownership, `success = "Own"`.
-    + `hypothesize()` that the null is true where `null = "independence"` (meaning gender and homeownership are not related).
-    + `generate()` 1000 permutations; set `reps` to 1000.
-    + `calculate()` the statistic `stat = "diff in props"` with the order of `c("male", "female")`.
-* Run the density plot code to create a smoothed visual representation of the distribution of differences. **What shape does the curve have?**
+Generate 1000 differences in proportions by shuffling the `HomeOwn` variable using the infer syntax. Then, run the density plot code to create a smoothed visual representation of the distribution of differences. **What shape does the curve have?**
 
 
 ```{r randomization_density-setup, include=FALSE}
@@ -1249,9 +1267,6 @@ Nice work! 212 permuted differences are more extreme than the observed differenc
 
 ### What can you conclude?
 
-*Hint*: Since you observed only 212 of 1000 null statistics are more extreme than the observed difference statistic, you can conclude that the observed difference **is** consistent with the permuted distribution. You've failed to reject the null hypothesis!
-
-
 ```{r mc3}
 question("What can you conclude from the analysis?", correct = "Right! We've failed to reject the null hypothesis.", allow_retry = TRUE,
     answer("We have learned that being female causes people to buy houses.", message = "Because the study was not an experiment, it is not possible to draw a causal conclusion.  There may have been other factors affecting the outcome."),
@@ -1259,7 +1274,12 @@ question("What can you conclude from the analysis?", correct = "Right! We've fai
     answer("We have learned that the observed difference (from the data) in proportion of home ownership across gender is due to something other than random variation.", message = "Unfortunately, there is not sufficient evidence to reject the null hypothesis.")
 )
 ```    
-    
+
+<details>
+<summary>**Hint**</summary>
+Since you observed only 212 of 1000 null statistics are more extreme than the observed difference statistic, you can conclude that the observed difference **is** consistent with the permuted distribution. You've failed to reject the null hypothesis!
+</details>
+
 ## Study conclusions
         
 In the calculations on the `NHANES` data, the observed statistic was consistent with the null statistics. That is, 212 of the 1000 permutations were smaller than the original value. There is no evidence that the data are inconsistent with the null hypothesis. That is, if gender played no role in home ownership, we would be likely to get data similar to those observed.
