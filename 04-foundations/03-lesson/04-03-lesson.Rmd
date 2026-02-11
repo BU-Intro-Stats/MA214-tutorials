@@ -144,7 +144,7 @@ As you saw in the lesson, we're interested in whether the treatment and control 
 
 In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
 
-*Instructions*
+**Exercise**
 
 - Use the `count()` function to tabulate the dataset called `opportunity`. *Make a note of the values in the `decision` column for use in the next step.*
 - For each experimental group, find the proportion who bought a DVD. That is, calculate the mean where `decision` is `"buyDVD"`.
@@ -191,7 +191,7 @@ Okay, so about 75% of the control group bought the DVD and about 55% of the trea
 
 Again, interest is in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  Here, you'll create a barplot to visualize the difference in proportions between the treatment and control groups.
 
-*Instructions*
+**Exercise**
 - Using the `opportunity` dataset, plot `group` `fill`ed by `decision`.  
 - Call `geom_bar()` to add a bar plot layer, setting the position argument to `"fill"` to compare relative frequencies. Note that fill should be defined by the `decision` for each group.
 
@@ -226,12 +226,12 @@ In the study, the number of individuals in each of the control and treatment gro
 
 Using the new data and the methods from the previous lesson, create a randomization distribution of the difference in proportions calculated on permuted data.
 
- (1)
+**Exercise**
 
-- Using the `opportunity` dataset, calculate the observed difference in purchase rate.
-    - Group by `group`.
-    - Summarize to calculate the proportion deciding to buy a DVD. That is, get the `mean()` of cases of `decision` equaling `"buyDVD"`.
-    - Summarize again to calculate the `diff()`erence of `prop_buy` between groups.
+Using the `opportunity` dataset, calculate the observed difference in purchase rate:
+- Group by `group`.
+- Summarize to calculate the proportion deciding to buy a DVD. That is, get the `mean()` of cases of `decision` equaling `"buyDVD"`.
+- Summarize again to calculate the `diff()`erence of `prop_buy` between groups.
 
 ```{r randomizing_cost_1, exercise=TRUE}
 # Calculate the observed difference in purchase rate
@@ -284,13 +284,13 @@ diff_obs <- opportunity |>
 <!-- diff_obs -->
 <!-- ``` -->
 
- (2)
+**Exercise**
 
-- Create a data frame of permuted differences in purchase rates.
-    - Specify the model `decision` vs. `group`, with the `success` value `"buyDVD"`.
-    - Hypothesize `"independence"`.
-    - Generate `1000` reps of type `"permute"`.
-    - Calculate the summary statistic `"diff in props"`.
+Create a data frame of permuted differences in purchase rates:
+- Specify the model `decision` vs. `group`, with the `success` value `"buyDVD"`.
+- Hypothesize `"independence"`.
+- Generate `1000` reps of type `"permute"`.
+- Calculate the summary statistic `"diff in props"`.
 
 ```{r randomizing_cost_2, exercise=TRUE}
 # Create data frame of permuted differences in purchase rates
@@ -348,9 +348,8 @@ opp_perm
 <!-- opp_perm -->
 <!-- ``` -->
 
- (3)
-
-Draw a histogram of permuted differences.
+ 
+Draw a histogram of permuted differences:
 
 - Using the permutation dataset, `opp_perm`, plot `stat`.
 - Add a histogram layer with `geom_histogram()`. The `binwidth` is set to `0.005`.
@@ -428,6 +427,8 @@ Now that you've created the randomization distribution, you'll use it to assess 
 The permuted dataset and the original observed statistic are available in your workspace as `opp_perm` and `diff_obs` respectively.
 
 `visualize()`, `shade_p_value()`, and `get_p_value()` using the built-in infer functions. Remember that the null statistics are above the original difference, so the p-value (which represents how often a null value is more *extreme*) is calculated by counting the number of null values which are `less` than the original difference.
+
+**Exercise**
 
 - First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`.
 - Then `get_p_value()` is calculated as the proportion of permuted statistics which are `direction = "less"` than `obs_stat = diff_obs`.
@@ -605,6 +606,9 @@ The p-value measures the likelihood of data as or more extreme than the observed
 To find a two-sided p-value, you simply double the one sided p-value. That is, you want to find two times the proportion of permuted differences that are less than or equal to the observed difference.
 
 The `opp_perm` data frame, containing the differences in permuted proportions, and the original observed statistic, `diff_obs`, are available in your workspace.
+
+
+**Exercise**
 
 Use `opp_perm` to compute the two-sided p-value, or twice the proportion of permuted differences that are less than or equal to the original difference.
 
