@@ -152,9 +152,7 @@ question(
 
 ### Summarizing opportunity cost (1)
 
-We're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  
-
-In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
+We're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements. In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
 
 **Exercise**
 
@@ -203,6 +201,7 @@ Okay, so about 75% of the control group bought the DVD and about 55% of the trea
 Again, interest is in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  Here, you'll create a barplot to visualize the difference in proportions between the treatment and control groups.
 
 **Exercise**
+
 - Using the `opportunity` dataset, plot `group` `fill`ed by `decision`.  
 - Call `geom_bar()` to add a bar plot layer, setting the position argument to `"fill"` to compare relative frequencies. Note that fill should be defined by the `decision` for each group.
 
@@ -230,9 +229,7 @@ Great! The barplot better displays the results from the study. The treatment see
 
 ### Randomizing opportunity cost
 
-As in lesson 2, you will permute the data to generate a distribution of differences as if the null hypothesis were true.
-
-*TODO: check if the table reads well here*
+As in lesson 2, you will permute the data to generate a distribution of differences as if the null hypothesis were true. As a reminder, here's what the data looked like:
 
 ```{r the data}
 dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97),
@@ -250,6 +247,7 @@ Using the new data and the methods from the previous lesson, create a randomizat
 **Exercise**
 
 Using the `opportunity` dataset, calculate the observed difference in purchase rate:
+
 - Group by `group`.
 - Summarize to calculate the proportion deciding to buy a DVD. That is, get the `mean()` of cases of `decision` equaling `"buyDVD"`.
 - Summarize again to calculate the `diff()`erence of `prop_buy` between groups.
@@ -308,6 +306,7 @@ diff_obs <- opportunity |>
 **Exercise**
 
 Create a data frame of permuted differences in purchase rates:
+
 - Specify the model `decision` vs. `group`, with the `success` value `"buyDVD"`.
 - Hypothesize `"independence"`.
 - Generate `1000` reps of type `"permute"`.
@@ -479,6 +478,8 @@ opp_perm |>
 opp_perm |>
   summarize(p_value = ___)
 ```
+
+*TODO: error `EXPR must be a length 1 vector`*
 
 <!-- ```{r summarizing_opportunity_cost-hint-1} -->
 <!-- opp_perm |> -->
@@ -686,11 +687,26 @@ ggplot(opp_perm) +
 
 ### Causation
 
-Because the p-value is substantially less than 0.05, we conclude that it was not simply random variability that led to fewer students buying the DVD when being reminded to save.
+```{r reflect-mc}
+question("Based on the plot you created in the last exercise (displayed again here), which of the following seems like a reasonable conclusion about opportunity cost?",
+  correct = "Good job! There are very few permuted differences which are as extreme as the observed difference, and we can make a causative conclusion because the study was experimental, with randomized groups.", allow_retry = TRUE,
+  answer("In the population there is no evidence that reminding people of their savings will influence their buying decisions.", message = "No, try again. Look at the curves and the p-values to see if the observed data is consistent with the null hypothesis."),
+  answer("In the population there is evidence that reminding people of their savings does influence their buying decisions, and there is also evidence that it is the reminder itself that causes the difference in buying decisions.", correct = TRUE),
+  answer("In the population there is evidence that reminding people of their savings does influence their buying decisions, but we cannot tell whether the difference is due to the reminder itself or something else.", message = "Incorrect. This would be true if the study had been observational, but in this case we know the data came from a controlled experiment and used randomized groups to control for other factors."))
+```
 
-Because the study was randomized, that is, the individuals were randomly assigned the choices, there was nothing systematically different about the participants in the treatment and control groups. The only difference in the two groups was the set of options they received.
+```{r}
+ggplot(opp_perm) +
+  geom_histogram(aes(x = diff_perm), binwidth = .005) +
+  geom_vline(xintercept = diff_obs, color = openintro::COL[4,1])
+```
 
-Therefore, any difference in DVD buying rates is due to the options given, that is, being reminded to save. A causal inference can be made in this setting.
+
+<!-- Because the p-value is substantially less than 0.05, we conclude that it was not simply random variability that led to fewer students buying the DVD when being reminded to save. -->
+
+<!-- Because the study was randomized, that is, the individuals were randomly assigned the choices, there was nothing systematically different about the participants in the treatment and control groups. The only difference in the two groups was the set of options they received. -->
+
+<!-- Therefore, any difference in DVD buying rates is due to the options given, that is, being reminded to save. A causal inference can be made in this setting. -->
 
 Importantly, however, the 150 individuals in the sample were not randomly sampled from all people. Indeed, they were said to be students. Students are certainly different from the adult population in many ways.
 
