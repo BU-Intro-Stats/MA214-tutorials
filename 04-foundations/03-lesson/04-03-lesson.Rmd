@@ -160,27 +160,27 @@ opportunity |>
   summarize(buy_prop = ___(___))
 ```
 
-```{r opportunity_cost_1-hint-1}
-opportunity |>
-  count(decision, group)
-```
+<!-- ```{r opportunity_cost_1-hint-1} -->
+<!-- opportunity |> -->
+<!--   count(decision, group) -->
+<!-- ``` -->
 
-```{r opportunity_cost_1-hint-2}
-opportunity |>
-  group_by(group) |>
-  summarize(buy_prop = ___(___))
-```
+<!-- ```{r opportunity_cost_1-hint-2} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(buy_prop = ___(___)) -->
+<!-- ``` -->
 
-```{r opportunity_cost_1-solution}
-# Tabulate the data
-opportunity |>
-  count(decision, group)
+<!-- ```{r opportunity_cost_1-solution} -->
+<!-- # Tabulate the data -->
+<!-- opportunity |> -->
+<!--   count(decision, group) -->
 
-# Find the proportion who bought the DVD in each group
-opportunity |>
-  group_by(group) |>
-  summarize(buy_prop = mean(decision == "buyDVD"))
-```
+<!-- # Find the proportion who bought the DVD in each group -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(buy_prop = mean(decision == "buyDVD")) -->
+<!-- ``` -->
 
 
 
@@ -202,17 +202,17 @@ ggplot(opportunity, aes(x = ___, fill = ___)) +
   ___
 ```
 
-```{r plot-hint}
-ggplot(opportunity, aes(x = ___, fill = decision)) + 
-  ___
-```
+<!-- ```{r plot-hint} -->
+<!-- ggplot(opportunity, aes(x = ___, fill = decision)) +  -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r plot-solution}
-# Plot group, filled by decision
-ggplot(opportunity, aes(x = group, fill = decision)) + 
-  # Add a bar layer, with position "fill"
-  geom_bar(position = "fill")
-```
+<!-- ```{r plot-solution} -->
+<!-- # Plot group, filled by decision -->
+<!-- ggplot(opportunity, aes(x = group, fill = decision)) +  -->
+<!--   # Add a bar layer, with position "fill" -->
+<!--   geom_bar(position = "fill") -->
+<!-- ``` -->
 
 
 
@@ -245,44 +245,44 @@ diff_obs <- opportunity |>
   pull()
 ```
 
-```{r randomizing_cost_1-hint-1}
-opportunity |>
-  group_by(group) |>
-  ___(prop_buy = ___(___)) |>
-  ___(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-1} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   ___(prop_buy = ___(___)) |> -->
+<!--   ___(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-hint-2}
-opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  ___(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-2} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   ___(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-hint-3}
-opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-3} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-solution}
-# Calculate the observed difference in purchase rate
-diff_obs <- opportunity |>
-  # Group by group
-  group_by(group) |>
-  # Calculate proportion deciding to buy a DVD
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  # Calculate difference between groups
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
-    
-# Review the result
-diff_obs
-```
+<!-- ```{r randomizing_cost_1-solution} -->
+<!-- # Calculate the observed difference in purchase rate -->
+<!-- diff_obs <- opportunity |> -->
+<!--   # Group by group -->
+<!--   group_by(group) |> -->
+<!--   # Calculate proportion deciding to buy a DVD -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   # Calculate difference between groups -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
+
+<!-- # Review the result -->
+<!-- diff_obs -->
+<!-- ``` -->
 
  (2)
 
@@ -308,45 +308,45 @@ opp_perm <- opportunity |>
 opp_perm
 ```
 
-```{r randomizing_cost_2-hint-1}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  __(null = ___) |>
-  ___(reps = ___, type = ___) |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-1} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   __(null = ___) |> -->
+<!--   ___(reps = ___, type = ___) |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-hint-2}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  ___(reps = ___, type = ___) |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-2} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   ___(reps = ___, type = ___) |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-hint-3}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-3} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-solution}
-# Create data frame of permuted differences in purchase rates
-opp_perm <- opportunity |>
-  # Specify decision vs. group, where success is buying a DVD
-  specify(decision ~ group, success = "buyDVD") |>
-  # Set the null hypothesis to independence
-  hypothesize(null = "independence") |>
-  # Generate 1000 reps of type permute
-  generate(reps = 1000, type = "permute") |>
-  # Calculate the summary stat difference in proportions
-  calculate(stat = "diff in props", order = c("treatment", "control"))
-    
-# Review the result
-opp_perm
-```
+<!-- ```{r randomizing_cost_2-solution} -->
+<!-- # Create data frame of permuted differences in purchase rates -->
+<!-- opp_perm <- opportunity |> -->
+<!--   # Specify decision vs. group, where success is buying a DVD -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   # Set the null hypothesis to independence -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generate 1000 reps of type permute -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   # Calculate the summary stat difference in proportions -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+
+<!-- # Review the result -->
+<!-- opp_perm -->
+<!-- ``` -->
 
  (3)
 
@@ -379,45 +379,45 @@ ggplot(___, aes(x = ___)) +
   ___(aes(xintercept = ___), color = "red")
 ```
 
-```{r randomizing_cost_3-hint-1}
-ggplot(opp_perm, aes(x = ___)) + 
-  ___(binwidth = ___) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- ```{r randomizing_cost_3-hint-1} -->
+<!-- ggplot(opp_perm, aes(x = ___)) +  -->
+<!--   ___(binwidth = ___) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
 
-```{r randomizing_cost_3-hint-2}
-ggplot(opp_perm, aes(x = stat)) + 
-  ___(binwidth = ___) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- ```{r randomizing_cost_3-hint-2} -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   ___(binwidth = ___) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
 
-```{r randomizing_cost_3-hint-3}
-ggplot(opp_perm, aes(x = stat)) + 
-  geom_histogram(binwidth = 0.005) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- ```{r randomizing_cost_3-hint-3} -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   geom_histogram(binwidth = 0.005) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
 
-```{r randomizing_cost_3-solution}
-# From previous steps
-diff_obs <- opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
+<!-- ```{r randomizing_cost_3-solution} -->
+<!-- # From previous steps -->
+<!-- diff_obs <- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
 
-opp_perm <- opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  calculate(stat = "diff in props", order = c("treatment", "control"))
-  
-# Using the permuation data, plot stat
-ggplot(opp_perm, aes(x = stat)) + 
-  # Add a histogram layer with binwidth 0.005
-  geom_histogram(binwidth = 0.005) +
-  # Add a vline layer with intercept diff_obs
-  geom_vline(aes(xintercept = diff_obs), color = "red")
-```
+<!-- opp_perm <- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+
+<!-- # Using the permuation data, plot stat -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   # Add a histogram layer with binwidth 0.005 -->
+<!--   geom_histogram(binwidth = 0.005) + -->
+<!--   # Add a vline layer with intercept diff_obs -->
+<!--   geom_vline(aes(xintercept = diff_obs), color = "red") -->
+<!-- ``` -->
 
 Great work! In the next exercise, you'll calculate the p-value to judge if the difference in proportions permuted is consistent with the observed difference.
 
@@ -449,31 +449,31 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-```{r summarizing_opportunity_cost-hint-1}
-opp_perm |>
-  visualize() +
-  shade_p_value(obs_stat = diff_obs, direction = "less")
-```
+<!-- ```{r summarizing_opportunity_cost-hint-1} -->
+<!-- opp_perm |> -->
+<!--   visualize() + -->
+<!--   shade_p_value(obs_stat = diff_obs, direction = "less") -->
+<!-- ``` -->
 
-```{r summarizing_opportunity_cost-hint-2}
-opp_perm |>
-  get_p_value(obs_stat = diff_obs, direction = "less")
-```
+<!-- ```{r summarizing_opportunity_cost-hint-2} -->
+<!-- opp_perm |> -->
+<!--   get_p_value(obs_stat = diff_obs, direction = "less") -->
+<!-- ``` -->
 
-```{r summarizing_opportunity_cost-solution}
-# Visualize the statistic 
-opp_perm |>
-  visualize() +
-  shade_p_value(obs_stat = diff_obs, direction = "less")
+<!-- ```{r summarizing_opportunity_cost-solution} -->
+<!-- # Visualize the statistic  -->
+<!-- opp_perm |> -->
+<!--   visualize() + -->
+<!--   shade_p_value(obs_stat = diff_obs, direction = "less") -->
 
-# Calculate the p-value using `get_p_value()`
-opp_perm |>
-  get_p_value(obs_stat = diff_obs, direction = "less")
+<!-- # Calculate the p-value using `get_p_value()` -->
+<!-- opp_perm |> -->
+<!--   get_p_value(obs_stat = diff_obs, direction = "less") -->
 
-# Calculate the p-value using `summarize`
-opp_perm |>
-  summarize(p_value = mean(stat <= diff_obs))
-```
+<!-- # Calculate the p-value using `summarize` -->
+<!-- opp_perm |> -->
+<!--   summarize(p_value = mean(stat <= diff_obs)) -->
+<!-- ``` -->
 
 Great work! The small p-value indicates that the observed data are inconsistent with the null hypothesis.  We should reject the null claim and conclude that financial advice does affect the likelihood of purchase.
 
@@ -614,15 +614,16 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-```{r opportunity_costs-hint}
- This should be double what you calculated as one-tailed p-value before.
-```
+<details>
+<summary>**Hint**</summary>
+This should be double what you calculated as a one-tailed p-value before.
+</details>
 
-```{r opportunity_costs-solution}
-# Calculate the two-sided p-value
-opp_perm |>
-  summarize(p_value = 2 * mean(stat <= diff_obs))
-```
+<!-- ```{r opportunity_costs-solution} -->
+<!-- # Calculate the two-sided p-value -->
+<!-- opp_perm |> -->
+<!--   summarize(p_value = 2 * mean(stat <= diff_obs)) -->
+<!-- ``` -->
 
 Great work! Take a moment to remind yourself why you used the proportion of permuted statistics that are smaller than (instead of bigger than) the observed value. Hint: Look at the histogram of permuted statistics.
 
