@@ -122,25 +122,37 @@ Another 75 students were assigned to the treatment group and were given a slight
 
 ### State the hypotheses
 
-The null hypothesis is that the two sets of choices don't impact buying habits. The research, or alternative, hypothesis is that, in this setting, a reminder might make people more inclined to save.
-
-Of the 75 students assigned to the control group, 56, or about 75%, bought the DVD. Of the 75 students assigned to the treatment group, 41, or about 55%, bought the DVD. As before, you will use a null distribution to determine whether the difference of 20% could be attributed to random variability.
-
-```{r the data}
-dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97), 
-             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |>
-  mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
-
-kable(dt, format = "html", escape = F) |>
-  kable_styling("striped", full_width = F)
-
+```{r hypotheses-mc}
+question(
+  "Which of the following null and alternative hypotheses are appropriate for the opportunity cost study?", correct = "Correct!", allow_retry = TRUE,
+  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the treatment (reminder) group were more likely to save their money.", correct = TRUE),
+  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the control (no reminder) group were more likely to save their money.",
+    message = "Not quite, the researchers are expecting to see more decisions to save in a particular direction (the alternative hypothesis)."),
+  answer("H0: The students in the treatment (reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
+    message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."),
+  answer("H0: The students in the control (no reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
+    message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."))
 ```
 
+
+<!-- The null hypothesis is that the two sets of choices don't impact buying habits. The research, or alternative, hypothesis is that, in this setting, a reminder might make people more inclined to save. -->
+
+<!-- Of the 75 students assigned to the control group, 56, or about 75%, bought the DVD. Of the 75 students assigned to the treatment group, 41, or about 55%, bought the DVD. As before, you will use a null distribution to determine whether the difference of 20% could be attributed to random variability. -->
+
+<!-- ```{r the data} -->
+<!-- dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97),  -->
+<!--              Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |> -->
+<!--   mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T)) -->
+
+<!-- kable(dt, format = "html", escape = F) |> -->
+<!--   kable_styling("striped", full_width = F) -->
+
+<!-- ``` -->
 
 
 ### Summarizing opportunity cost (1)
 
-As you saw in the lesson, we're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  
+We're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  
 
 In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
 
@@ -183,7 +195,6 @@ opportunity |>
 <!-- ``` -->
 
 
-
 Okay, so about 75% of the control group bought the DVD and about 55% of the treatment group (i.e. the group that was reminded that the money could be saved) bought the DVD. Interesting!
 
 
@@ -221,6 +232,18 @@ Great! The barplot better displays the results from the study. The treatment see
 ### Randomizing opportunity cost
 
 As in lesson 2, you will permute the data to generate a distribution of differences as if the null hypothesis were true.
+
+*TODO: check if the table reads well here*
+
+```{r the data}
+dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97),
+             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |>
+  mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
+
+kable(dt, format = "html", escape = F) |>
+  kable_styling("striped", full_width = F)
+
+```
 
 In the study, the number of individuals in each of the control and treatment groups is fixed.  Additionally, when you assume that the null hypothesis is true—that is, the experiment had no effect on the outcome of buying a DVD—it is reasonable to infer that the number of individuals who would buy a DVD is also fixed.  That is, 97 people were going to buy a DVD regardless of which treatment group they were in.
 
