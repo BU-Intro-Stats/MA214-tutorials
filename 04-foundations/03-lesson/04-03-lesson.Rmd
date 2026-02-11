@@ -125,11 +125,11 @@ Another 75 students were assigned to the treatment group and were given a slight
 ```{r hypotheses-mc}
 question(
   "Which of the following null and alternative hypotheses are appropriate for the opportunity cost study?", correct = "Correct!", allow_retry = TRUE,
-  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the treatment (reminder) group were more likely to save their money.", correct = TRUE),
   answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the control (no reminder) group were more likely to save their money.",
     message = "Not quite, the researchers are expecting to see more decisions to save in a particular direction (the alternative hypothesis)."),
   answer("H0: The students in the treatment (reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
     message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."),
+  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the treatment (reminder) group were more likely to save their money.", correct = TRUE),
   answer("H0: The students in the control (no reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
     message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."))
 ```
@@ -226,7 +226,6 @@ ggplot(opportunity, aes(x = ___, fill = ___)) +
 <!-- ``` -->
 
 
-
 Great! The barplot better displays the results from the study. The treatment seems like it might have had an effect.
 
 ### Randomizing opportunity cost
@@ -242,10 +241,9 @@ dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(
 
 kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F)
-
 ```
 
-In the study, the number of individuals in each of the control and treatment groups is fixed.  Additionally, when you assume that the null hypothesis is true—that is, the experiment had no effect on the outcome of buying a DVD—it is reasonable to infer that the number of individuals who would buy a DVD is also fixed.  That is, 97 people were going to buy a DVD regardless of which treatment group they were in.
+In the study, the number of individuals in each of the control and treatment groups is fixed. Additionally, when you assume that the null hypothesis is true—that is, the experiment had no effect on the outcome of buying a DVD—it is reasonable to infer that the number of individuals who would buy a DVD is also fixed.  That is, 97 people were going to buy a DVD regardless of which treatment group they were in.
 
 Using the new data and the methods from the previous lesson, create a randomization distribution of the difference in proportions calculated on permuted data.
 
@@ -371,6 +369,14 @@ opp_perm
 <!-- opp_perm -->
 <!-- ``` -->
 
+```{r, include=FALSE, echo=FALSE}
+# keep in workspace so they can complete part 3
+opp_perm <- opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
+  calculate(stat = "diff in props", order = c("treatment", "control"))
+```
  
 Draw a histogram of permuted differences:
 
@@ -378,21 +384,7 @@ Draw a histogram of permuted differences:
 - Add a histogram layer with `geom_histogram()`. The `binwidth` is set to `0.005`.
 - Add a vertical line with `geom_vline()`. The `xintercept` is at `diff_obs`.
 
-
 ```{r randomizing_cost_3, exercise=TRUE}
-# From previous steps
-diff_obs <- opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
-
-opp_perm <- opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  calculate(stat = "diff in props", order = c("treatment", "control"))
-  
 # Using the permuation data, plot stat
 ggplot(___, aes(x = ___)) + 
   # Add a histogram layer with binwidth 0.005
@@ -400,6 +392,21 @@ ggplot(___, aes(x = ___)) +
   # Add a vline layer with intercept diff_obs
   ___(aes(xintercept = ___), color = "red")
 ```
+
+<!-- ```{r} -->
+<!-- # From previous steps -->
+<!-- diff_obs <- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
+
+<!-- opp_perm <- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+<!-- ``` -->
 
 <!-- ```{r randomizing_cost_3-hint-1} -->
 <!-- ggplot(opp_perm, aes(x = ___)) +  -->
