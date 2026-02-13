@@ -190,18 +190,17 @@ With hypothesis testing, it is important to understand how samples from a null p
 
 Note that the *statistic* at hand is $\widehat{p}$, which is the proportion of successes in the _sample_. The *parameter*, on the other hand, is the proportion of successes in the _population_.
 
-In contrast, with confidence intervals, there is no null population. Instead, we need to understand how samples from the population of interest vary. 
+<!-- In contrast, with confidence intervals, there is no null population. Instead, we need to understand how samples from the population of interest vary.  -->
 
-We expect the sample statistic to vary around the parameter, but how far is the statistic from the parameter? Bootstrapping is a method that allows us to estimate the distance from a statistic to the parameter. Let's see how it works.
+We expect the sample statistic to vary around the parameter, but how far is the statistic from the parameter? Bootstrapping is a method that allows us to estimate this distance. Let's see how it works.
 
 ![](images/lesson4_img2.png){ width=80% }
 
-Bootstrapping repeatedly samples from the sample in order to estimate the variability of the statistic. Each time we resample, the data are sampled from the original data with replacement. It turns out that the process of resampling from the original sample is an excellent approximation for sampling from a population!
+Bootstrapping is a method of taking samples with replacement from the observed data. It turns out that the process of resampling from the original sample is an excellent approximation for sampling from a population! 
 
 We call the bootstrapped statistic $\widehat{p}^*$, which is the proportion of successes in the resample.
 
 ### Polling
-
 
 The original sample showed 4 of 7 who plan to vote for candidate X, or 57.1%. When we sample with replacement from the original sample, 71.4% of individuals will vote for candidate X. The second resample has 28.6% of individuals voting for candidate X. Note that in this second resample, the red person is repeated three times and both the brown and tan people show up twice. The third resampled proportion is 42.9%.
 
@@ -222,7 +221,9 @@ By repeating the resampling process many times, the resampled proportions give a
 ### Standard error
 
 
-The **standard error**, which describes how variable the statistic is around the parameter, is key to building a confidence interval. As we've already said, the bootstrap process is an excellent approximation for estimating how variable the statistic is. To demonstrate how well the bootstrap works, we set up a hypothetical situation where we actually know the number we need. The following R code calculates the standard error of the sample proportions in two ways. First, we use the population information, then we use the bootstrap.
+The **standard error**, which describes how variable the statistic is around the parameter, is key to building a confidence interval. To evaluate how well the bootstrap works, we set up a hypothetical situation where we actually know the number we need. 
+
+The following R code calculates the standard error of the sample proportions in two ways. First, we use the population information, then the bootstrap, and compare the two.
 
 ```{r eval = TRUE}
 # Compute p-hat for each poll
@@ -240,34 +241,36 @@ ex1_props |>
   summarize(sd(prop_yes))
 ```
 
-### Variability of $\widehat{p}$ from the sample (bootstrapping)
+<!-- ### Variability of $\widehat{p}$ from the sample (bootstrapping) -->
 
-To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. As a way of trying to measure the variability of $\widehat{p}$ we have set up a scenario, again, totally unrealistic, where we are taking many samples from the same population. For each of the samples, $\widehat{p}$ is calculated. The standard error is exactly the number we need to know and is calculated to be 0.087. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population.
+<!-- To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. Then we take bootstrap samples from the observed data. For each of the samples, $\widehat{p}$ is calculated.  -->
 
-It turns out that the variability of the statistic $\widehat{p}$ can be measured without taking repeated samples from the population. Instead, we take repeated samples from the original observed data.
+<!-- The standard error is exactly the number we need to know and is calculated to be 0.087. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population. -->
 
-Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical.
+<!-- It turns out that the variability of the statistic $\widehat{p}$ can be measured without taking repeated samples from the population. Instead, we take repeated samples from the original observed data. -->
 
-Notice that the resampled $\widehat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide.
+<!-- Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical. -->
 
-```{r eval = TRUE}
-# Generate 1000 resamples of one poll
-one_poll_boot_30 <- one_poll |>
-  rep_sample_n(30, replace = TRUE, reps = 1000)
+<!-- Notice that the resampled $\widehat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide. -->
+<!-- *TODO: check this output - need 0.087 to show* -->
 
-# Compute p-hat for each resampled poll
-ex2_props <- one_poll_boot_30 |>
-  summarize(prop_yes = mean(vote == "yes"))
+<!-- ```{r eval = TRUE} -->
+<!-- # Generate 1000 resamples of one poll -->
+<!-- one_poll_boot_30 <- one_poll |> -->
+<!--   rep_sample_n(30, replace = TRUE, reps = 1000) -->
 
-# Variability of p-hat
-ex2_props |>
-  summarize(sd(prop_yes))
-```
+<!-- # Compute p-hat for each resampled poll -->
+<!-- ex2_props <- one_poll_boot_30 |> -->
+<!--   summarize(prop_yes = mean(vote == "yes")) -->
 
+<!-- # Variability of p-hat -->
+<!-- ex2_props |> -->
+<!--   summarize(sd(prop_yes)) -->
+<!-- ``` -->
 
 
 ### Resampling from a sample
-
+*TODO: move this section to the veginning, to motivate bootstrapping from observed data?*
 
 To investigate how much the estimates of a population proportion change from sample to sample, you will set up two sampling experiments.
 
@@ -287,6 +290,8 @@ Compute the sample proportion for each of the 1000 original samples, assigning t
 - Summarize to calculate `stat` as the `mean()` of cases of `vote` that equal `"yes"`.
 
 ```{r resampling, exercise=TRUE}
+glimpse(all_polls)
+
 # Compute p-hat for each poll
 ex1_props <- all_polls |> 
   # Group by poll
@@ -355,6 +360,16 @@ ex2_props <- one_poll |>
   ___(stat = ___)
 ```
 
+<details>
+<summary>**Hint**</summary>
+For selecting one poll, try using `filter()` with the appropriate input. What do you want the value of `poll` to be?
+</details>
+
+<details>
+<summary>**Hint**</summary>
+For computing p-hat* for each resampled poll, recall the `infer` framework: first use `specify()`, then `generate()`, and then `calculate()`. 
+</details>
+
 <!-- ```{r resampling2-hint-1} -->
 <!-- one_poll <- all_polls |> -->
 <!--   filter(poll == 1) |> -->
@@ -405,8 +420,7 @@ ex2_props <- one_poll |>
 - Using `ex1_props`, calculate the variability of $\widehat{p}$. In the call to `summarize()`, set `variability` to the standard deviation, `sd()`, of `stat`.
 - Do the same with `ex2_props` to calculate the variability of $\widehat{p}^*$.
 
-Again, because you are looking for an interval estimate, you have not made a hypothesis claim about the proportion (thus, there is no `hypothesize()` step needed in the infer pipeline).
-
+<!-- Again, because you are looking for an interval estimate, you have not made a hypothesis claim about the proportion (thus, there is no `hypothesize()` step needed in the infer pipeline). -->
 
 ```{r resampling3, exercise=TRUE}
 # Calculate variability of p-hat
@@ -418,9 +432,10 @@ ex2_props |>
   ___
 ```
 
-<!-- ```{r resampling3-hint} -->
-<!--  Use the `sd()` function in the `summarize()` call to calculate `variability`. -->
-<!-- ``` -->
+<details>
+<summary>**Hint**</summary>
+Use the `sd()` function in the `summarize()` call to calculate `variability`.
+</details>
 
 <!-- ```{r resampling3-solution} -->
 <!-- # From previous steps -->
@@ -484,6 +499,11 @@ ggplot(___, aes(___, color = ___)) +
   # Add a density layer with bandwidth 0.1
   ___(bw = ___)
 ```
+
+<details>
+<summary>**Hint**</summary>
+Use the function `bind_rows(<object1>, <object2>)` to combine data from both experiments.
+</details>
 
 <!-- ```{r variability_phat-hint-1} -->
 <!-- both_ex_props <- bind_rows(ex1_props, ex2_props, .id = "experiment") -->
