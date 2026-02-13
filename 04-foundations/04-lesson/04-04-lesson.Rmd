@@ -119,15 +119,16 @@ hash_encoder_ui <- {
 
 ### Research questions
 
-Until now, the research question at hand has been a question of comparison. What if, instead, the research question is one of estimation?
+*TODO: replace*
+<!-- Until now, the research question at hand has been a question of comparison. What if, instead, the research question is one of estimation? -->
 
-![](images/lesson4_img1.png){ width=80% }
+<!-- ![](images/lesson4_img1.png){ width=80% } -->
 
-For example, “under which diet plan will participants lose more weight on average” is a comparative question and we use a hypothesis test. “How much should participants expect to lose on average” is an estimation question for which we use confidence intervals.
+<!-- For example, “under which diet plan will participants lose more weight on average” is a comparative question and we use a hypothesis test. “How much should participants expect to lose on average” is an estimation question for which we use confidence intervals. -->
 
-Or another example is the comparative question: “which of two car manufacturers are drivers more likely to recommend to their friends?” Hypothesis testing is used to analyze that question. But: “what percent of users are likely to recommend Subaru to their friends” is an estimation problem and we use confidence intervals to answer that question.
+<!-- Or another example is the comparative question: “which of two car manufacturers are drivers more likely to recommend to their friends?” Hypothesis testing is used to analyze that question. But: “what percent of users are likely to recommend Subaru to their friends” is an estimation problem and we use confidence intervals to answer that question. -->
 
-One more, the comparative question: “are education level and average income linearly related” is addressed with a hypothesis test. The estimation question: “for each additional year of education, what is the predicted change in average income” uses a confidence interval. OK, you see the pattern.
+<!-- One more, the comparative question: “are education level and average income linearly related” is addressed with a hypothesis test. The estimation question: “for each additional year of education, what is the predicted change in average income” uses a confidence interval. OK, you see the pattern. -->
 
 ### Parameter
 
@@ -164,26 +165,23 @@ quiz(
 
 ### Hypothesis test or confidence interval?
 
+*TODO: replace*
 
-A university is trying to determine whether parking is a problem on its campus. The student
-newspaper contacts a random sample of 200 students and asks whether or not they are frustrated
-with the parking situation. They want to estimate the proportion of students at the college who are
-frustrated with the parking situation.
+<!-- A university is trying to determine whether parking is a problem on its campus. The student newspaper contacts a random sample of 200 students and asks whether or not they are frustrated with the parking situation. They want to estimate the proportion of students at the college who are frustrated with the parking situation. -->
 
 
-
-```{r quiz_2}
-quiz(
-  question("In this setting, which is more appropriate, a hypothesis test or a confidence interval?", 
-           correct = "Correct!", 
-           allow_retry = TRUE,
-    answer("Hypothesis test because there is a particular research claim.", message = "Read the set-up carefully, the researchers do not have a particular claim to test."),
-    answer("Hypothesis test because the goal is to estimate a population parameter.", message = "False. A confidence interval is more appropriate here."),
-    answer("Confidence interval because there is a particular research claim.", message = "Close, but it's not because there's a particular research claim."),
-    answer("Confidence interval because the goal is to estimate a population parameter.", correct = TRUE)
-  ), caption = ""
-)
-```
+<!-- ```{r quiz_2} -->
+<!-- quiz( -->
+<!--   question("In this setting, which is more appropriate, a hypothesis test or a confidence interval?",  -->
+<!--            correct = "Correct!",  -->
+<!--            allow_retry = TRUE, -->
+<!--     answer("Hypothesis test because there is a particular research claim.", message = "Read the set-up carefully, the researchers do not have a particular claim to test."), -->
+<!--     answer("Hypothesis test because the goal is to estimate a population parameter.", message = "False. A confidence interval is more appropriate here."), -->
+<!--     answer("Confidence interval because there is a particular research claim.", message = "Close, but it's not because there's a particular research claim."), -->
+<!--     answer("Confidence interval because the goal is to estimate a population parameter.", correct = TRUE) -->
+<!--   ), caption = "" -->
+<!-- ) -->
+<!-- ``` -->
 
 ## Bootstrapping
 
@@ -1317,42 +1315,6 @@ ggplot(conf_int_data, aes(___, ___)) +
 
 Amazing! Congratulations on finishing the tutorial! 
 
-
-
-## Summary of statistical inference
-
-### Inference
-
-Throughout the entire tutorial, we have focused on making claims about a population using information from a sample of data.
-
-![](images/lesson4_img8.png){ width=80% }
-
-### Testing
-
-Hypothesis testing is used to test a particular claim about the population.
-
-Remember, the claim to refute is called the null hypothesis, while the claim you want is called the alternative hypothesis. For example, in the gender discrimination example, the null hypothesis is that there is no gender discrimination in hiring. The alternative hypothesis is that men are more likely to be promoted than women.
-
-These ideas are important to remember because the entire process of hypothesis testing will be repeated with different types of data and research questions in later tutorials.
-
-* **$H_0$**: There is no gender discrimination in hiring  
-* **$H_A$**: Men are more likely to be promoted than women
-
-![](images/lesson4_img9.png){ width=80% }
-
-### Estimation
-
-Estimation is used to understand the value of a population parameter.
-
-> What proportion of the voters will select candidate X?
-
-Using measures of variability of the statistic, we can estimate how far $\widehat{p}$ is from the true proportion. In particular, the variability of $\widehat{p}$ can be measured using resamples from the original data. This process is called bootstrapping.
-
-![](images/lesson4_img10.png){ width=80% }
-
-As with hypothesis testing, the entire bootstrap process will be repeated with different data structures and research questions in later tutorials.
-
-    
 
 ## Submit
 
