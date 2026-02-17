@@ -989,269 +989,6 @@ one_poll_boot |>
 
 Excellent! Again, the same caveat applies: because the two intervals were created using different methods, the intervals are expected to be a bit different as well. In the long run, however, the intervals should provide the same information.
 
-## Interpreting CIs and technical conditions
-
-
-### Creating CIs
-
-By using the bootstrapped $\widehat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X.
-
-The first interval was based on the empirical rule, which extended two standard errors from the sample proportion to create the interval.
-
-The second interval used the natural variability of the resampled $\widehat{p}$ values to characterize the distance from the true parameter. Remember, as in previous exercises, the quantile function finds the value which gives 2.5% of the bootstrapped proportions below and the value which gives 97.5% of the bootstrapped proportions below.
-
-We can see that the two intervals are different because they used different methods, but they are consistent because they are based on the same observations.
-
-```{r echo=FALSE}
-set.seed(47)
-one_poll <- all_polls |>
-  filter(poll == 1) |>
-  select(vote)
-one_poll_boot <- one_poll |>
-  specify(response = vote, success = "yes") |>
-  generate(reps = 1000, type = "bootstrap") |> 
-  calculate(stat = "prop")
-```
-
-
-```{r echo=TRUE}
-# Look at the bootstrap t-confidence interval for comparison
-one_poll_boot |>
-  summarize(lower = stat - 2 * sd(stat),
-            upper = stat + 2 * sd(stat))
-
-one_poll_boot
-
-# Find the 2.5% and 97.5% of the p-hat values
-one_poll_boot |>
-  summarize(q025_prop = quantile(stat, p = .025),
-            q975_prop = quantile(stat, p = .975))
-```
-
-### Motivating CIs
-
-
-Remember that the goal is to find an interval estimate of the parameter: the true proportion who will vote for candidate X, when the only information is the sample, which gives the proportion of individuals in the data who will vote for candidate X.
-
-Ideas about the variability of $\widehat{p}^*$ are used to estimate how far the observed $\widehat{p}$ was from the population proportion.
-
-Because we don't know whether the sample is close to the population or far from it, we don't know whether the confidence interval actually captures the true parameter. To that end, we interpret the interval using a confidence percentage. That is, we say _*we are 95% confident that the true proportion of people planning to vote for candidate X is between 0.536 and 0.864*_.
-
-
-### Technical conditions
-
-
-In this lesson, we have provided two ways for creating bootstrap confidence intervals.
-
-These methods work for __any__ statistic and parameter, as long as the following technical conditions hold: (1) the distribution of the statistic is reasonably symmetric and bell-shaped, (2) the sample size is reasonably large, and (3) the sample was representative of the population. 
-
-A plot of the bootstrap $\widehat{p}^*$ values will give a good indication for whether the technical conditions are valid.
-
-Both the bootstrap t-confidence interval and the bootstrap percentile interval measured the variability of the resampled proportions. And both methods will be used in later tutorials, along with more advanced methods, to find intervals for other parameters.
-
-
-
-### Sample size effects on bootstrap CIs
-
-
-In a previous multiple choice exercise, you realized that if you resampled the data with the wrong size (e.g. 300 or 3 instead of 30), the standard error (SE) of the sample proportions was off.  With 300 resampled observations, the SE was too small.  With 3 resampled observations, the SE was too large.
-
-Here, you will use the *incorrect* standard error (based on the incorrect sample size) to create a confidence interval. The idea is that when the standard error is off, the interval is not particularly useful, nor is it correct.
-
-
-**Exercise:**
-
-A function for calculating the bootstrapped t-confidence interval, `calc_t_conf_int()`, is shown is the script. Read the code and try to understand what it is doing. You can use the function by typing `calc_t_conf_int()` in the code. Then:
-
-- Use the `calc_t_conf_int()` function on `one_poll_boot` to calculate the correct t-confidence interval.
-- Do the same on `one_poll_boot_300`, to find an incorrect interval for the resamples of size 300.
-- Do the same on `one_poll_boot_3`, to find an incorrect interval for the resamples of size 3.
-
-```{r bootstrap_ci-setup}
-one_poll <- all_polls |>
-  filter(poll == 1) |>
-  select(vote)
-
-one_poll_boot <- one_poll |>
-  rep_sample_n(30, replace = TRUE, reps = 1000) |>
-  summarize(stat = mean(vote == "yes"))
-  
-# Resample the data using samples of size 300 (an incorrect strategy!)
-one_poll_boot_300 <- one_poll |>
-  rep_sample_n(300, replace = TRUE, reps = 1000) |>
-  summarize(stat = mean(vote == "yes"))
-  
-# Resample the data using samples of size 3 (an incorrect strategy!)
-one_poll_boot_3 <- one_poll |>
-  rep_sample_n(3, replace = TRUE, reps = 1000) |>
-  summarize(stat = mean(vote == "yes")) 
-
-p_hat <- one_poll |>
-  summarize(mean(vote == "yes")) |>
-  pull()
-```
-
-```{r bootstrap_ci, exercise=TRUE}
-calc_t_conf_int <- function(resampled_dataset) {
-  resampled_dataset |>
-    summarize(
-      lower = p_hat - 2 * sd(stat),
-      upper = p_hat + 2 * sd(stat)
-    )
-}
-
-# Find the bootstrap t-confidence interval for 30 resamples
-calc_t_conf_int(___)
-
-# ... and for 300 resamples
-___
-
-# ... and for 3 resamples
-___
-```
-
-<!-- ```{r bootstrap_ci-hint} -->
-<!--  Use `calc_t_conf_int()` on `one_poll_boot`, `one_poll_boot_300`, and `one_poll_boot_3`, in that order. -->
-<!-- ``` -->
-
-<!-- ```{r bootstrap_ci-solution} -->
-<!-- calc_t_conf_int <- function(resampled_dataset) { -->
-<!--   resampled_dataset |> -->
-<!--     summarize( -->
-<!--       lower = p_hat - 2 * sd(stat), -->
-<!--       upper = p_hat + 2 * sd(stat) -->
-<!--     ) -->
-<!-- } -->
-
-<!-- # Find the bootstrap t-confidence interval for 30 resamples -->
-<!-- calc_t_conf_int(one_poll_boot) -->
-
-<!-- # ... and for 300 resamples -->
-<!-- calc_t_conf_int(one_poll_boot_300) -->
-
-<!-- # ... and for 3 resamples -->
-<!-- calc_t_conf_int(one_poll_boot_3) -->
-<!-- ``` -->
-
-
-*TODO: make mc question*
-Notice how the resampled interval with size 300 was way too small and the resampled interval with size 3 was way too big. Great job!
-
-
-### Sample proportion value effects on bootstrap CIs
-
-
-One additional element that changes the width of the confidence interval is the sample parameter value, $\widehat{p}$.  
-Generally, when the true parameter is close to 0.5, the standard error of $\widehat{p}$ is larger than when the true parameter is closer to 0 or 1.  When calculating a bootstrap t-confidence interval, the standard error controls the width of the CI, and here (given a true parameter of 0.8) the sample proportion is higher than in previous exercises, so the width of the confidence interval will be narrower.
-
-
-**Exercise:**
-The function `calc_p_hat()` is shown in the script, and can be used to calculate the sample proportions. The `calc_t_conf_int()` function from the previous exercise has been updated to now use any value of `p_hat` as an argument! Read the function and try to understand what it's doing. Then:
-- Run the code to calculate the bootstrap t-confidence interval for the original population.
-- Consider a new population where the true parameter is 0.8, saved as the dataset `one_poll_0.8`. 
-- Calculate $\widehat{p}$ of this new sample, using the same technique as with the original dataset. Assign it to the variable `p_hat_0.8`.
-- Find the bootstrap t-confidence interval using the new bootstrapped data, `one_poll_boot_0.8`, and the new $\widehat{p}$. *Notice that it is narrower than previously calculated.*
-
-```{r bootstrap_ci_2-setup}
-set.seed(47)
-
-one_poll <- all_polls |>
-  filter(poll == 1) |>
-  select(vote)
-
-# Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot <- one_poll |>
-  specify(response = vote, success = "yes") |>
-  generate(reps = 1000, type = "bootstrap") |> 
-  calculate(stat = "prop") 
-
-set.seed(470)  
-# Collect 30 observations from a population with true proportion of 0.8
-one_poll_0.8 <- tibble(vote = ifelse(rbinom(30, 1, .8) == 1L, "yes", "no"))
-
-# Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot_0.8 <- one_poll_0.8 |>
-  specify(response = vote, success = "yes") |>
-  generate(reps = 1000, type = "bootstrap") |> 
-  calculate(stat = "prop")
-```
-
-```{r bootstrap_ci_2, exercise=TRUE}
-calc_p_hat <- function(dataset) {
-  dataset |>
-    summarize(stat = mean(vote == "yes")) |>
-    pull()
-}
-calc_t_conf_int <- function(resampled_dataset, p_hat) {
-  resampled_dataset |>
-    summarize(
-      lower = p_hat - 2 * sd(stat),
-      upper = p_hat + 2 * sd(stat)
-    )
-}
-
-# Find proportion of yes votes from original population
-p_hat <- calc_p_hat(one_poll)
-
-# Review the value
-p_hat  
-
-# Calculate bootstrap t-confidence interval (original 0.6 param)
-calc_t_conf_int(one_poll_boot, p_hat)
-
-# Find proportion of yes votes from new population
-p_hat_0.8 <- calc_p_hat(___)
-  
-# Review the value
-p_hat_0.8  
-  
-# Calculate the bootstrap t-confidence interval (new 0.8 param)
-calc_t_conf_int(___, ___)
-```
-
-<!-- ```{r bootstrap_ci_2-hint} -->
-
-
-<!-- - `p_hat_0.8` is calculated in the same way as `p_hat`, but starting with `one_poll_0.8`. -->
-<!-- - To calculate the new confidence interval, call `calc_t_conf_int()`, passing `one_poll_boot_0.8` and `p_hat_0.8`. -->
-<!-- ``` -->
-
-<!-- ```{r bootstrap_ci_2-solution} -->
-<!-- calc_p_hat <- function(dataset) { -->
-<!--   dataset |> -->
-<!--     summarize(stat = mean(vote == "yes")) |> -->
-<!--     pull() -->
-<!-- } -->
-<!-- calc_t_conf_int <- function(resampled_dataset, p_hat) { -->
-<!--   resampled_dataset |> -->
-<!--     summarize( -->
-<!--       lower = p_hat - 2 * sd(stat), -->
-<!--       upper = p_hat + 2 * sd(stat) -->
-<!--     ) -->
-<!-- } -->
-
-<!-- # Find proportion of yes votes from original population -->
-<!-- p_hat <- calc_p_hat(one_poll) -->
-
-<!-- # Review the value -->
-<!-- p_hat   -->
-
-<!-- # Calculate bootstrap t-confidence interval (original 0.6 param) -->
-<!-- calc_t_conf_int(one_poll_boot, p_hat) -->
-
-<!-- # Find proportion of yes votes from new population -->
-<!-- p_hat_0.8 <- calc_p_hat(one_poll_0.8) -->
-
-<!-- # Review the value -->
-<!-- p_hat_0.8   -->
-
-<!-- # Calculate the bootstrap t-confidence interval (new 0.8 param) -->
-<!-- calc_t_conf_int(one_poll_boot_0.8, p_hat_0.8) -->
-<!-- ``` -->
-
-
-Nice job! You have found the bootstrap t-confidence interval. Note that it's narrower than previously calculated because the sample proportion itself was close to 1.
-
 
 ### Percentile effects on bootstrap CIs
 
@@ -1318,6 +1055,337 @@ ggplot(conf_int_data, aes(___, ___)) +
   # Add a line layer
   ___()
 ```
+
+
+<!-- ## Interpreting CIs and technical conditions -->
+
+
+<!-- ### Creating CIs -->
+
+<!-- By using the bootstrapped $\widehat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X. -->
+
+<!-- The first interval was based on the empirical rule, which extended two standard errors from the sample proportion to create the interval. -->
+
+<!-- The second interval used the natural variability of the resampled $\widehat{p}$ values to characterize the distance from the true parameter. Remember, as in previous exercises, the quantile function finds the value which gives 2.5% of the bootstrapped proportions below and the value which gives 97.5% of the bootstrapped proportions below. -->
+
+<!-- We can see that the two intervals are different because they used different methods, but they are consistent because they are based on the same observations. -->
+
+<!-- ```{r echo=FALSE} -->
+<!-- set.seed(47) -->
+<!-- one_poll <- all_polls |> -->
+<!--   filter(poll == 1) |> -->
+<!--   select(vote) -->
+<!-- one_poll_boot <- one_poll |> -->
+<!--   specify(response = vote, success = "yes") |> -->
+<!--   generate(reps = 1000, type = "bootstrap") |>  -->
+<!--   calculate(stat = "prop") -->
+<!-- ``` -->
+
+
+<!-- ```{r echo=TRUE} -->
+<!-- # Look at the bootstrap t-confidence interval for comparison -->
+<!-- one_poll_boot |> -->
+<!--   summarize(lower = stat - 2 * sd(stat), -->
+<!--             upper = stat + 2 * sd(stat)) -->
+
+<!-- one_poll_boot -->
+
+<!-- # Find the 2.5% and 97.5% of the p-hat values -->
+<!-- one_poll_boot |> -->
+<!--   summarize(q025_prop = quantile(stat, p = .025), -->
+<!--             q975_prop = quantile(stat, p = .975)) -->
+<!-- ``` -->
+
+<!-- ### Motivating CIs -->
+
+
+<!-- Remember that the goal is to find an interval estimate of the parameter: the true proportion who will vote for candidate X, when the only information is the sample, which gives the proportion of individuals in the data who will vote for candidate X. -->
+
+<!-- Ideas about the variability of $\widehat{p}^*$ are used to estimate how far the observed $\widehat{p}$ was from the population proportion. -->
+
+<!-- Because we don't know whether the sample is close to the population or far from it, we don't know whether the confidence interval actually captures the true parameter. To that end, we interpret the interval using a confidence percentage. That is, we say _*we are 95% confident that the true proportion of people planning to vote for candidate X is between 0.536 and 0.864*_. -->
+
+
+<!-- ### Technical conditions -->
+
+
+<!-- In this lesson, we have provided two ways for creating bootstrap confidence intervals. -->
+
+<!-- These methods work for __any__ statistic and parameter, as long as the following technical conditions hold: (1) the distribution of the statistic is reasonably symmetric and bell-shaped, (2) the sample size is reasonably large, and (3) the sample was representative of the population.  -->
+
+<!-- A plot of the bootstrap $\widehat{p}^*$ values will give a good indication for whether the technical conditions are valid. -->
+
+<!-- Both the bootstrap t-confidence interval and the bootstrap percentile interval measured the variability of the resampled proportions. And both methods will be used in later tutorials, along with more advanced methods, to find intervals for other parameters. -->
+
+
+
+<!-- ### Sample size effects on bootstrap CIs -->
+
+
+<!-- In a previous multiple choice exercise, you realized that if you resampled the data with the wrong size (e.g. 300 or 3 instead of 30), the standard error (SE) of the sample proportions was off.  With 300 resampled observations, the SE was too small.  With 3 resampled observations, the SE was too large. -->
+
+<!-- Here, you will use the *incorrect* standard error (based on the incorrect sample size) to create a confidence interval. The idea is that when the standard error is off, the interval is not particularly useful, nor is it correct. -->
+
+
+<!-- **Exercise:** -->
+
+<!-- A function for calculating the bootstrapped t-confidence interval, `calc_t_conf_int()`, is shown is the script. Read the code and try to understand what it is doing. You can use the function by typing `calc_t_conf_int()` in the code. Then: -->
+
+<!-- - Use the `calc_t_conf_int()` function on `one_poll_boot` to calculate the correct t-confidence interval. -->
+<!-- - Do the same on `one_poll_boot_300`, to find an incorrect interval for the resamples of size 300. -->
+<!-- - Do the same on `one_poll_boot_3`, to find an incorrect interval for the resamples of size 3. -->
+
+<!-- ```{r bootstrap_ci-setup} -->
+<!-- one_poll <- all_polls |> -->
+<!--   filter(poll == 1) |> -->
+<!--   select(vote) -->
+
+<!-- one_poll_boot <- one_poll |> -->
+<!--   rep_sample_n(30, replace = TRUE, reps = 1000) |> -->
+<!--   summarize(stat = mean(vote == "yes")) -->
+
+<!-- # Resample the data using samples of size 300 (an incorrect strategy!) -->
+<!-- one_poll_boot_300 <- one_poll |> -->
+<!--   rep_sample_n(300, replace = TRUE, reps = 1000) |> -->
+<!--   summarize(stat = mean(vote == "yes")) -->
+
+<!-- # Resample the data using samples of size 3 (an incorrect strategy!) -->
+<!-- one_poll_boot_3 <- one_poll |> -->
+<!--   rep_sample_n(3, replace = TRUE, reps = 1000) |> -->
+<!--   summarize(stat = mean(vote == "yes"))  -->
+
+<!-- p_hat <- one_poll |> -->
+<!--   summarize(mean(vote == "yes")) |> -->
+<!--   pull() -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci, exercise=TRUE} -->
+<!-- calc_t_conf_int <- function(resampled_dataset) { -->
+<!--   resampled_dataset |> -->
+<!--     summarize( -->
+<!--       lower = p_hat - 2 * sd(stat), -->
+<!--       upper = p_hat + 2 * sd(stat) -->
+<!--     ) -->
+<!-- } -->
+
+<!-- # Find the bootstrap t-confidence interval for 30 resamples -->
+<!-- calc_t_conf_int(___) -->
+
+<!-- # ... and for 300 resamples -->
+<!-- ___ -->
+
+<!-- # ... and for 3 resamples -->
+<!-- ___ -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci-hint} -->
+<!--  Use `calc_t_conf_int()` on `one_poll_boot`, `one_poll_boot_300`, and `one_poll_boot_3`, in that order. -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci-solution} -->
+<!-- calc_t_conf_int <- function(resampled_dataset) { -->
+<!--   resampled_dataset |> -->
+<!--     summarize( -->
+<!--       lower = p_hat - 2 * sd(stat), -->
+<!--       upper = p_hat + 2 * sd(stat) -->
+<!--     ) -->
+<!-- } -->
+
+<!-- # Find the bootstrap t-confidence interval for 30 resamples -->
+<!-- calc_t_conf_int(one_poll_boot) -->
+
+<!-- # ... and for 300 resamples -->
+<!-- calc_t_conf_int(one_poll_boot_300) -->
+
+<!-- # ... and for 3 resamples -->
+<!-- calc_t_conf_int(one_poll_boot_3) -->
+<!-- ``` -->
+
+
+<!-- Notice how the resampled interval with size 300 was way too small and the resampled interval with size 3 was way too big. Great job! -->
+
+
+<!-- ### Sample proportion value effects on bootstrap CIs -->
+
+
+<!-- One additional element that changes the width of the confidence interval is the sample parameter value, $\widehat{p}$.   -->
+<!-- Generally, when the true parameter is close to 0.5, the standard error of $\widehat{p}$ is larger than when the true parameter is closer to 0 or 1.  When calculating a bootstrap t-confidence interval, the standard error controls the width of the CI, and here (given a true parameter of 0.8) the sample proportion is higher than in previous exercises, so the width of the confidence interval will be narrower. -->
+
+
+<!-- **Exercise:** -->
+
+<!-- The function `calc_p_hat()` is shown in the script, and can be used to calculate the sample proportions. The `calc_t_conf_int()` function from the previous exercise has been updated to now use any value of `p_hat` as an argument! Read the function and try to understand what it's doing. Then: -->
+<!-- - Run the code to calculate the bootstrap t-confidence interval for the original population. -->
+<!-- - Consider a new population where the true parameter is 0.8, saved as the dataset `one_poll_0.8`.  -->
+<!-- - Calculate $\widehat{p}$ of this new sample, using the same technique as with the original dataset. Assign it to the variable `p_hat_0.8`. -->
+<!-- - Find the bootstrap t-confidence interval using the new bootstrapped data, `one_poll_boot_0.8`, and the new $\widehat{p}$. *Notice that it is narrower than previously calculated.* -->
+
+<!-- ```{r bootstrap_ci_2-setup} -->
+<!-- set.seed(47) -->
+
+<!-- one_poll <- all_polls |> -->
+<!--   filter(poll == 1) |> -->
+<!--   select(vote) -->
+
+<!-- # Bootstrap to find the SE of p-hat: one_poll_boot -->
+<!-- one_poll_boot <- one_poll |> -->
+<!--   specify(response = vote, success = "yes") |> -->
+<!--   generate(reps = 1000, type = "bootstrap") |>  -->
+<!--   calculate(stat = "prop")  -->
+
+<!-- set.seed(470)   -->
+<!-- # Collect 30 observations from a population with true proportion of 0.8 -->
+<!-- one_poll_0.8 <- tibble(vote = ifelse(rbinom(30, 1, .8) == 1L, "yes", "no")) -->
+
+<!-- # Bootstrap to find the SE of p-hat: one_poll_boot -->
+<!-- one_poll_boot_0.8 <- one_poll_0.8 |> -->
+<!--   specify(response = vote, success = "yes") |> -->
+<!--   generate(reps = 1000, type = "bootstrap") |>  -->
+<!--   calculate(stat = "prop") -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci_2, exercise=TRUE} -->
+<!-- calc_p_hat <- function(dataset) { -->
+<!--   dataset |> -->
+<!--     summarize(stat = mean(vote == "yes")) |> -->
+<!--     pull() -->
+<!-- } -->
+<!-- calc_t_conf_int <- function(resampled_dataset, p_hat) { -->
+<!--   resampled_dataset |> -->
+<!--     summarize( -->
+<!--       lower = p_hat - 2 * sd(stat), -->
+<!--       upper = p_hat + 2 * sd(stat) -->
+<!--     ) -->
+<!-- } -->
+
+<!-- # Find proportion of yes votes from original population -->
+<!-- p_hat <- calc_p_hat(one_poll) -->
+
+<!-- # Review the value -->
+<!-- p_hat   -->
+
+<!-- # Calculate bootstrap t-confidence interval (original 0.6 param) -->
+<!-- calc_t_conf_int(one_poll_boot, p_hat) -->
+
+<!-- # Find proportion of yes votes from new population -->
+<!-- p_hat_0.8 <- calc_p_hat(___) -->
+
+<!-- # Review the value -->
+<!-- p_hat_0.8   -->
+
+<!-- # Calculate the bootstrap t-confidence interval (new 0.8 param) -->
+<!-- calc_t_conf_int(___, ___) -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci_2-hint} -->
+
+
+<!-- - `p_hat_0.8` is calculated in the same way as `p_hat`, but starting with `one_poll_0.8`. -->
+<!-- - To calculate the new confidence interval, call `calc_t_conf_int()`, passing `one_poll_boot_0.8` and `p_hat_0.8`. -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_ci_2-solution} -->
+<!-- calc_p_hat <- function(dataset) { -->
+<!--   dataset |> -->
+<!--     summarize(stat = mean(vote == "yes")) |> -->
+<!--     pull() -->
+<!-- } -->
+<!-- calc_t_conf_int <- function(resampled_dataset, p_hat) { -->
+<!--   resampled_dataset |> -->
+<!--     summarize( -->
+<!--       lower = p_hat - 2 * sd(stat), -->
+<!--       upper = p_hat + 2 * sd(stat) -->
+<!--     ) -->
+<!-- } -->
+
+<!-- # Find proportion of yes votes from original population -->
+<!-- p_hat <- calc_p_hat(one_poll) -->
+
+<!-- # Review the value -->
+<!-- p_hat   -->
+
+<!-- # Calculate bootstrap t-confidence interval (original 0.6 param) -->
+<!-- calc_t_conf_int(one_poll_boot, p_hat) -->
+
+<!-- # Find proportion of yes votes from new population -->
+<!-- p_hat_0.8 <- calc_p_hat(one_poll_0.8) -->
+
+<!-- # Review the value -->
+<!-- p_hat_0.8   -->
+
+<!-- # Calculate the bootstrap t-confidence interval (new 0.8 param) -->
+<!-- calc_t_conf_int(one_poll_boot_0.8, p_hat_0.8) -->
+<!-- ``` -->
+
+
+Nice job! You have found the bootstrap t-confidence interval. Note that it's narrower than previously calculated because the sample proportion itself was close to 1.
+
+
+<!-- ### Percentile effects on bootstrap CIs -->
+
+
+<!-- Most scientists use 95% intervals to quantify their uncertainty about an estimate.  That is, they understand that over a lifetime of creating confidence intervals, only 95% of them will actually contain the parameter that they set out to estimate.   -->
+
+<!-- There are studies, however, which warrant either stricter or more lenient confidence intervals (and subsequent error rates). -->
+
+<!-- The previous bootstrapped $\widehat{p}^*$ values have been loaded for you and are available in `one_poll_boot`. -->
+
+
+<!-- **Exercise:** -->
+
+<!-- - Calculate a 95% percentile interval by calling `get_confidence_interval()`, setting `level` to `0.95`.   -->
+<!-- - Do the same for a 99% interval, -->
+<!-- - ... and a 90% interval. -->
+
+<!-- The results you just got have been stored in a dataframe called `conf_int_data`.  -->
+<!-- - With this dataset, plot `ci_endpoints` (y-axis) vs. `ci_percent` (x-axis).  -->
+<!-- - And add a line layer using `geom_line()`. -->
+
+<!-- ```{r bootstrap_ci_3-setup} -->
+<!-- set.seed(47) -->
+
+<!-- one_poll <- all_polls |> -->
+<!--   filter(poll == 1) |> -->
+<!--   select(vote) -->
+
+<!-- p_hat <- one_poll |> -->
+<!--   summarize(mean(vote == "yes")) |> -->
+<!--   pull() -->
+
+<!-- # Bootstrap to find the SE of p-hat: one_poll_boot -->
+<!-- one_poll_boot <- one_poll |> -->
+<!--   specify(response = vote, success = "yes") |> -->
+<!--   generate(reps = 1000, type = "bootstrap") |>  -->
+<!--   calculate(stat = "prop") -->
+
+<!-- p <- c(0.005, 0.025, 0.05, 0.95, 0.975, 0.995)  -->
+<!-- intervals <- paste0(c(99, 95, 90), "%") -->
+<!-- conf_int_data <- tibble( -->
+<!--   p = p, -->
+<!--   ci_endpoints = quantile(one_poll_boot$stat, p), -->
+<!--   ci_percent = c(intervals, rev(intervals)) -->
+<!-- ) -->
+<!-- ``` -->
+
+
+<!-- ```{r bootstrap_ci_3, exercise=TRUE} -->
+<!-- # Calculate a 95% bootstrap percentile interval -->
+<!-- one_poll_boot |>  -->
+<!--   ___(___)  -->
+
+<!-- # Calculate a 99% bootstrap percentile interval -->
+<!-- ___ |>  -->
+<!--   ___(___)  -->
+
+<!-- # Calculate a 90% bootstrap percentile interval -->
+<!-- ___ |>  -->
+<!--   ___(___)  -->
+
+<!-- # Plot ci_endpoints vs. ci_percent to compare the intervals -->
+<!-- ggplot(conf_int_data, aes(___, ___)) + -->
+<!--   # Add a line layer -->
+<!--   ___() -->
+<!-- ``` -->
 
 <!-- ```{r bootstrap_ci_3-hint} -->
 
