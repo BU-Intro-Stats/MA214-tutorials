@@ -119,7 +119,8 @@ hash_encoder_ui <- {
 
 ### Research questions
 
-*TODO: replace*
+Recall from the last round of tutorials that we often use hypothesis tests to answer research questions. Until now, you have used p-values to determine whether there is sufficient evidence to reject a null hypothesis - but there are also other tools you can use, some of which we will learn today. 
+
 <!-- Until now, the research question at hand has been a question of comparison. What if, instead, the research question is one of estimation? -->
 
 <!-- ![](images/lesson4_img1.png){ width=80% } -->
@@ -152,23 +153,27 @@ Leaving aside the idea that popular opinion changes over time, a poll can be tho
 Consider an election in your hometown that will take place in a week's time. You poll a randomly selected subset of the voters in your town and ask them if they plan to vote for Candidate X or Candidate Y. In this lesson, we will focus on *sampling variability*—the variability in sample proportions due to polling different randomly selected individuals from the population.
 
 ```{r quiz_1}
-quiz(
-  question("Before investigating the sampling variability, what is the population parameter of interest?", 
-           correct = "Right!", 
-           allow_retry = TRUE,
+quiz(question("Before investigating the sampling variability, what is the population parameter of interest?", correct = "Right!", allow_retry = TRUE,
     answer("The proportion of individuals in a given poll who will vote for Candidate X.", message = "Not quite. The population parameter has to do with *all* voters."),
     answer("The variability of the sample proportion from poll to poll.", message = "Incorrect. The variability will be the focus of this lesson, but it isn't the population parameter of interest."),
-    answer("The proportion of all voters in your town who will vote for Candidate X on election day.", correct = TRUE)
-  ), caption = ""
-)
+    answer("The proportion of all voters in your town who will vote for Candidate X on election day.", correct = TRUE)), caption = "")
 ```
 
-### Hypothesis test or confidence interval?
+### Hypothesis test with a confidence interval?
 
-*TODO: replace*
+A university is trying to determine whether parking is a problem on its campus, but would only implement a change if it's clear that a majority of students think it's a problem. The student newspaper contacts a random sample of 200 students and asks whether or not they are frustrated with the parking situation.
 
-<!-- A university is trying to determine whether parking is a problem on its campus. The student newspaper contacts a random sample of 200 students and asks whether or not they are frustrated with the parking situation. They want to estimate the proportion of students at the college who are frustrated with the parking situation. -->
+```{r hypotheses-mc}
+question("Which of the following null and alternative hypotheses are appropriate for the campus parking survey? Let p be the proportion of students who are frustrated with parking on campus.", correct = "Correct!", allow_retry = TRUE,
+  answer("H0: p = 0.5. HA: p > 0.5.", correct = TRUE),
+  answer("H0: p = 100. HA: p > 100", message="Not quite. Is the parameter of interest a count or a proportion?"))
+```
 
+Say that the survey reveals that between 50% and 70% of students are frustrated with the parking situation on campus. Do you think this is enough for the university to make a change? 
+
+What if the interval was between 40% and 60%? How sure would you need to be about the range, if you wanted to convince the university? 
+
+We'll answer these questions and more throughout the lesson.
 
 <!-- ```{r quiz_2} -->
 <!-- quiz( -->
