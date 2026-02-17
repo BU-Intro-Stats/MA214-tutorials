@@ -133,17 +133,9 @@ Recall from the last round of tutorials that we often use hypothesis tests to an
 
 ### Parameter
 
+For each of the estimation problems, we need to understand what a parameter is. A parameter is a _numerical value from the population_. 
 
-For each of the estimation problems, we need to understand what a parameter is. A parameter is a _numerical value from the population_. So in the first example, the parameter is the true average amount that all dieters will lose on a particular program. In the second example, the parameter is the proportion of individuals in the population who recommend Subaru cars. And the last parameter is the change in average income of all individuals in the population when increasing education by one year. 
-
-### Confidence interval
-
-
-A **confidence interval** is a range of numbers that hopefully captures the true parameter value of interest. For example, at the end of the tutorial, we'll be able to make conclusions along the lines of “we are 95% confident that somewhere between 12% and 34% of the entire population recommends Subarus.”
-
-That is, the goal in creating a confidence interval is to calculate a range of plausible values for the parameter of interest.
-
-
+<!-- So in the first example, the parameter is the true average amount that all dieters will lose on a particular program. In the second example, the parameter is the proportion of individuals in the population who recommend Subaru cars. And the last parameter is the change in average income of all individuals in the population when increasing education by one year.  -->
 
 ### What is the parameter?
 
@@ -158,6 +150,15 @@ quiz(question("Before investigating the sampling variability, what is the popula
     answer("The variability of the sample proportion from poll to poll.", message = "Incorrect. The variability will be the focus of this lesson, but it isn't the population parameter of interest."),
     answer("The proportion of all voters in your town who will vote for Candidate X on election day.", correct = TRUE)), caption = "")
 ```
+
+
+### Confidence interval
+
+
+A **confidence interval** is a range of numbers that hopefully captures the true parameter value of interest. For example, at the end of the tutorial, we'll be able to make conclusions along the lines of “we are 95% confident that somewhere between 12% and 34% of the entire population recommends Subarus.”
+
+That is, the goal in creating a confidence interval is to calculate a range of plausible values for the parameter of interest.
+
 
 ### Hypothesis test with a confidence interval?
 
@@ -424,6 +425,7 @@ For computing p-hat* for each resampled poll, recall the `infer` framework: firs
 <!--   # Calculate the summary stat "prop" -->
 <!--   calculate(stat = "prop") -->
 <!-- ``` -->
+
 
 
 **Exercise:**
@@ -699,17 +701,16 @@ Note that you will use the R function `sd()` which calculates the variability of
 
 **Exercise:**
 
-- Run the code to generate `props`, the proportion of individuals who are planning to vote yes in each poll. *This is based upon `ex1_props` from previous exercises.*
+- Generate `props`, the proportion of individuals who are planning to vote yes in each poll.
 - Add a column, `is_in_conf_int` that is `TRUE` when the sampled proportion of yes votes is less than `2` standard errors away from the true population proportion of yes votes. That is, the `abs()`solute difference between `prop_yes` and `true_prop_yes` is less than twice `sd()` of `prop_yes`.
 - Calculate the proportion of sample statistics in the confidence interval, `prop_in_conf_int`, by taking the `mean()` of `is_in_conf_int`.
 
 
 ```{r emperical_rule_1, exercise=TRUE}
 # Proportion of yes votes by poll
-# TODO: make the below an exercise or reuse an object from above
 props <- all_polls |> 
-  group_by(poll) |> 
-  summarize(prop_yes = mean(vote == "yes"))
+  group_by(___) |> 
+  ___(prop_yes = ___)
 
 # The true population proportion of yes votes
 true_prop_yes <- 0.6
@@ -774,17 +775,6 @@ As in the previous exercise, when discussing the variability of a statistic, the
     - The `upper` bound is `p_hat` plus twice the standard error of `stat`.
 
 ```{r bootstrap, exercise=TRUE}
-# TODO: same as above
-# From previous exercises
-one_poll <- all_polls |>
-  filter(poll == 1) |>
-  select(vote)
-
-one_poll_boot <- one_poll |>
-  specify(response = vote, success = "yes") |>
-  generate(reps = 1000, type = "bootstrap") |> 
-  calculate(stat = "prop")
-  
 p_hat <- one_poll |>
   # Calculate proportion of yes votes
   summarize(stat = ___) |>
@@ -797,8 +787,7 @@ one_poll_boot |>
     # Lower bound is p_hat minus 2 std errors
     lower = ___,
     # Upper bound is p_hat plus 2 std errors
-    upper = ___
-  )
+    upper = ___)
 ```
 
 <!-- ```{r bootstrap-hint} -->
@@ -862,28 +851,23 @@ one_poll_boot <- one_poll |>
 
 **Exercise:**
 
-- Run the code to remind yourself of the t-interval from the previous exercise.
-- Calculate the `95` percent interval of the bootstrapped $\widehat{p}^*$ values contained in `one_poll_boot`.
+Calculate the `95` percent interval of the bootstrapped $\widehat{p}^*$ values contained in `one_poll_boot`:
     - Summarize to calculate the lower end at the 2.5% `quantile()` of `stat` by setting `p` to `0.025`.
     - Calculate the upper 97.5% `quantile()` in a similar way.
 
 
 ```{r bootstrap_percentile, exercise=TRUE}
-# TODO: same
-# From previous exercise: bootstrap t-confidence interval
-one_poll_boot |>
-  summarize(
-    lower = p_hat - 2 * sd(stat),
-    upper = p_hat + 2 * sd(stat)
-  )
-  
 # Manually calculate a 95% percentile interval
 one_poll_boot |>
   summarize(
     lower = ___(stat, p = ___),
-    upper = ___
-  )
+    upper = ___)
 ```
+
+<details>
+<summary>**Hint**</summary>
+Inside summarize, use `quantile()` with the correct quantile level to get the upper and lower values.
+</details>
 
 <!-- ```{r bootstrap_percentile-hint} -->
 
@@ -917,14 +901,6 @@ Perform the same calculation using infer's convenience function, `get_confidence
 
 
 ```{r bootstrap_percentile_2, exercise=TRUE}
-# TODO: same
-# From previous step
-one_poll_boot |>
-  summarize(
-    lower = quantile(stat, 0.025),
-    upper = quantile(stat, 0.975)
-  )
-  
 # Calculate the same interval, more conveniently
 percentile_ci <- one_poll_boot |> 
   ___
@@ -962,10 +938,6 @@ Finally, use the `visualize()` function together with `shade_confidence_interval
 
 
 ```{r bootstrap_percentile_3, exercise=TRUE}
-# From previous step
-percentile_ci <- one_poll_boot |> 
-  get_confidence_interval(level = 0.95)
-  
 one_poll_boot |> 
   # Visualize in-between the endpoints given by percentile_ci
   ___() +
