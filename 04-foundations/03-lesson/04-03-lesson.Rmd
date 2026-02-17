@@ -384,7 +384,7 @@ Draw a histogram of permuted differences:
 - Add a vertical line with `geom_vline()`. The `xintercept` is at `diff_obs`.
 
 ```{r randomizing_cost_3, exercise=TRUE}
-# Using the permuation data, plot stat
+# Using the permutation data, plot stat
 ggplot(___, aes(x = ___)) + 
   # Add a histogram layer with binwidth 0.005
   ___(binwidth = ___) +
@@ -459,17 +459,18 @@ The permuted dataset and the original observed statistic are available in your w
 
 **Exercise**
 
-- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`.
+- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`. [this is already done for you below]
 - Then `get_p_value()` is calculated as the proportion of permuted statistics which are `direction = "less"` than `obs_stat = diff_obs`.
 - As an alternative way to calculate the p-value, use `summarize()` and `mean()` to find the proportion of times the permuted differences in `opp_perm` (called `stat`) are less than or equal to the observed difference (called `diff_obs`).
 - You can test your knowledge by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"` before submitting your answer to both `visualize()` and `get_p_value()`.
 
-```{r summarizing_opportunity_cost, exercise=TRUE}
-# Visualize the statistic 
-opp_perm |>
-  ___() +
-  ___(___, ___)
+```{r visualize_opp_perm, echo = TRUE, show = TRUE}
+# Visualize the statistic
+visualize(opp_perm) +
+  shade_p_value(obs_stat = diff_obs, direction = "less")
+```
 
+```{r summarizing_opportunity_cost, exercise=TRUE}
 # Calculate the p-value using `get_p_value()`
 opp_perm |>
   ___(___, ___)
@@ -479,7 +480,7 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-*TODO: error `EXPR must be a length 1 vector`*
+<!-- *TODO: error `EXPR must be a length 1 vector`* -->
 
 <!-- ```{r summarizing_opportunity_cost-hint-1} -->
 <!-- opp_perm |> -->
@@ -507,7 +508,7 @@ opp_perm |>
 <!--   summarize(p_value = mean(stat <= diff_obs)) -->
 <!-- ``` -->
 
-Great work! The small p-value indicates that the observed data are inconsistent with the null hypothesis.  We should reject the null claim and conclude that financial advice does affect the likelihood of purchase.
+Great work! The small p-value indicates that the observed data are inconsistent with the null hypothesis.  We should reject the null claim and tentatively conclude that financial advice does affect the likelihood of purchase.
 
 
 ### Opportunity cost conclusion
