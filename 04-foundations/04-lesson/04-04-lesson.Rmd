@@ -225,7 +225,7 @@ The **standard error**, which describes how variable the statistic is around the
 
 The following R code calculates the standard error of the sample proportions in two ways. First, we use the population information, then the bootstrap, and compare the two.
 
-```{r eval = TRUE}
+```{r, include=TRUE, echo=TRUE, eval = TRUE}
 # Compute p-hat for each poll
 ex1_props <- all_polls |>
   group_by(poll) |>
@@ -270,22 +270,23 @@ ex1_props |>
 
 
 ### Resampling from a sample
-*TODO: move this section to the veginning, to motivate bootstrapping from observed data?*
 
 To investigate how much the estimates of a population proportion change from sample to sample, you will set up two sampling experiments.
 
 In the first experiment, you will simulate repeated samples from a population. In the second, you will choose a single sample from the first experiment and repeatedly resample from that sample: a method called *bootstrapping*. More specifically:
 
-**Experiment 1**: Assume the true proportion of people who will vote for Candidate X is 0.6.  Repeatedly sample 30 people from the population and measure the variability of $\widehat{p}$ (the *sample* proportion).  
+<!-- **Experiment 1**: Assume the true proportion of people who will vote for Candidate X is 0.6.  Repeatedly sample 30 people from the population and measure the variability of $\widehat{p}$ (the *sample* proportion).   -->
 
-**Experiment 2**: Take *one* sample of size 30 from the same population. Repeatedly sample 30 people (with replacement!) from the original sample and measure the variability of $\widehat{p}^*$ (the *resample* proportion).
+<!-- **Experiment 2**: Take *one* sample of size 30 from the same population. Repeatedly sample 30 people (with replacement!) from the original sample and measure the variability of $\widehat{p}^*$ (the *resample* proportion). -->
 
 It's important to realize that the first experiment relies on knowing the population and is typically impossible in practice. The second relies only on the sample of data and is therefore easy to implement for any statistic. Fortunately, as you will see, the variability in $\widehat{p}$, or the proportion of "successes" in a sample, is approximately the same whether we sample from the population or resample from a sample.
 
 We have created 1000 random samples, each of size 30, from the population. The resulting data frame, `all_polls`, is available in your workspace. Take a look before getting started.
 
 **Exercise:**
+
 Compute the sample proportion for each of the 1000 original samples, assigning to `ex1_props`:
+
 - Group by `poll`.
 - Summarize to calculate `stat` as the `mean()` of cases of `vote` that equal `"yes"`.
 
@@ -331,10 +332,12 @@ ex1_props
 **Exercise:**
 
 First, select one poll from which to resample, as `one_poll`.
+
 - Filter out data for every poll except the first poll. That is, only keep `poll` when `poll` equals `1`.
 - Select the `vote` column.
 
 Then, compute $\widehat{p}^*$ for each resampled poll, as `ex2_props`, using tolls from the infer package.
+
 - Specify the `response` as `vote`. The `success` value is `"yes"`.
 - Generate `1000` replicates of type `"bootstrap"`.
 - Calculate the `"prop"`ortion summary statistic.
@@ -358,6 +361,9 @@ ex2_props <- one_poll |>
   ___(reps = ___, type = ___) |> 
   # Calculate the summary stat "prop"
   ___(stat = ___)
+
+# Review the result
+ex2_props
 ```
 
 <details>
@@ -459,6 +465,7 @@ Use the `sd()` function in the `summarize()` call to calculate `variability`.
 <!-- ``` -->
 
 Great work! The variability in the proportion of "successes" in a sample is approximately the same whether we sample from the population or resample from a sample.
+
 
 ### Visualizing the variability of $\widehat{p}$
 
