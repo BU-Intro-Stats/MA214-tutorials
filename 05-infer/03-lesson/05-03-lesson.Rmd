@@ -15,7 +15,6 @@ library(broom)
 library(knitr)
 library(tidyverse)
 library(infer)
-library(emo)
 library(patchwork)
 
 # knitr options ----------------------------------------------------------------
@@ -663,7 +662,7 @@ Now you have some experience conducting a hypothesis test of independence using 
 
 ### Approximation distributions: normal
 
-- Statistics: $\hat{p}, \hat{p}\_{1} - \hat{p}\_{2}$
+- Statistics: $\widehat{p}, \widehat{p}\_{1} - \widehat{p}\_{2}$
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/categorical-inference-ch3v3-normal-curve.png")
@@ -675,7 +674,7 @@ The approximation distribution that you're most familiar with is the Normal dist
 
 ### Approximation distributions: chi-squared
 
-- Statistics: $\hat{\chi}^{2}$
+- Statistics: $\widehat{\chi}^{2}$
 - Shape is determined by degrees of freedom 
 - $df = (nrows - 1) \times (ncols - 1)$ 
 

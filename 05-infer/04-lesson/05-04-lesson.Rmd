@@ -16,7 +16,6 @@ library(knitr)
 library(tidyverse)
 library(gapminder)
 library(infer)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 

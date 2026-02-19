@@ -15,7 +15,6 @@ library(knitr)
 library(tidyverse)
 library(infer)
 library(openintro)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -132,7 +131,7 @@ knitr::include_graphics("images/2-1-2.png")
 
 ### Hypothesis test
 
-A hypothesis test on a proportion asks the question: what sort of $\hat{p}\text{s}$ would you observe if the true parameter p held a particular value?
+A hypothesis test on a proportion asks the question: what sort of $\widehat{p}\text{s}$ would you observe if the true parameter p held a particular value?
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-3.png")
@@ -156,7 +155,7 @@ knitr::include_graphics("images/2-1-5.png")
 
 ### 
 
-Thus the sampling distribution, now called the null distribution, captures the variability in $\hat{p}$ that you might observe in a world where $H_0$ is true.
+Thus the sampling distribution, now called the null distribution, captures the variability in $\widehat{p}$ that you might observe in a world where $H_0$ is true.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-6.png")
@@ -166,7 +165,7 @@ knitr::include_graphics("images/2-1-6.png")
 
 Let’s use a hypothesis test to study another question on the gss. Respondents were asked if they favor or oppose capital punishment, also called the death penalty, for the crime of murder. You can look at the distribution of answers by forming a bar chart. You see that of the 150 respondents, more than half answered in favor.
 
-You can calculate that proportion, $\hat{p}$, more precisely using the `summarize` command, and you learn that the proportion is about 0.57.
+You can calculate that proportion, $\widehat{p}$, more precisely using the `summarize` command, and you learn that the proportion is about 0.57.
 
 ```{r echo=TRUE}
 p_hat <- gss2016 |>
@@ -183,7 +182,7 @@ Next, you hypothesize that the true proportion that favor is 0.5. This is an exa
 
 Next, we generate through "simulation", 500 data sets that might occur under this hypothesis, and calculate the proportion that favor for each. We’ll save this data frame under the name `null`.
 
-If you print out the top of the null data frame, you’ll see in the `stat` column you have 500 examples of the type of $\hat{p}\text{s}$ that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the $\hat{p}$ that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
+If you print out the top of the null data frame, you’ll see in the `stat` column you have 500 examples of the type of $\widehat{p}\text{s}$ that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the $\widehat{p}$ that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
 
 ```{r include=FALSE}
 set.seed(12345)
@@ -201,7 +200,7 @@ null
 
 ### 
 
-The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed $\hat{p}$, 0.57. The curve represents the sort of $\hat{p}\text{s}$ you would see if p was 0.50 and the red line is the $\hat{p}$ that you actually observed. If your $\hat{p}$ is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
+The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed $\widehat{p}$, 0.57. The curve represents the sort of $\widehat{p}\text{s}$ you would see if p was 0.50 and the red line is the $\widehat{p}$ that you actually observed. If your $\widehat{p}$ is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
 
 ```{r eval=TRUE}
 ggplot(null, aes(x = stat)) +
@@ -212,7 +211,7 @@ ggplot(null, aes(x = stat)) +
   )
 ```
 
-This is formalized by computing the p-value, the proportion of generated $\hat{p}\text{s}$ that were more extreme than the observed $\hat{p}$. In other words, we want to summarize the column of statistics by finding the proportion that are greater than 0.57. We multiply that number by two to account for the left tail of the null distribution, which also contained $\hat{p}\text{s}$ that were just as far from the center of the distribution, in the opposite direction.
+This is formalized by computing the p-value, the proportion of generated $\widehat{p}\text{s}$ that were more extreme than the observed $\widehat{p}$. In other words, we want to summarize the column of statistics by finding the proportion that are greater than 0.57. We multiply that number by two to account for the left tail of the null distribution, which also contained $\widehat{p}\text{s}$ that were just as far from the center of the distribution, in the opposite direction.
 
 ```{r eval=TRUE, echo=TRUE}
 null |>
@@ -230,7 +229,7 @@ null |>
 
 To recap, the hypothesis test is formulated around a null hypothesis that states a theory about the way the world works, in this case the particular point value taken by a proportion. 
 
-The null distribution provides a sense of the statistics, the $\hat{p}\text{s}$, that would be calculated if you were to generate many data sets according to the null hypothesis. The p-value tells you where your actual observed $\hat{p}$ falls into that distribution. 
+The null distribution provides a sense of the statistics, the $\widehat{p}\text{s}$, that would be calculated if you were to generate many data sets according to the null hypothesis. The p-value tells you where your actual observed $\widehat{p}$ falls into that distribution. 
 
 If it's in the body of the distribution, the p-value will be high, indicating consistency between your data and the null hypothesis. 
 
@@ -432,7 +431,7 @@ sim1 |>
 
 ### Testing a claim
 
-In the last exercise, you got a sense of what a single simulated $\hat{p}$ might be if in fact the true proportion of believers was 0.75. That $\hat{p}$ was likely different from the $\hat{p}$ in `gss2016`, but was that a fluke or is there a systematic inconsistency between that claim and the data in the GSS?
+In the last exercise, you got a sense of what a single simulated $\widehat{p}$ might be if in fact the true proportion of believers was 0.75. That $\widehat{p}$ was likely different from the $\widehat{p}$ in `gss2016`, but was that a fluke or is there a systematic inconsistency between that claim and the data in the GSS?
 
 In this exercise, you'll settle this question.
 
@@ -449,7 +448,7 @@ p_hat <- gss2016 |>
     pull()
 ```
 
-Extend your code for the last exercise to `calculate()` sample proportions of believers in 500 generated data sets. Save this collection of $\hat{p}\text{s}$ to `null`.
+Extend your code for the last exercise to `calculate()` sample proportions of believers in 500 generated data sets. Save this collection of $\widehat{p}\text{s}$ to `null`.
 
 ```{r ex6, exercise=TRUE}
 # Generate null distribution
@@ -1309,7 +1308,7 @@ knitr::include_graphics("images/2-3-8.png")
 
 ### 
 
-The distribution of the differences in $\hat{p}\text{s}$ that you might observe in a given sample if the null is true.
+The distribution of the differences in $\widehat{p}\text{s}$ that you might observe in a given sample if the null is true.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-9.png")
