@@ -558,20 +558,22 @@ question("Generally, if $n$ represents the size of the original sample, how many
 
 ## Variability in $\widehat{p}$
 
+Remember the goal of creating a confidence interval is to find a range of plausible values for the true population parameter. The observed statistic is a good estimate, but it is a random variable and varies from sample to sample. As such, we can't know how far away the statistic $\widehat{p}$ is from the true parameter $p$ just by looking at our observed data.  We can, however, get a sense for the distance between the statistic and the parameterby looking at how much the re-sampled proportions ($\widehat{p}^*$) vary.
 
-Remember the goal of creating a confidence interval is to find a range of plausible values for the true population parameter. The observed statistic is a good estimate, but it is impossible to know whether it is one of the $\widehat{p}$ values, which is very close to the true parameter or whether it is one of the $\widehat{p}$ values, which is in the tail of the distribution of observed statistics. We won't know how far away the statistic is from the parameter just by looking at the sample of data.  We can however, get a sense for the distance between the statistic ($\widehat{p}$) and the parameter (p) by looking at how much the re-sampled proportions ($\widehat{p}^*$) vary.
+<!-- Remember the goal of creating a confidence interval is to find a range of plausible values for the true population parameter. The observed statistic is a good estimate, but it is impossible to know whether it is one of the $\widehat{p}$ values, which is very close to the true parameter or whether it is one of the $\widehat{p}$ values, which is in the tail of the distribution of observed statistics. We won't know how far away the statistic is from the parameter just by looking at the sample of data.  We can however, get a sense for the distance between the statistic ($\widehat{p}$) and the parameter (p) by looking at how much the re-sampled proportions ($\widehat{p}^*$) vary. -->
 
-The image below shows that the re-sampled proportions center around $\widehat{p}$, but the true proportion may be one of the values near $\widehat{p}$ (red) or one of the values in the tail (blue).
+<!-- The image below shows that the re-sampled proportions center around $\widehat{p}$, but the true proportion may be one of the values near $\widehat{p}$ (red) or one of the values in the tail (blue). -->
 
 ```{r}
 set.seed(4747)
 all_polls |>
   group_by(poll) |>
   summarize(prop_yes = mean(vote == "yes")) |>
-  sample_n(200) |>
+  sample_n(200) |>         
   arrange(prop_yes) |>
-  mutate(pointer = c(rep("col1", 90), "col2", rep("col1", 105), "col3", rep("col1", 3))) |>
-ggplot() + 
+  #mutate(pointer = c(rep("col1", 90), "col2", rep("col1", 105), "col3", rep("col1", 3))) |>
+  mutate(pointer=c(rep("col1", 90), "col2", rep("col1", 108), "col3")) |>
+ggplot() +
   geom_dotplot(aes(x = prop_yes, fill = pointer, color = pointer), binwidth = 0.01) +
   xlab("re-sampled proportions") +
   theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(),
@@ -584,78 +586,95 @@ ggplot() +
 ```
 
 
-The variability of the $\widehat{p}$ statistics gives a measure for how far apart any given observed $\widehat{p}$ and the parameter are expected to be. 
+### Central Limit Theorem
+
+*TODO: add to intro using 213 slides*
+*TODO: formally write CLT*
+
+For large samples, $\widehat{p}^*$ is approximately normally distributed with mean $p$ and standard deviation $\sqrt{\frac{p(1-p)}{n}}$. The following plot shows $n=200$ bootstrap resamples, with the true parameter $p$ in red. The blue dot in the right tail represents one sample value, which would be a poor estimate for $p$.
+
+*TODO: ask a concept check question*
+
+<!-- The variability of the $\widehat{p}$ statistics gives a measure for how far apart any given observed $\widehat{p}$ and the parameter are expected to be.  -->
 
 
-### Standard error of $\widehat{p}$
+<!-- ### Standard error of $\widehat{p}$ -->
 
 
-Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\widehat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\widehat{p}$ values from the population.
+<!-- Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\widehat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\widehat{p}$ values from the population. -->
 
-```{r, fig.width=8}
-data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
-ggplot() + 
-  geom_line(aes(x = ex, y = samp, col = "sample from population")) +
-  geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) +
-  geom_segment(x = 0.51, xend = 0.69, y = dnorm(0.507, 0.6, 0.09), yend = dnorm(0.507, 0.6, 0.09),
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_segment(x = 0.69, xend = 0.69, y = 0, yend = dnorm(0.507, 0.6, 0.09),
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_segment(x = 0.51, xend = 0.51, y = dnorm(0.507, 0.6, 0.09), yend = 0,
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_line(aes(x = ex, y = boot, col = "bootstrap sample")) +
-  geom_point(x = 0.72, y = dnorm(0.807, 0.72, 0.09), col = openintro::COL[2,1]) +
-  geom_segment(x = 0.63, xend = 0.81, y = dnorm(0.807, 0.72, 0.09), yend = dnorm(0.807, 0.72, 0.09),
-               lty = 2, col = openintro::COL[2,1]) +
-  geom_segment(x = 0.81, xend = 0.81, y = 0, yend = dnorm(0.807, 0.72, 0.09),
-               lty = 2, col = openintro::COL[2,1]) + 
-  geom_segment(x = 0.63, xend = 0.63, y = dnorm(0.807, 0.72, 0.09), yend = 0,
-               lty = 2, col = openintro::COL[2,1]) +   
-  xlab("distribution of sample proportions") +
-  theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(),
-        axis.ticks.y = element_blank(), panel.grid.major.y = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major.x = element_line()) +
-  scale_color_manual(name="", values = c(openintro::COL[2,1],openintro::COL[5,1])) +
-  scale_x_continuous(breaks = seq(0.2,1,0.1))
-```
+<!-- ```{r, fig.width=8} -->
+<!-- data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |>  -->
+<!-- ggplot() +  -->
+<!--   geom_line(aes(x = ex, y = samp, col = "sample from population")) + -->
+<!--   geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) + -->
+<!--   geom_segment(x = 0.51, xend = 0.69, y = dnorm(0.507, 0.6, 0.09), yend = dnorm(0.507, 0.6, 0.09), -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_segment(x = 0.69, xend = 0.69, y = 0, yend = dnorm(0.507, 0.6, 0.09), -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_segment(x = 0.51, xend = 0.51, y = dnorm(0.507, 0.6, 0.09), yend = 0, -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_line(aes(x = ex, y = boot, col = "bootstrap sample")) + -->
+<!--   geom_point(x = 0.72, y = dnorm(0.807, 0.72, 0.09), col = openintro::COL[2,1]) + -->
+<!--   geom_segment(x = 0.63, xend = 0.81, y = dnorm(0.807, 0.72, 0.09), yend = dnorm(0.807, 0.72, 0.09), -->
+<!--                lty = 2, col = openintro::COL[2,1]) + -->
+<!--   geom_segment(x = 0.81, xend = 0.81, y = 0, yend = dnorm(0.807, 0.72, 0.09), -->
+<!--                lty = 2, col = openintro::COL[2,1]) +  -->
+<!--   geom_segment(x = 0.63, xend = 0.63, y = dnorm(0.807, 0.72, 0.09), yend = 0, -->
+<!--                lty = 2, col = openintro::COL[2,1]) +    -->
+<!--   xlab("distribution of sample proportions") + -->
+<!--   theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(), -->
+<!--         axis.ticks.y = element_blank(), panel.grid.major.y = element_blank(), -->
+<!--         panel.grid.minor = element_blank(), panel.grid.major.x = element_line()) + -->
+<!--   scale_color_manual(name="", values = c(openintro::COL[2,1],openintro::COL[5,1])) + -->
+<!--   scale_x_continuous(breaks = seq(0.2,1,0.1)) -->
+<!-- ``` -->
 
 
-Lucky for us that bootstrapping works because in real life we only have one dataset!
+<!-- Lucky for us that bootstrapping works because in real life we only have one dataset! -->
 
-We can use the value of the standard error to count the number of sample $\widehat{p}$s, which are close to the parameter.
+<!-- We can use the value of the standard error to count the number of sample $\widehat{p}$s, which are close to the parameter. -->
 
-It turns out that because the distribution of $\widehat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\widehat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions.
+<!-- It turns out that because the distribution of $\widehat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\widehat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions. -->
 
-```{r, fig.width=8}
-data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
-ggplot() + 
-  geom_line(aes(x = ex, y = samp, col = "sample from population")) +
-  geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) +
-  geom_segment(x = 0.42, xend = 0.78, y = dnorm(0.507, 0.6, 0.09), yend = dnorm(0.507, 0.6, 0.09),
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_segment(x = 0.78, xend = 0.78, y = 0, yend = dnorm(0.507, 0.6, 0.09),
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_segment(x = 0.42, xend = 0.42, y = dnorm(0.507, 0.6, 0.09), yend = 0,
-               lty = 3, col = openintro::COL[5,1]) + 
-  geom_line(aes(x = ex, y = boot, col = "bootstrap sample")) +
-  geom_point(x = 0.72, y = dnorm(0.807, 0.72, 0.09), col = openintro::COL[2,1]) +
-  geom_segment(x = 0.54, xend = 0.90, y = dnorm(0.807, 0.72, 0.09), yend = dnorm(0.807, 0.72, 0.09),
-               lty = 2, col = openintro::COL[2,1]) +
-  geom_segment(x = 0.90, xend = 0.90, y = 0, yend = dnorm(0.807, 0.72, 0.09),
-               lty = 2, col = openintro::COL[2,1]) + 
-  geom_segment(x = 0.54, xend = 0.54, y = dnorm(0.807, 0.72, 0.09), yend = 0,
-               lty = 2, col = openintro::COL[2,1]) +   
-  xlab("distribution of sample proportions") +
-  theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(),
-        axis.ticks.y = element_blank(), panel.grid.major.y = element_blank(),
-        panel.grid.minor = element_blank(), panel.grid.major.x = element_line()) +
-  scale_color_manual(name="", values = c(openintro::COL[2,1],openintro::COL[5,1])) +
-  scale_x_continuous(breaks = seq(0.2,1.2,0.1), limits = c(0.2, 1.2)) +
-  geom_label(label = "approximately 95% of\n samples will produce\n p-hats that are within\n 2SE of the center",
-             x = 1, y = 3.8, color = openintro::COL[5,1])
-```
+<!-- ```{r, fig.width=8} -->
+<!-- data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |>  -->
+<!-- ggplot() +  -->
+<!--   geom_line(aes(x = ex, y = samp, col = "sample from population")) + -->
+<!--   geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) + -->
+<!--   geom_segment(x = 0.42, xend = 0.78, y = dnorm(0.507, 0.6, 0.09), yend = dnorm(0.507, 0.6, 0.09), -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_segment(x = 0.78, xend = 0.78, y = 0, yend = dnorm(0.507, 0.6, 0.09), -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_segment(x = 0.42, xend = 0.42, y = dnorm(0.507, 0.6, 0.09), yend = 0, -->
+<!--                lty = 3, col = openintro::COL[5,1]) +  -->
+<!--   geom_line(aes(x = ex, y = boot, col = "bootstrap sample")) + -->
+<!--   geom_point(x = 0.72, y = dnorm(0.807, 0.72, 0.09), col = openintro::COL[2,1]) + -->
+<!--   geom_segment(x = 0.54, xend = 0.90, y = dnorm(0.807, 0.72, 0.09), yend = dnorm(0.807, 0.72, 0.09), -->
+<!--                lty = 2, col = openintro::COL[2,1]) + -->
+<!--   geom_segment(x = 0.90, xend = 0.90, y = 0, yend = dnorm(0.807, 0.72, 0.09), -->
+<!--                lty = 2, col = openintro::COL[2,1]) +  -->
+<!--   geom_segment(x = 0.54, xend = 0.54, y = dnorm(0.807, 0.72, 0.09), yend = 0, -->
+<!--                lty = 2, col = openintro::COL[2,1]) +    -->
+<!--   xlab("distribution of sample proportions") + -->
+<!--   theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(), -->
+<!--         axis.ticks.y = element_blank(), panel.grid.major.y = element_blank(), -->
+<!--         panel.grid.minor = element_blank(), panel.grid.major.x = element_line()) + -->
+<!--   scale_color_manual(name="", values = c(openintro::COL[2,1],openintro::COL[5,1])) + -->
+<!--   scale_x_continuous(breaks = seq(0.2,1.2,0.1), limits = c(0.2, 1.2)) + -->
+<!--   geom_label(label = "approximately 95% of\n samples will produce\n p-hats that are within\n 2SE of the center", -->
+<!--              x = 1, y = 3.8, color = openintro::COL[5,1]) -->
+<!-- ``` -->
 
-Note that in the exercises, we refer to the intervals created from the empirical rule as t-intervals. The “t” is simply the label that statisticians use and we provide that label here for you in case you want to learn more about these types of intervals in future tutorials.
+<!-- Note that in the exercises, we refer to the intervals created from the empirical rule as t-intervals. The “t” is simply the label that statisticians use and we provide that label here for you in case you want to learn more about these types of intervals in future tutorials. -->
+
+
+### Empirical Rule
+
+
+Many statistics we use in data analysis (including both the sample average and sample proportion) have nice properties that are used to better understand the population parameter(s) of interest.  
+
+One such property is that if the variability of the sample proportion (called the *standard error*, or $SE$) is known, then approximately 95% of $\widehat{p}$ values (from different samples) will be within $2SE$ of the true population proportion.
 
 Here, in red, we see all the sample $\widehat{p}$ values that are close to the true parameter. If our data is one of the red dots, our confidence interval will correctly capture the true parameter.
 
@@ -667,7 +686,7 @@ all_polls |>
   sample_n(200) |>
   arrange(prop_yes) |>
   mutate(pointer = ifelse(prop_yes <= .42, "col1", ifelse(prop_yes >= 0.78, "col1", "col2"))) |>
-ggplot() + 
+ggplot() +
   geom_dotplot(aes(x = prop_yes, fill = pointer, color = pointer), binwidth = 0.01) +
   xlab("sample p-hat values") +
   theme(axis.title.y = element_blank(), axis.text.y.left = element_blank(),
@@ -681,15 +700,6 @@ ggplot() +
              x = .8, y = .8, color = openintro::COL[5,1])
 ```
 
-
-
-
-### Empirical Rule
-
-
-Many statistics we use in data analysis (including both the sample average and sample proportion) have nice properties that are used to better understand the population parameter(s) of interest.  
-
-One such property is that if the variability of the sample proportion (called the *standard error*, or $SE$) is known, then approximately 95% of $\widehat{p}$ values (from different samples) will be within $2SE$ of the true population proportion.
 
 To check whether that holds in the situation at hand, let's go back to the polls generated by taking many samples from the same population.
 
@@ -823,6 +833,8 @@ one_poll_boot |>
 Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter.  Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Luckily!
 
 ### Bootstrap percentile interval
+
+*TODO: move to first subsection, before CLT*
 
 The main idea in the previous exercise was that the distance between the original sample $\widehat{p}$ and the resampled (or bootstrapped) $\widehat{p}^*$ values gives a measure for how far the original $\widehat{p}$ is from the true population proportion.  
 
