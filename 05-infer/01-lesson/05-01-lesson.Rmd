@@ -1222,7 +1222,7 @@ knitr::include_graphics("images/bootstrap_two.png")
 
 ### The normal distribution
 
-A.K.A the "bell curve".
+A.K.A the "bell curve". Recall that the Central Limit Theorem (CLT) says:
 
 **If** 
 
@@ -1237,7 +1237,7 @@ A.K.A the "bell curve".
 knitr::include_graphics("images/normal-curve.png")
 ```
 
-That approximation is the normal distribution, also known as the bell curve. A useful result in mathematics says that if you have independent observations and a sufficiently large sample size, then $\widehat{p}$ will follow a normal distribution with a known standard deviation. This distribution is called the sampling distribution of $\widehat{p}$ and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
+That approximation is the normal distribution, also known as the bell curve. This distribution is called the sampling distribution of $\widehat{p}$ and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
 
 ### Standard deviation
 
