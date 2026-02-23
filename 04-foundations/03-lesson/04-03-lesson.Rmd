@@ -14,7 +14,6 @@ library(learnr)
 library(kableExtra)
 library(tidyverse)
 library(infer)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -123,29 +122,39 @@ Another 75 students were assigned to the treatment group and were given a slight
 
 ### State the hypotheses
 
-The null hypothesis is that the two sets of choices don't impact buying habits. The research, or alternative, hypothesis is that, in this setting, a reminder might make people more inclined to save.
-
-Of the 75 students assigned to the control group, 56, or about 75%, bought the DVD. Of the 75 students assigned to the treatment group, 41, or about 55%, bought the DVD. As before, you will use a null distribution to determine whether the difference of 20% could be attributed to random variability.
-
-```{r the data}
-dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97), 
-             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |>
-  mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
-
-kable(dt, format = "html", escape = F) |>
-  kable_styling("striped", full_width = F)
-
+```{r hypotheses-mc}
+question(
+  "Which of the following null and alternative hypotheses are appropriate for the opportunity cost study?", correct = "Correct!", allow_retry = TRUE,
+  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the control (no reminder) group were more likely to save their money.",
+    message = "Not quite, the researchers are expecting to see more decisions to save in a particular direction (the alternative hypothesis)."),
+  answer("H0: The students in the treatment (reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
+    message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."),
+  answer("H0: Being reminded that they could save money instead of buying a DVD did not influence the students' decision. HA: The students in the treatment (reminder) group were more likely to save their money.", correct = TRUE),
+  answer("H0: The students in the control (no reminder) group were more likely to save their money. HA: Being reminded that they could save money instead of buying a DVD did not influence the students' decision.",
+    message = "Remember, the null hypothesis always contains the claim that there is no effect of the variables."))
 ```
 
+
+<!-- The null hypothesis is that the two sets of choices don't impact buying habits. The research, or alternative, hypothesis is that, in this setting, a reminder might make people more inclined to save. -->
+
+<!-- Of the 75 students assigned to the control group, 56, or about 75%, bought the DVD. Of the 75 students assigned to the treatment group, 41, or about 55%, bought the DVD. As before, you will use a null distribution to determine whether the difference of 20% could be attributed to random variability. -->
+
+<!-- ```{r the data} -->
+<!-- dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97),  -->
+<!--              Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |> -->
+<!--   mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T)) -->
+
+<!-- kable(dt, format = "html", escape = F) |> -->
+<!--   kable_styling("striped", full_width = F) -->
+
+<!-- ``` -->
 
 
 ### Summarizing opportunity cost (1)
 
-As you saw in the lesson, we're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  
+We're interested in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements. In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
 
-In this exercise, you'll use the data from the study to find the sample statistics (here: proportions) that are needed for the analysis.
-
-*Instructions*
+**Exercise**
 
 - Use the `count()` function to tabulate the dataset called `opportunity`. *Make a note of the values in the `decision` column for use in the next step.*
 - For each experimental group, find the proportion who bought a DVD. That is, calculate the mean where `decision` is `"buyDVD"`.
@@ -161,28 +170,27 @@ opportunity |>
   summarize(buy_prop = ___(___))
 ```
 
-```{r opportunity_cost_1-hint-1}
-opportunity |>
-  count(decision, group)
-```
+<!-- ```{r opportunity_cost_1-hint-1} -->
+<!-- opportunity |> -->
+<!--   count(decision, group) -->
+<!-- ``` -->
 
-```{r opportunity_cost_1-hint-2}
-opportunity |>
-  group_by(group) |>
-  summarize(buy_prop = ___(___))
-```
+<!-- ```{r opportunity_cost_1-hint-2} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(buy_prop = ___(___)) -->
+<!-- ``` -->
 
-```{r opportunity_cost_1-solution}
-# Tabulate the data
-opportunity |>
-  count(decision, group)
+<!-- ```{r opportunity_cost_1-solution} -->
+<!-- # Tabulate the data -->
+<!-- opportunity |> -->
+<!--   count(decision, group) -->
 
-# Find the proportion who bought the DVD in each group
-opportunity |>
-  group_by(group) |>
-  summarize(buy_prop = mean(decision == "buyDVD"))
-```
-
+<!-- # Find the proportion who bought the DVD in each group -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(buy_prop = mean(decision == "buyDVD")) -->
+<!-- ``` -->
 
 
 Okay, so about 75% of the control group bought the DVD and about 55% of the treatment group (i.e. the group that was reminded that the money could be saved) bought the DVD. Interesting!
@@ -192,7 +200,8 @@ Okay, so about 75% of the control group bought the DVD and about 55% of the trea
 
 Again, interest is in whether the treatment and control groups were equally likely to buy a DVD after reading the experimental statements.  Here, you'll create a barplot to visualize the difference in proportions between the treatment and control groups.
 
-*Instructions*
+**Exercise**
+
 - Using the `opportunity` dataset, plot `group` `fill`ed by `decision`.  
 - Call `geom_bar()` to add a bar plot layer, setting the position argument to `"fill"` to compare relative frequencies. Note that fill should be defined by the `decision` for each group.
 
@@ -203,36 +212,45 @@ ggplot(opportunity, aes(x = ___, fill = ___)) +
   ___
 ```
 
-```{r plot-hint}
-ggplot(opportunity, aes(x = ___, fill = decision)) + 
-  ___
-```
+<!-- ```{r plot-hint} -->
+<!-- ggplot(opportunity, aes(x = ___, fill = decision)) +  -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r plot-solution}
-# Plot group, filled by decision
-ggplot(opportunity, aes(x = group, fill = decision)) + 
-  # Add a bar layer, with position "fill"
-  geom_bar(position = "fill")
-```
-
+<!-- ```{r plot-solution} -->
+<!-- # Plot group, filled by decision -->
+<!-- ggplot(opportunity, aes(x = group, fill = decision)) +  -->
+<!--   # Add a bar layer, with position "fill" -->
+<!--   geom_bar(position = "fill") -->
+<!-- ``` -->
 
 
 Great! The barplot better displays the results from the study. The treatment seems like it might have had an effect.
 
 ### Randomizing opportunity cost
 
-As in lesson 2, you will permute the data to generate a distribution of differences as if the null hypothesis were true.
+As in lesson 2, you will permute the data to generate a distribution of differences as if the null hypothesis were true. As a reminder, here's what the data looked like:
 
-In the study, the number of individuals in each of the control and treatment groups is fixed.  Additionally, when you assume that the null hypothesis is true—that is, the experiment had no effect on the outcome of buying a DVD—it is reasonable to infer that the number of individuals who would buy a DVD is also fixed.  That is, 97 people were going to buy a DVD regardless of which treatment group they were in.
+```{r the data}
+dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97),
+             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |>
+  mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
+
+kable(dt, format = "html", escape = F) |>
+  kable_styling("striped", full_width = F)
+```
+
+In the study, the number of individuals in each of the control and treatment groups is fixed. Additionally, when you assume that the null hypothesis is true—that is, the experiment had no effect on the outcome of buying a DVD—it is reasonable to infer that the number of individuals who would buy a DVD is also fixed.  That is, 97 people were going to buy a DVD regardless of which treatment group they were in.
 
 Using the new data and the methods from the previous lesson, create a randomization distribution of the difference in proportions calculated on permuted data.
 
- (1)
+**Exercise**
 
-- Using the `opportunity` dataset, calculate the observed difference in purchase rate.
-    - Group by `group`.
-    - Summarize to calculate the proportion deciding to buy a DVD. That is, get the `mean()` of cases of `decision` equaling `"buyDVD"`.
-    - Summarize again to calculate the `diff()`erence of `prop_buy` between groups.
+Using the `opportunity` dataset, calculate the observed difference in purchase rate:
+
+- Group by `group`.
+- Summarize to calculate the proportion deciding to buy a DVD. That is, get the `mean()` of cases of `decision` equaling `"buyDVD"`.
+- Summarize again to calculate the `diff()`erence of `prop_buy` between groups.
 
 ```{r randomizing_cost_1, exercise=TRUE}
 # Calculate the observed difference in purchase rate
@@ -246,52 +264,53 @@ diff_obs <- opportunity |>
   pull()
 ```
 
-```{r randomizing_cost_1-hint-1}
-opportunity |>
-  group_by(group) |>
-  ___(prop_buy = ___(___)) |>
-  ___(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-1} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   ___(prop_buy = ___(___)) |> -->
+<!--   ___(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-hint-2}
-opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  ___(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-2} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   ___(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-hint-3}
-opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = ___) |> 
-  pull()
-```
+<!-- ```{r randomizing_cost_1-hint-3} -->
+<!-- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = ___) |>  -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r randomizing_cost_1-solution}
-# Calculate the observed difference in purchase rate
-diff_obs <- opportunity |>
-  # Group by group
-  group_by(group) |>
-  # Calculate proportion deciding to buy a DVD
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  # Calculate difference between groups
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
-    
-# Review the result
-diff_obs
-```
+<!-- ```{r randomizing_cost_1-solution} -->
+<!-- # Calculate the observed difference in purchase rate -->
+<!-- diff_obs <- opportunity |> -->
+<!--   # Group by group -->
+<!--   group_by(group) |> -->
+<!--   # Calculate proportion deciding to buy a DVD -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   # Calculate difference between groups -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
 
- (2)
+<!-- # Review the result -->
+<!-- diff_obs -->
+<!-- ``` -->
 
-- Create a data frame of permuted differences in purchase rates.
-    - Specify the model `decision` vs. `group`, with the `success` value `"buyDVD"`.
-    - Hypothesize `"independence"`.
-    - Generate `1000` reps of type `"permute"`.
-    - Calculate the summary statistic `"diff in props"`.
+**Exercise**
+
+Create a data frame of permuted differences in purchase rates:
+
+- Specify the model `decision` vs. `group`, with the `success` value `"buyDVD"`.
+- Hypothesize `"independence"`.
+- Generate `1000` reps of type `"permute"`.
+- Calculate the summary statistic `"diff in props"`.
 
 ```{r randomizing_cost_2, exercise=TRUE}
 # Create data frame of permuted differences in purchase rates
@@ -309,70 +328,63 @@ opp_perm <- opportunity |>
 opp_perm
 ```
 
-```{r randomizing_cost_2-hint-1}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  __(null = ___) |>
-  ___(reps = ___, type = ___) |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-1} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   __(null = ___) |> -->
+<!--   ___(reps = ___, type = ___) |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-hint-2}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  ___(reps = ___, type = ___) |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-2} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   ___(reps = ___, type = ___) |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-hint-3}
-opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  ___(stat = ___, order = c("treatment", "control"))
-```
+<!-- ```{r randomizing_cost_2-hint-3} -->
+<!-- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   ___(stat = ___, order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_2-solution}
-# Create data frame of permuted differences in purchase rates
+<!-- ```{r randomizing_cost_2-solution} -->
+<!-- # Create data frame of permuted differences in purchase rates -->
+<!-- opp_perm <- opportunity |> -->
+<!--   # Specify decision vs. group, where success is buying a DVD -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   # Set the null hypothesis to independence -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generate 1000 reps of type permute -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   # Calculate the summary stat difference in proportions -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+
+<!-- # Review the result -->
+<!-- opp_perm -->
+<!-- ``` -->
+
+```{r, include=FALSE, echo=FALSE}
+# keep in workspace so they can complete part 3
 opp_perm <- opportunity |>
-  # Specify decision vs. group, where success is buying a DVD
   specify(decision ~ group, success = "buyDVD") |>
-  # Set the null hypothesis to independence
   hypothesize(null = "independence") |>
-  # Generate 1000 reps of type permute
   generate(reps = 1000, type = "permute") |>
-  # Calculate the summary stat difference in proportions
   calculate(stat = "diff in props", order = c("treatment", "control"))
-    
-# Review the result
-opp_perm
 ```
-
- (3)
-
-Draw a histogram of permuted differences.
+ 
+Draw a histogram of permuted differences:
 
 - Using the permutation dataset, `opp_perm`, plot `stat`.
 - Add a histogram layer with `geom_histogram()`. The `binwidth` is set to `0.005`.
 - Add a vertical line with `geom_vline()`. The `xintercept` is at `diff_obs`.
 
-
 ```{r randomizing_cost_3, exercise=TRUE}
-# From previous steps
-diff_obs <- opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
-
-opp_perm <- opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  calculate(stat = "diff in props", order = c("treatment", "control"))
-  
-# Using the permuation data, plot stat
+# Using the permutation data, plot stat
 ggplot(___, aes(x = ___)) + 
   # Add a histogram layer with binwidth 0.005
   ___(binwidth = ___) +
@@ -380,45 +392,60 @@ ggplot(___, aes(x = ___)) +
   ___(aes(xintercept = ___), color = "red")
 ```
 
-```{r randomizing_cost_3-hint-1}
-ggplot(opp_perm, aes(x = ___)) + 
-  ___(binwidth = ___) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- ```{r} -->
+<!-- # From previous steps -->
+<!-- diff_obs <- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
 
-```{r randomizing_cost_3-hint-2}
-ggplot(opp_perm, aes(x = stat)) + 
-  ___(binwidth = ___) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- opp_perm <- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+<!-- ``` -->
 
-```{r randomizing_cost_3-hint-3}
-ggplot(opp_perm, aes(x = stat)) + 
-  geom_histogram(binwidth = 0.005) +
-  ___(aes(xintercept = ___), color = "red")
-```
+<!-- ```{r randomizing_cost_3-hint-1} -->
+<!-- ggplot(opp_perm, aes(x = ___)) +  -->
+<!--   ___(binwidth = ___) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
 
-```{r randomizing_cost_3-solution}
-# From previous steps
-diff_obs <- opportunity |>
-  group_by(group) |>
-  summarize(prop_buy = mean(decision == "buyDVD")) |>
-  summarize(stat = diff(prop_buy)) |> 
-  pull()
+<!-- ```{r randomizing_cost_3-hint-2} -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   ___(binwidth = ___) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
 
-opp_perm <- opportunity |>
-  specify(decision ~ group, success = "buyDVD") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1000, type = "permute") |>
-  calculate(stat = "diff in props", order = c("treatment", "control"))
-  
-# Using the permuation data, plot stat
-ggplot(opp_perm, aes(x = stat)) + 
-  # Add a histogram layer with binwidth 0.005
-  geom_histogram(binwidth = 0.005) +
-  # Add a vline layer with intercept diff_obs
-  geom_vline(aes(xintercept = diff_obs), color = "red")
-```
+<!-- ```{r randomizing_cost_3-hint-3} -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   geom_histogram(binwidth = 0.005) + -->
+<!--   ___(aes(xintercept = ___), color = "red") -->
+<!-- ``` -->
+
+<!-- ```{r randomizing_cost_3-solution} -->
+<!-- # From previous steps -->
+<!-- diff_obs <- opportunity |> -->
+<!--   group_by(group) |> -->
+<!--   summarize(prop_buy = mean(decision == "buyDVD")) |> -->
+<!--   summarize(stat = diff(prop_buy)) |>  -->
+<!--   pull() -->
+
+<!-- opp_perm <- opportunity |> -->
+<!--   specify(decision ~ group, success = "buyDVD") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1000, type = "permute") |> -->
+<!--   calculate(stat = "diff in props", order = c("treatment", "control")) -->
+
+<!-- # Using the permuation data, plot stat -->
+<!-- ggplot(opp_perm, aes(x = stat)) +  -->
+<!--   # Add a histogram layer with binwidth 0.005 -->
+<!--   geom_histogram(binwidth = 0.005) + -->
+<!--   # Add a vline layer with intercept diff_obs -->
+<!--   geom_vline(aes(xintercept = diff_obs), color = "red") -->
+<!-- ``` -->
 
 Great work! In the next exercise, you'll calculate the p-value to judge if the difference in proportions permuted is consistent with the observed difference.
 
@@ -430,17 +457,20 @@ The permuted dataset and the original observed statistic are available in your w
 
 `visualize()`, `shade_p_value()`, and `get_p_value()` using the built-in infer functions. Remember that the null statistics are above the original difference, so the p-value (which represents how often a null value is more *extreme*) is calculated by counting the number of null values which are `less` than the original difference.
 
-- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`.
+**Exercise**
+
+- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`. [this is already done for you below]
 - Then `get_p_value()` is calculated as the proportion of permuted statistics which are `direction = "less"` than `obs_stat = diff_obs`.
 - As an alternative way to calculate the p-value, use `summarize()` and `mean()` to find the proportion of times the permuted differences in `opp_perm` (called `stat`) are less than or equal to the observed difference (called `diff_obs`).
 - You can test your knowledge by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"` before submitting your answer to both `visualize()` and `get_p_value()`.
 
-```{r summarizing_opportunity_cost, exercise=TRUE}
-# Visualize the statistic 
-opp_perm |>
-  ___() +
-  ___(___, ___)
+```{r visualize_opp_perm, echo = TRUE, show = TRUE}
+# Visualize the statistic
+visualize(opp_perm) +
+  shade_p_value(obs_stat = diff_obs, direction = "less")
+```
 
+```{r summarizing_opportunity_cost, exercise=TRUE}
 # Calculate the p-value using `get_p_value()`
 opp_perm |>
   ___(___, ___)
@@ -450,33 +480,35 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-```{r summarizing_opportunity_cost-hint-1}
-opp_perm |>
-  visualize() +
-  shade_p_value(obs_stat = diff_obs, direction = "less")
-```
+<!-- *TODO: error `EXPR must be a length 1 vector`* -->
 
-```{r summarizing_opportunity_cost-hint-2}
-opp_perm |>
-  get_p_value(obs_stat = diff_obs, direction = "less")
-```
+<!-- ```{r summarizing_opportunity_cost-hint-1} -->
+<!-- opp_perm |> -->
+<!--   visualize() + -->
+<!--   shade_p_value(obs_stat = diff_obs, direction = "less") -->
+<!-- ``` -->
 
-```{r summarizing_opportunity_cost-solution}
-# Visualize the statistic 
-opp_perm |>
-  visualize() +
-  shade_p_value(obs_stat = diff_obs, direction = "less")
+<!-- ```{r summarizing_opportunity_cost-hint-2} -->
+<!-- opp_perm |> -->
+<!--   get_p_value(obs_stat = diff_obs, direction = "less") -->
+<!-- ``` -->
 
-# Calculate the p-value using `get_p_value()`
-opp_perm |>
-  get_p_value(obs_stat = diff_obs, direction = "less")
+<!-- ```{r summarizing_opportunity_cost-solution} -->
+<!-- # Visualize the statistic  -->
+<!-- opp_perm |> -->
+<!--   visualize() + -->
+<!--   shade_p_value(obs_stat = diff_obs, direction = "less") -->
 
-# Calculate the p-value using `summarize`
-opp_perm |>
-  summarize(p_value = mean(stat <= diff_obs))
-```
+<!-- # Calculate the p-value using `get_p_value()` -->
+<!-- opp_perm |> -->
+<!--   get_p_value(obs_stat = diff_obs, direction = "less") -->
 
-Great work! The small p-value indicates that the observed data are inconsistent with the null hypothesis.  We should reject the null claim and conclude that financial advice does affect the likelihood of purchase.
+<!-- # Calculate the p-value using `summarize` -->
+<!-- opp_perm |> -->
+<!--   summarize(p_value = mean(stat <= diff_obs)) -->
+<!-- ``` -->
+
+Great work! The small p-value indicates that the observed data are inconsistent with the null hypothesis.  We should reject the null claim and tentatively conclude that financial advice does affect the likelihood of purchase.
 
 
 ### Opportunity cost conclusion
@@ -544,7 +576,7 @@ Recall that the decision being made controls the Type I error rate, that is the 
 
 ![](images/lesson3_img2.png){ width=80% }
 
-The logic of hypothesis testing shares many key elements with the US judicial system. The jury does not know whether the defendant committed the crime, but they must decide whether or not to convict the individual. The jury is presented with evidence, akin to data, and asked whether the evidence is consistent with innocence. If the evidence is outside of what would be expected, the defendant is charged with a crime.
+The logic of hypothesis testing shares many key elements with the US judicial system. The jury does not know whether the defendant committed the crime, but they must decide whether or not to convict the individual. The jury is presented with evidence, akin to data, and asked whether the evidence is consistent with innocence. If the evidence is outside of what would be expected, the defendant is convicted of a crime.
 
 
 ### Different choice of error rate
@@ -607,6 +639,9 @@ To find a two-sided p-value, you simply double the one sided p-value. That is, y
 
 The `opp_perm` data frame, containing the differences in permuted proportions, and the original observed statistic, `diff_obs`, are available in your workspace.
 
+
+**Exercise**
+
 Use `opp_perm` to compute the two-sided p-value, or twice the proportion of permuted differences that are less than or equal to the original difference.
 
 ```{r opportunity_costs, exercise=TRUE}
@@ -615,15 +650,16 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-```{r opportunity_costs-hint}
- This should be double what you calculated as one-tailed p-value before.
-```
+<details>
+<summary>**Hint**</summary>
+This should be double what you calculated as a one-tailed p-value before.
+</details>
 
-```{r opportunity_costs-solution}
-# Calculate the two-sided p-value
-opp_perm |>
-  summarize(p_value = 2 * mean(stat <= diff_obs))
-```
+<!-- ```{r opportunity_costs-solution} -->
+<!-- # Calculate the two-sided p-value -->
+<!-- opp_perm |> -->
+<!--   summarize(p_value = 2 * mean(stat <= diff_obs)) -->
+<!-- ``` -->
 
 Great work! Take a moment to remind yourself why you used the proportion of permuted statistics that are smaller than (instead of bigger than) the observed value. Hint: Look at the histogram of permuted statistics.
 
@@ -652,11 +688,26 @@ ggplot(opp_perm) +
 
 ### Causation
 
-Because the p-value is substantially less than 0.05, we conclude that it was not simply random variability that led to fewer students buying the DVD when being reminded to save.
+```{r reflect-mc}
+question("Based on the plot you created in the last exercise (displayed again here), which of the following seems like a reasonable conclusion about opportunity cost?",
+  correct = "Good job! There are very few permuted differences which are as extreme as the observed difference, and we can make a causative conclusion because the study was experimental, with randomized groups.", allow_retry = TRUE,
+  answer("In the population there is no evidence that reminding people of their savings will influence their buying decisions.", message = "No, try again. Look at the curves and the p-values to see if the observed data is consistent with the null hypothesis."),
+  answer("In the population there is evidence that reminding people of their savings does influence their buying decisions, and there is also evidence that it is the reminder itself that causes the difference in buying decisions.", correct = TRUE),
+  answer("In the population there is evidence that reminding people of their savings does influence their buying decisions, but we cannot tell whether the difference is due to the reminder itself or something else.", message = "Incorrect. This would be true if the study had been observational, but in this case we know the data came from a controlled experiment and used randomized groups to control for other factors."))
+```
 
-Because the study was randomized, that is, the individuals were randomly assigned the choices, there was nothing systematically different about the participants in the treatment and control groups. The only difference in the two groups was the set of options they received.
+```{r}
+ggplot(opp_perm) +
+  geom_histogram(aes(x = diff_perm), binwidth = .005) +
+  geom_vline(xintercept = diff_obs, color = openintro::COL[4,1])
+```
 
-Therefore, any difference in DVD buying rates is due to the options given, that is, being reminded to save. A causal inference can be made in this setting.
+
+<!-- Because the p-value is substantially less than 0.05, we conclude that it was not simply random variability that led to fewer students buying the DVD when being reminded to save. -->
+
+<!-- Because the study was randomized, that is, the individuals were randomly assigned the choices, there was nothing systematically different about the participants in the treatment and control groups. The only difference in the two groups was the set of options they received. -->
+
+<!-- Therefore, any difference in DVD buying rates is due to the options given, that is, being reminded to save. A causal inference can be made in this setting. -->
 
 Importantly, however, the 150 individuals in the sample were not randomly sampled from all people. Indeed, they were said to be students. Students are certainly different from the adult population in many ways.
 
