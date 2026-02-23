@@ -775,8 +775,24 @@ ggplot(conf_int_data, aes(___, ___)) +
 
 Recall that our goal with bootstrapping is to estimate the *sampling distribution* of the random variable $\widehat{p}^*$ using our observed polling data. When we resample the `poll`s with replacement $B$ times, we create a *bootstrap distribution* that, for a large number of bootstrap resamples, will satisfy the Central Limit Theorem. 
 
-Then for large $B$, the Central Limit Theorem says that $\widehat{p}^*$ is approximately normally distributed with mean $p$ and standard deviation $\sqrt{\frac{p(1-p)}{B}}$. The following plot shows $B=200$ bootstrap resamples, with the true parameter $p$ in red. The blue dot in the right tail represents one sample value, which would be a poor estimate for $p$.
+Formally, say that our `poll` data consist of $n$ Bernoulli samples: $X_1,...,X_n \sim Bernoulli(p)$ where $p$ is the population parameter we wish to estimate. Here, a "success" is a given person's stated support for candidate X in the poll. Then our point estimate is given by
 
+$$\widehat{p} = \frac{1}{n}\sum_{i=1}^n X_i$$
+
+And the bootstrapping procedure creates $B$ independent resamples of $X_1,...,X_n$:
+
+$$\mathbf{X}_1^*=(X_{1,1}^*,...,X_{1,n}^*),...,\mathbf{X}_B^*=(X_{B,1}^*,...,X_{B,n}^*)$$
+so for each of the $B$ bootstrap samples we compute a new sample proportion:
+
+$$\widehat{p}_1^* = \frac{1}{n}\sum_{i=1}^n X^*_{1,i} \ ,..., \widehat{p}_B^*= \frac{1}{n}\sum_{i=1}^n X^*_{B,i}$$
+
+We say these bootstrapped sample proportions $\widehat{p}^*$ follow a bootstrap distribution, which approximates the sampling distribution of $p$. Then for large $B$, the Central Limit Theorem says that:
+
+$$\widehat{p}^* \sim \mathcal{N}\biggl(p, \frac{p(1-p)}{n} \biggr)$$ 
+
+or in words, is approximately normally distributed with mean $p$ and variance $p(1-p)$. 
+
+The following plot shows $B=200$ bootstrap resamples. The red and blue dots each represent two different point estimates for $p$, only one of which is close to the true value.
 
 ```{r}
 set.seed(4747)
