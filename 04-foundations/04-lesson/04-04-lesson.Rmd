@@ -792,7 +792,9 @@ $$\widehat{p}^* \sim \mathcal{N}\biggl(p, \frac{p(1-p)}{n} \biggr)$$
 
 or in words, is approximately normally distributed with mean $p$ and variance $p(1-p)$. 
 
-The following plot shows $B=200$ bootstrap resamples. The red and blue dots each represent two different point estimates for $p$, only one of which is close to the true value.
+###
+
+To bring us back to our problem, the following plot shows $B=200$ bootstrap resamples of the `poll` data. The red and blue dots each represent two different point estimates for $p$. 
 
 ```{r}
 set.seed(4747)
@@ -815,6 +817,14 @@ ggplot() +
   scale_fill_manual(values = c(COL[5,1], COL[4,1], COL[1,1]))
 ```
 
+
+```{r clt-mc}
+question("Based on the plot of the bootstrap distribution above and what you know from the CLT, where does the population proportion p lie?",
+  correct = "Good job! The CLT says that for large resamples B, the bootstrap distribution is roughly normal and is centered at the population proportion.", allow_retry = TRUE,
+  answer("The blue dot, around p=0.82", message = "No, try again. The blue dot is in the tail of the bootstrap distribution."),
+  answer("The red dot, around p=0.56.", message = "Incorrect. The red dot is towards the center of the bootstrap distribution but not quite there. Where should the mean be according to the CLT?"),
+  answer("Neither the blue nor red dot, but instead around p=0.6.", correct = TRUE))
+```
 
 <!-- The variability of the $\widehat{p}$ statistics gives a measure for how far apart any given observed $\widehat{p}$ and the parameter are expected to be.  -->
 
@@ -904,7 +914,9 @@ The Empirical Rule, also called the 68-95-99.7 Rule, says that:
 - 95% of the data fall within 2 $SE$ of the mean; and
 - 99.7% of the data fall within 3 $SE$ of the mean,
 
-where the mean is the value of the true parameter. 
+where the mean is the value of the true parameter. Recall that in the plot of the bootstrap distribution in the previous section, the blue dot in the tail of the distribution was far from the mean while the red dot was much closer.
+
+###
 
 Here, in red, we see all the sample $\widehat{p}$ values that are close to the true parameter. If our data is one of the red dots, our confidence interval will correctly capture the true parameter.
 
@@ -1061,7 +1073,7 @@ one_poll_boot |>
 <!--   ) -->
 <!-- ``` -->
 
-Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter.Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Luckily!
+Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter. Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Good work.
 
 <!-- ## Interpreting CIs and technical conditions -->
 
