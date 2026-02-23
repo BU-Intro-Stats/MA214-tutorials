@@ -229,23 +229,23 @@ By repeating the resampling process many times, the resampled proportions give a
 
 The **standard error**, which describes how variable the statistic is around the parameter, is key to building a confidence interval. To evaluate how well the bootstrap works, we set up a hypothetical situation where we actually know the number we need. 
 
-The following R code calculates the standard error of the sample proportions in two ways. First, we use the population information, then the bootstrap, and compare the two.
+<!-- The following R code calculates the standard error of the sample proportions in two ways. First, we use the population information, then the bootstrap, and compare the two. -->
 
-```{r, include=TRUE, echo=TRUE, eval = TRUE}
-# Compute p-hat for each poll
-ex1_props <- all_polls |>
-  group_by(poll) |>
-  summarize(prop_yes = mean(vote == "yes"))
+<!-- ```{r, include=TRUE, echo=TRUE, eval = TRUE} -->
+<!-- # Compute p-hat for each poll -->
+<!-- ex1_props <- all_polls |> -->
+<!--   group_by(poll) |> -->
+<!--   summarize(prop_yes = mean(vote == "yes")) -->
 
-# Select one poll from which to resample
-one_poll <- all_polls |>
-  filter(poll == 1) |>
-  select(vote)
+<!-- # Select one poll from which to resample -->
+<!-- one_poll <- all_polls |> -->
+<!--   filter(poll == 1) |> -->
+<!--   select(vote) -->
 
-# Variability of p-hat
-ex1_props |>
-  summarize(sd(prop_yes))
-```
+<!-- # Variability of p-hat -->
+<!-- ex1_props |> -->
+<!--   summarize(sd(prop_yes)) -->
+<!-- ``` -->
 
 <!-- ### Variability of $\widehat{p}$ from the sample (bootstrapping) -->
 
@@ -258,7 +258,6 @@ ex1_props |>
 <!-- Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical. -->
 
 <!-- Notice that the resampled $\widehat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide. -->
-<!-- *TODO: check this output - need 0.087 to show* -->
 
 <!-- ```{r eval = TRUE} -->
 <!-- # Generate 1000 resamples of one poll -->
@@ -348,7 +347,7 @@ Then, compute $\widehat{p}^*$ for each resampled poll, as `ex2_props`, using tol
 - Generate `1000` replicates of type `"bootstrap"`.
 - Calculate the `"prop"`ortion summary statistic.
 
-Note that because you are looking for an interval estimate, you have not made a hypothesis claim about the proportion (thus, there is no `hypothesize()` step needed in the infer pipeline).
+<!-- Note that because you are looking for an interval estimate, you have not made a hypothesis claim about the proportion (thus, there is no `hypothesize()` step needed in the infer pipeline). -->
 
 
 ```{r resampling2, exercise=TRUE}
@@ -567,8 +566,6 @@ Remember the goal of creating a confidence interval is to find a range of plausi
 
 ### Bootstrap percentile interval
 
-*TODO: move to first subsection, before CLT*
-
 The main idea in the previous exercise was that the distance between the original sample $\widehat{p}$ and the resampled (or bootstrapped) $\widehat{p}^*$ values gives a measure for how far the original $\widehat{p}$ is from the true population proportion.  
 
 The same variability can be measured through a different mechanism.  As before, if $\widehat{p}$ is sufficiently close to the true parameter, then the resampled (or bootstrapped) $\widehat{p}^*$ values will vary in such a way that they overlap with the true parameter.  
@@ -636,6 +633,7 @@ Inside summarize, use `quantile()` with the correct quantile level to get the up
 <!--     upper = quantile(stat, 0.975) -->
 <!--   ) -->
 <!-- ``` -->
+
 
 
 Excellent! Note that the two intervals were created using different methods. Because the methods are different, the intervals are expected to be a bit different as well. In the long run, however, the intervals should provide the same information.
