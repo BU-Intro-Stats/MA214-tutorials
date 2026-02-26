@@ -139,7 +139,7 @@ gss2016 |>
   glimpse()
 ```
 
-Let's investigate the relationship between the variables party and natarms. The first contains the political party affiliation of the respondent: Republican, Democrat, or independent. The second contains opinions on whether the government is spending too much money, too little money or about the right amount of money on national defense. A natural way to visualize the relationship between these two variables is with a stacked bar plot.
+Let's investigate the relationship between the variables `party` and `natarms`. The first contains the political party affiliation of the respondent: Republican, Democrat, or independent. The second contains opinions on whether the government is spending too much money, too little money or about the right amount of money on national defense. A natural way to visualize the relationship between these two variables is with a stacked bar plot.
 
 
 
@@ -151,7 +151,7 @@ ggplot(gss2016, aes(x = party, fill = natarms)) +
 ```
 
 
-We can construct that by putting party on the x-axis and filling the bars using natarms. To make it easy to compare proportions, we can add the position equals "fill" option. If we look at the two major parties, we learn that a much larger proportion of Republicans than Democrats think we spend too little on the military.
+We can construct that by putting `party` on the x-axis and filling the bars using `natarms`. To make it easy to compare proportions, we can add the position equals "fill" option. If we look at the two major parties, we learn that a much larger proportion of Republicans than Democrats think we spend too little on the military.
 
 This also jumps out. It appears that all people who listed "O" or "Other" think that spending is just about right. Can this be correct? Just how many people are in this other group?
 
@@ -517,6 +517,8 @@ Map `x` to `party` and `fill` to `natspace` to make your bar plot.
 <!--   geom_bar() -->
 <!-- ``` -->
 
+
+
 **Exercise**
 
 Calculate the associated chi-squared test statistic by running the `gss_party` data through the `chisq_stat()` function and specifying the variables using the formula notation as you did in `specify()`.
@@ -596,6 +598,8 @@ Use `geom_density()` to make a density plot.
 <!--   # Add vertical line at obs stat -->
 <!--   geom_vline(xintercept = chi_obs_spac, color = "red") -->
 <!-- ``` -->
+
+
 
 **Exercise**
 
@@ -917,6 +921,8 @@ Under a null hypothesis of `"independence"`, the type of data generation is `"pe
 <!--   calculate(stat = "Chisq") -->
 <!-- ``` -->
 
+
+
 **Exercise**
 
 Create a density plot of `null`, add a vertical red line at `chi_obs`, and overlay the corresponding approximation from the Chi-squared distribution with the appropriate degrees of freedom.
@@ -954,6 +960,8 @@ The degrees of freedom is calculated from the contingency table as the (number o
 <!--   # Overlay chisq approximation -->
 <!--   stat_function(fun = dchisq, args = list(df = 3), color = "blue") -->
 <!-- ``` -->
+
+
 
 **Exercise**
 
@@ -1005,11 +1013,13 @@ At this point you should be familiar with this diagram
 knitr::include_graphics("images/3-4-2.png")
 ```
 
-which shows how we formulate the null distribution as the distribution of test statistics for data generated in a world where the null hypothesis is true. The procedure is the same when were testing independence using the chi squared statistic its just the shape of the null distribution that changes. To formulate a confidence interval for the chi squared, it makes sense to simply remove the step where we propose a null hypothesis and instead generate data simply through bootstrap resampling.
+which shows how we formulate the null distribution as the distribution of test statistics for data generated in a world where the null hypothesis is true. 
+
+The procedure is the same when we're testing independence using the chi-squared statistic, it's just the shape of the null distribution that changes. To formulate a confidence interval for the chi-squared, it makes sense to simply remove the step where we propose a null hypothesis and instead generate data simply through bootstrap resampling...
 
 ### 
 
-that give us a sampling distribution
+...that give us a sampling distribution...
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-3.png")
@@ -1017,7 +1027,7 @@ knitr::include_graphics("images/3-4-3.png")
 
 ### 
 
-of the chi squared statistic
+...of the chi squared statistic...
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-4.png")
@@ -1025,7 +1035,7 @@ knitr::include_graphics("images/3-4-4.png")
 
 ### 
 
-so that we can formulate an interval
+...so that we can formulate an interval...
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-5.png")
@@ -1034,7 +1044,7 @@ knitr::include_graphics("images/3-4-5.png")
 
 ### 
 
-to capture the true chi squared parameter. But hold on...
+...to capture the true chi squared parameter. But hold on...
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-6.png")
