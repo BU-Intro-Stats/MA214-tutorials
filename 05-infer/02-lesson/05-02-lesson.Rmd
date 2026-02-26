@@ -264,8 +264,6 @@ ___ +
 
 We can exclude the missing data by calling `na.omit`:
 
-*TODO: check how this looks*
-
 ```{r ex1-naomit, exercise=TRUE}
 gss2016_completecases <- gss2016 |>
                           na.omit()
@@ -367,7 +365,7 @@ In `generate()`, set `reps` to `1` and `type` to `"simulate"`.
 <!-- sim1 -->
 <!-- ``` -->
 
-
+###
 
 **Exercise**
 
@@ -1492,12 +1490,6 @@ p_hats
 Compute your final test statistic, `d_hat`, as the difference in `p_hats`.
 
 ```{r ex18, exercise=TRUE, exercise.setup="gssmod_init"}
-# From previous step
-p_hats <- gssmod |>
-  group_by(coinflip) |>
-  summarize(prop_favor = mean(cappun == "FAVOR")) |>
-  pull()
-  
 # Compute difference in proportions
 d_hat <- ___
 ```
@@ -1523,13 +1515,6 @@ The `diff()` function will calculate the difference between the two elements of 
 Construct the null distribution of the difference in proportions under the null hypothesis that `cappun` and `coinflip` are independent and save it to `null`. Note that the order of the difference should be `"heads"` then `"tails"`.
 
 ```{r ex19, exercise=TRUE, exercise.setup="gssmod_init"}
-# From previous steps
-p_hats <- gssmod |>
-  group_by(coinflip) |>
-  summarize(prop_favor = mean(cappun == "FAVOR")) |>
-  pull()
-d_hat <- diff(p_hats)
-
 # Form null distribution
 null <- gssmod |>
   # Specify the response and explanatory var and success
@@ -1571,21 +1556,7 @@ Use the formula `cappun ~ coinflip` in `specify()`.
 
 Visualize the distribution of the null statistics using a density plot and add a vertical red line at the value of your observed `d_hat`.
 
-*TODO: check for redundancy*
-
 ```{r ex20, exercise=TRUE, exercise.setup="gssmod_init"}
-# From previous steps
-p_hats <- gssmod |>
-  group_by(coinflip) |>
-  summarize(prop_favor = mean(cappun == "FAVOR")) |>
-  pull()
-d_hat <- diff(p_hats)
-null <- gssmod |>
-  specify(cappun ~ coinflip, success = "FAVOR") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "diff in props", order = c("heads", "tails"))
-  
 # Visualize null
 ___ +
   # Add density layer
