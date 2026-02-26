@@ -208,6 +208,7 @@ Start your exploration by simplifying the data set to include only people that i
 
 Create a new data set called `gss_party` that is `gss2016` with a filter applied to remove people who responded `"Oth"` to `party`.
 
+**Exercise**
 
 ```{r ex1, exercise=TRUE}
 # Subset data
@@ -216,17 +217,19 @@ gss_party <- ___
   ___
 ```
 
-```{r ex1-hint}
-filter(party != "Oth")
-```
+<!-- ```{r ex1-hint} -->
+<!-- filter(party != "Oth") -->
+<!-- ``` -->
 
-```{r ex1-solution}
-# Subset data
-gss_party <- gss2016 |>
-  # Filter out the "Oth"
-  filter(party != "Oth")
-```
+<!-- ```{r ex1-solution} -->
+<!-- # Subset data -->
+<!-- gss_party <- gss2016 |> -->
+<!--   # Filter out the "Oth" -->
+<!--   filter(party != "Oth") -->
+<!-- ``` -->
 
+
+**Exercise**
 
 Using `gss_party`, construct a stacked bar plot of `party` filled based on `natspac`. Modify the geometry so that the plot displays proportions.
 
@@ -239,19 +242,19 @@ ___
   ___
 ```
 
-```{r ex2-hint}
-geom_bar(position = "fill")
-```
+<!-- ```{r ex2-hint} -->
+<!-- geom_bar(position = "fill") -->
+<!-- ``` -->
 
-```{r ex2-solution}
-# Visualize distribution take 1
-gss_party |>
-  ggplot(aes(x = party, fill = natspac)) +
-  # Add bar layer of proportions
-  geom_bar(position = "fill")
-```
+<!-- ```{r ex2-solution} -->
+<!-- # Visualize distribution take 1 -->
+<!-- gss_party |> -->
+<!--   ggplot(aes(x = party, fill = natspac)) + -->
+<!--   # Add bar layer of proportions -->
+<!--   geom_bar(position = "fill") -->
+<!-- ``` -->
 
-
+**Exercise**
 
 Construct a second plot that illustrates the same relationship but this time, modify the plot to display counts.
 
@@ -264,17 +267,18 @@ ___
   ___
 ```
 
-```{r ex3-hint}
- Just `geom_bar()` this time!
-```
+<details>
+<summary>**Hint**</summary>
+Just `geom_bar()` this time!
+</details>
 
-```{r ex3-solution}
-# Visualize distribution take 2 
-gss_party |>
-  ggplot(aes(x = party, fill = natspac)) +
-  # Add bar layer of counts
-  geom_bar()
-```
+<!-- ```{r ex3-solution} -->
+<!-- # Visualize distribution take 2  -->
+<!-- gss_party |> -->
+<!--   ggplot(aes(x = party, fill = natspac)) + -->
+<!--   # Add bar layer of counts -->
+<!--   geom_bar() -->
+<!-- ``` -->
 
 ### Understanding contingency tables
 
@@ -286,8 +290,6 @@ Which of the following is FALSE regarding contingency tables?
 ggplot(gss_party, aes(x = party, fill = natspac)) +
   geom_bar()
 ```
-
-*Hint:* Contingency tables show the counts of different combinations of two variables.
 
 
 ```{r mc1, echo=FALSE}
@@ -301,11 +303,17 @@ question("Which of the following is FALSE regarding contingency tables?
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+Contingency tables show the counts of different combinations of two variables.
+</details>
 
 ### From tidy to table to tidy
 
 
 The `gss_party` data set that you created is in a tidy format to facilitate visualization and analysis. In this exercise, you'll untidy the data to create a contingency table to display counts. As a data analyst, it's commonplace to be given data in a contingency table, so you'll also practice tidying it back up.
+
+**Exercise**
 
 Using `gss_party`, create a contingency `table()` of `natspac` and `party` and save it to `Obs` for observed table.
 
@@ -319,19 +327,25 @@ ___ <- ___
   ___
 ```
 
-```{r ex4-hint}
-- Select the `natspac` and `party` columns.
-- Call `table()` without arguments to make a contingency table.
-```
+<details>
+<summary>**Hint**</summary>
+Select the `natspac` and `party` columns.
+</details>
 
-```{r ex4-solution}
-# Create table of natspac and party
-Obs <- gss_party |>
-  # Select columns of interest
-  select(natspac, party) |>
-  # Create table
-  table()
-```
+<details>
+<summary>**Hint**</summary>
+Call `table()` without arguments to make a contingency table.
+</details>
+
+
+<!-- ```{r ex4-solution} -->
+<!-- # Create table of natspac and party -->
+<!-- Obs <- gss_party |> -->
+<!--   # Select columns of interest -->
+<!--   select(natspac, party) |> -->
+<!--   # Create table -->
+<!--   table() -->
+<!-- ``` -->
 
 ## Chi-squared test statistic
 
@@ -447,6 +461,8 @@ With this statistic in hand, you can return to the hypothesis test to answer the
 
 The key to generating data under a null hypothesis of independence is *permutation*. Generate just a single data set to see what sort of chi-squared statistic you might observe when in fact these two variables are independent of one another.
 
+**Exercise**
+
 Using `gss_party`, first specify that you'd like to study `natspace` as a function of `party`, create a null hypothesis of independence, then generate a single data set via permutation. Save this as `perm_1`.
 
 
@@ -461,52 +477,47 @@ ___ <- ___
   ___
 ```
 
-```{r ex6-hint}
- Take a look at some of the exercises from the last lesson for a refresher on how to create a permuted dataset.
-```
+<!-- ```{r ex6-solution} -->
+<!-- # Create one permuted data set -->
+<!-- perm_1 <- gss_party |> -->
+<!--   # Specify the variables of interest -->
+<!--   specify(natspace ~ party) |> -->
+<!--   # Set up the null -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generate a single permuted data set -->
+<!--   generate(reps = 1, type = "permute") -->
+<!-- ``` -->
 
-```{r ex6-solution}
-# Create one permuted data set
-perm_1 <- gss_party |>
-  # Specify the variables of interest
-  specify(natspace ~ party) |>
-  # Set up the null
-  hypothesize(null = "independence") |>
-  # Generate a single permuted data set
-  generate(reps = 1, type = "permute")
-```
+**Exercise**
 
 Using `perm_1`, visualize the relationship between `natspace` and `party` by constructing a stacked bar plot of counts.
 
 ```{r ex7, exercise=TRUE}
-# From previous step
-perm_1 <- gss_party |>
-  specify(natspace ~ party) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1, type = "permute")
-  
 # Visualize permuted data
 ___ +
   # Add bar layer
   ___
 ```
 
-```{r ex7-hint}
- Map `x` to `party` and `fill` to `natspace` to make your bar plot.
-```
+<details>
+<summary>**Hint**</summary>
+Map `x` to `party` and `fill` to `natspace` to make your bar plot.
+</details>
 
-```{r ex7-solution}
-# From previous step
-perm_1 <- gss_party |>
-  specify(natspace ~ party) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 1, type = "permute")
-  
-# Visualize permuted data
-ggplot(perm_1, aes(x = party, fill = natarms)) +
-  # Add bar layer
-  geom_bar()
-```
+<!-- ```{r ex7-solution} -->
+<!-- # From previous step -->
+<!-- perm_1 <- gss_party |> -->
+<!--   specify(natspace ~ party) |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 1, type = "permute") -->
+
+<!-- # Visualize permuted data -->
+<!-- ggplot(perm_1, aes(x = party, fill = natarms)) + -->
+<!--   # Add bar layer -->
+<!--   geom_bar() -->
+<!-- ``` -->
+
+**Exercise**
 
 Calculate the associated chi-squared test statistic by running the `gss_party` data through the `chisq_stat()` function and specifying the variables using the formula notation as you did in `specify()`.
 
@@ -516,15 +527,16 @@ gss_party |>
   chisq_stat(___)
 ```
 
-```{r ex8-hint}
- To get the statistic, add the argument that specifies the variables: `natspace ~ party`.
-```
+<details>
+<summary>**Hint**</summary>
+To get the statistic, add the argument that specifies the variables: `natspace ~ party`.
+</details>
 
-```{r ex8-solution}
-# Compute chi-squared stat
-gss_party |>
-  chisq_stat(natspace ~ party)
-```
+<!-- ```{r ex8-solution} -->
+<!-- # Compute chi-squared stat -->
+<!-- gss_party |> -->
+<!--   chisq_stat(natspace ~ party) -->
+<!-- ``` -->
 
 ### Building two null distributions
 
@@ -536,6 +548,8 @@ Do this by first adding onto your work from the previous exercise with the `nats
 chi_obs_spac <- chisq_stat(gss_party, natspac ~ party)
 chi_obs_arms <- chisq_stat(gss_party, natarms ~ party)
 ```
+
+**Exercise**
 
 - Extend your code from the previous exercise to generate 500 data sets under the null hypothesis that `natspac` is independent from `party`. Save this as `null_spac`.
 - Create a density plot of `null_spac` and add a vertical red line to indicate the location of the observed statistic (saved in your workspace as `chi_obs_spac`).
@@ -556,26 +570,34 @@ ___ +
   ___
 ```
 
-```{r ex9-hint}
-- The `stat` you're after is the `"Chisq"`.
-- Use `geom_density()` to make a density plot.
-```
+<details>
+<summary>**Hint**</summary>
+The `stat` you're after is the `"Chisq"`.
+</details>
 
-```{r ex9-solution}
-# Create null
-null_spac <- gss_party |>
-  specify(natspac ~ party) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
-# Visualize null
-ggplot(null_spac, aes(x = stat)) +
-  # Add density layer
-  geom_density() +
-  # Add vertical line at obs stat
-  geom_vline(xintercept = chi_obs_spac, color = "red")
-```
+<details>
+<summary>**Hint**</summary>
+Use `geom_density()` to make a density plot.
+</details>
+
+
+<!-- ```{r ex9-solution} -->
+<!-- # Create null -->
+<!-- null_spac <- gss_party |> -->
+<!--   specify(natspac ~ party) |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "Chisq") -->
+
+<!-- # Visualize null -->
+<!-- ggplot(null_spac, aes(x = stat)) + -->
+<!--   # Add density layer -->
+<!--   geom_density() + -->
+<!--   # Add vertical line at obs stat -->
+<!--   geom_vline(xintercept = chi_obs_spac, color = "red") -->
+<!-- ``` -->
+
+**Exercise**
 
 - Construct a similar null distribution under the hypothesis that `natarms` is independent from `party` using the `"Chisq"` statistic. Save this as `null_arms`.
 - Create a density plot of `null_arms` and add a vertical red line to indicate the location of the observed statistic (saved in your workspace as `chi_obs_arms`).
@@ -596,21 +618,21 @@ ggplot(___, aes(x = stat)) +
   geom_vline(xintercept = ___, color = "red")
 ```
 
-```{r ex10-solution}
-# Create null
-null_arms <- gss_party |>
-  specify(natarms ~ party) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
-# Visualize null
-ggplot(null_arms, aes(x = stat)) +
-  # Add density layer
-  geom_density() +
-  # Add vertical red line at obs stat
-  geom_vline(xintercept = chi_obs_arms, color = "red")
-```
+<!-- ```{r ex10-solution} -->
+<!-- # Create null -->
+<!-- null_arms <- gss_party |> -->
+<!--   specify(natarms ~ party) |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "Chisq") -->
+
+<!-- # Visualize null -->
+<!-- ggplot(null_arms, aes(x = stat)) + -->
+<!--   # Add density layer -->
+<!--   geom_density() + -->
+<!--   # Add vertical red line at obs stat -->
+<!--   geom_vline(xintercept = chi_obs_arms, color = "red") -->
+<!-- ``` -->
 
 ### Is the data consistent with the model?
 
@@ -643,7 +665,6 @@ null_arms <- gss_party |>
   calculate(stat = "Chisq")
 ```
 
-*Hint:* Remember that the null hypothesis in both tests is that there's no relationship between the variables.
 
 ```{r option-b, echo=FALSE}
 question("Select the correct answer",
@@ -655,6 +676,12 @@ question("Select the correct answer",
   allow_retry = TRUE
 )
 ```
+
+<details>
+<summary>**Hint**</summary>
+Remember that the null hypothesis in both tests is that there's no relationship between the variables.
+</details>
+
 
 ## Alternate method: the chi-squared distribution
 
@@ -764,7 +791,6 @@ ds3 <- tibble(var1 = rep(c("A", "B"), times = c(47, 62)),
                      rep(c("X", "Y", "Z"), times = c(28, 20, 14))))
 ```
 
-*Hint:* Remember, the chi-squared approximation can be invalid if there are fewer than 5 observations in any cell of the contingency table. It is also suggested that the degrees of freedom be greater than 1 (that is, the table has greater than 2 rows and 2 columns). You can view the tables using `lapply(globalenv(), table)`.
 
 ```{r option-c, echo=FALSE}
 question("The chi-squared *approximation* method will only be accurate for one of them. Which one?",
@@ -775,13 +801,20 @@ question("The chi-squared *approximation* method will only be accurate for one o
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+Remember, the chi-squared approximation can be invalid if there are fewer than 5 observations in any cell of the contingency table. It is also suggested that the degrees of freedom be greater than 1 (that is, the table has greater than 2 rows and 2 columns). You can view the tables using `lapply(globalenv(), table)`.
+</details>
+
 ### The geography of happiness
 
 In addition to information regarding their opinions on policy issues, GSS survey respondents also provided the region of the United States in which they live. With this in hand, you can explore the question:
 
 *Does this data set provide evidence of an association between happiness and geography?*
 
-- Using `gss2016`,construct a bar plot of proportions capturing the relationship between `region` and `happy`. Plots like this are easier to read when the variable with the fewer number of levels is mapped to `fill`.
+**Exercise**
+
+- Using `gss2016`, construct a bar plot of proportions capturing the relationship between `region` and `happy`. Plots like this are easier to read when the variable with the fewer number of levels is mapped to `fill`.
 - Use `chisq_stat()` to compute the observed chi-squared statistic associated with this bar plot and save it as `chi_obs`.
 
 ```{r ex11, exercise=TRUE}
@@ -800,28 +833,36 @@ chi_obs <- ___ |>
 chi_obs
 ```
 
-```{r ex11-hint}
- 
-- Map the values of `happy` to the `fill` aesthetic.
-- `select()` the variables of interest before using the `table()` function.
-- The function `chisq_stat()` takes a formula that specifies the response and explanatory variables.
-```
+<details>
+<summary>**Hint**</summary>
+Map the values of `happy` to the `fill` aesthetic.
+</details>
 
-```{r ex11-solution}
-# Visualize distribution of region and happy
-ggplot(gss2016, aes(x = region, fill = happy)) +
-  # Add bar layer of proportions
-  geom_bar(position = "fill") + 
-  # Re-position x-axis values for readability
-  theme(axis.text = element_text(angle = 45, hjust = 1))
-  
-# Calculate and save observed statistic
-chi_obs <- gss2016 |>
-  chisq_stat(region ~ happy)
+<details>
+<summary>**Hint**</summary>
+`select()` the variables of interest before using the `table()` function.
+</details>
 
-# See the result
-chi_obs
-```
+<details>
+<summary>**Hint**</summary>
+The function `chisq_stat()` takes a formula that specifies the response and explanatory variables.
+</details>
+
+<!-- ```{r ex11-solution} -->
+<!-- # Visualize distribution of region and happy -->
+<!-- ggplot(gss2016, aes(x = region, fill = happy)) + -->
+<!--   # Add bar layer of proportions -->
+<!--   geom_bar(position = "fill") +  -->
+<!--   # Re-position x-axis values for readability -->
+<!--   theme(axis.text = element_text(angle = 45, hjust = 1)) -->
+
+<!-- # Calculate and save observed statistic -->
+<!-- chi_obs <- gss2016 |> -->
+<!--   chisq_stat(region ~ happy) -->
+
+<!-- # See the result -->
+<!-- chi_obs -->
+<!-- ``` -->
 
 
 ### A p-value two ways
@@ -835,6 +876,8 @@ The competing notion is the alternative hypothesis that there is an association 
 ```{r}
 chi_obs <- chisq_stat(gss2016, happy ~ region)
 ```
+
+**Exercise**
 
 Generate a distribution of the `"Chisq"` statistic under a null hypothesis of independence between `happy` and `region`. Save this object to `null`.
 
@@ -851,35 +894,34 @@ ___ <- ___
   ___
 ```
 
-```{r ex12-hint}
- 
-- Be sure to start by specifying the response and explanatory variables, along with what constitutes a `success`.
-- Under a null hypothesis of `"independence"`, the type of data generation is `"permute"`.
-```
+<details>
+<summary>**Hint**</summary>
+Be sure to start by specifying the response and explanatory variables, along with what constitutes a `success`.
+</details>
 
-```{r ex12-solution}
-# Generate null distribution
-null <- gss2016 |>
-  # Specify variables
-  specify(happy ~ region, success = "HAPPY") |>
-  # Set up null
-  hypothesize(null = "independence") |>
-  # Generated 500 permuted data sets
-  generate(reps = 500, type = "permute") |>
-  # Calculate statistics
-  calculate(stat = "Chisq")
-```
+<details>
+<summary>**Hint**</summary>
+Under a null hypothesis of `"independence"`, the type of data generation is `"permute"`.
+</details>
+
+<!-- ```{r ex12-solution} -->
+<!-- # Generate null distribution -->
+<!-- null <- gss2016 |> -->
+<!--   # Specify variables -->
+<!--   specify(happy ~ region, success = "HAPPY") |> -->
+<!--   # Set up null -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generated 500 permuted data sets -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   # Calculate statistics -->
+<!--   calculate(stat = "Chisq") -->
+<!-- ``` -->
+
+**Exercise**
 
 Create a density plot of `null`, add a vertical red line at `chi_obs`, and overlay the corresponding approximation from the Chi-squared distribution with the appropriate degrees of freedom.
 
 ```{r ex13, exercise=TRUE}
-# From previous step
-null <- gss2016 |>
-  specify(happy ~ region, success = "HAPPY") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
 # Visualize null
 ___
   # Add density layer
@@ -890,39 +932,35 @@ ___
   stat_function(fun = dchisq, args = list(df = ___), color = "___")
 ```
 
-```{r ex13-hint}
- The degrees of freedom is calculated from the contingency table as the (number of rows - 1)x(number of columns - 1).
-```
+<details>
+<summary>**Hint**</summary>
+The degrees of freedom is calculated from the contingency table as the (number of rows - 1)x(number of columns - 1).
+</details>
 
-```{r ex13-solution}
-# From previous step
-null <- gss2016 |>
-  specify(happy ~ region, success = "HAPPY") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
-# Visualize null
-ggplot(null, aes(x = stat)) +
-  # Add density layer
-  geom_density() +
-  # Add red vertical line at obs stat
-  geom_vline(xintercept = chi_obs, color = "red") +
-  # Overlay chisq approximation
-  stat_function(fun = dchisq, args = list(df = 3), color = "blue")
-```
+<!-- ```{r ex13-solution} -->
+<!-- # From previous step -->
+<!-- null <- gss2016 |> -->
+<!--   specify(happy ~ region, success = "HAPPY") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "Chisq") -->
+
+<!-- # Visualize null -->
+<!-- ggplot(null, aes(x = stat)) + -->
+<!--   # Add density layer -->
+<!--   geom_density() + -->
+<!--   # Add red vertical line at obs stat -->
+<!--   geom_vline(xintercept = chi_obs, color = "red") + -->
+<!--   # Overlay chisq approximation -->
+<!--   stat_function(fun = dchisq, args = list(df = 3), color = "blue") -->
+<!-- ``` -->
+
+**Exercise**
 
 - Compute the permutation p-value.
 - Compute the approximation p-value using `pchisq()`. Note that `pchisq()` will return the left tail of the distribution. To return the right tail, add an argument `lower.tail = FALSE`.
 
 ```{r ex14, exercise=TRUE}
-# From previous step
-null <- gss2016 |>
-  specify(happy ~ region, success = "HAPPY") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
 # Calculate computational pval
 ___ |>
   summarize(pval = ___)
@@ -931,27 +969,31 @@ ___ |>
 pchisq(chi_obs, df = ___, lower.tail = ___)
 ```
 
-```{r ex14-hint}
+<details>
+<summary>**Hint**</summary>
+For the permutation p-value, find the proportion (`mean()`) of `stat`s that are greater than or equal to the observed statistic.
+</details>
 
-- For the permutation p-value, find the proportion (`mean()`) of `stat`s that are greater than or equal to the observed statistic.
-- Use the argument `df = 3` again.
-```
+<details>
+<summary>**Hint**</summary>
+Use the argument `df = 3` again.
+</details>
 
-```{r ex14-solution}
-# From previous step
-null <- gss2016 |>
-  specify(happy ~ region, success = "HAPPY") |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "Chisq")
-  
-# Calculate computational pval
-null |> 
-  summarize(pval = mean(stat >= chi_obs))
+<!-- ```{r ex14-solution} -->
+<!-- # From previous step -->
+<!-- null <- gss2016 |> -->
+<!--   specify(happy ~ region, success = "HAPPY") |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "Chisq") -->
 
-# Calculate approximate pval
-pchisq(chi_obs, df = 3, lower.tail = FALSE)
-```
+<!-- # Calculate computational pval -->
+<!-- null |>  -->
+<!--   summarize(pval = mean(stat >= chi_obs)) -->
+
+<!-- # Calculate approximate pval -->
+<!-- pchisq(chi_obs, df = 3, lower.tail = FALSE) -->
+<!-- ``` -->
 
 ## Intervals for the chi-squared distribution
 
