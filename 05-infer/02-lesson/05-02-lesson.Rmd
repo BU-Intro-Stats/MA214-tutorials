@@ -662,8 +662,8 @@ Do women and men believe at different rates?
 
 Let $p$ be the proportion that believe in life after death.
 
-- $H\_{0} : p\_{female} - p\_{male} = 0$ 
-- $H\_{A} : p\_{female} - p\_{male} \ne 0$ 
+- $H_{0} : p_\mathrm{female} - p_\mathrm{male} = 0$ 
+- $H_{A} : p_\mathrm{female} - p_\mathrm{male} \ne 0$ 
 
 There are plenty of more pressing questions that just beg to be asked of this data, but they require that we look at more than just a single variable. We're curious to know: do men and women believe at different rates? 
 
