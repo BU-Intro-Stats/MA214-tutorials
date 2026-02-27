@@ -731,7 +731,7 @@ We can calculate the difference in these proportions by using our normal summari
 ### Generating data from $H_0$
 
 
-- $H\_{0} : p\_{female} - p\_{male} = 0$
+- $H_{0} : p_\mathrm{female} - p_\mathrm{male} = 0$
 
 - There is no association between belief in the afterlife and the sex of a subject. 
 - The variable `postlife` is independent from the variable `sex`.
