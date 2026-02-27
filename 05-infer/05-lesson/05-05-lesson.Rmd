@@ -229,7 +229,9 @@ In this exercise, the `tidyverse` packages, including `ggplot2` have been loaded
 
 ### 
 
-Next is a two part exercise: First, generate 15000 bootstrap distributions of `rent` in the `manhattan` data frame and record the median of each bootstrap distribution.
+**Exercise**
+
+First, generate 15000 bootstrap distributions of `rent` in the `manhattan` data frame and record the median of each bootstrap distribution.
  
 - Specify that `rent` is the response variable.
 - Generate 15000 bootstrap replicates.
@@ -250,30 +252,40 @@ rent_med_ci <- manhattan |>
 glimpse(rent_med_ci)
 ```
 
-```{r bootstrap_distribution-hint, echo = FALSE}
- 
-- In `specify()`, set `response` to `rent` without quotes.
-- In `generate()`, set `reps` to `15000` and `type` to `"bootstrap"`.
-- In `calculate()`, set `stat` to `"median"`.
-```
+<details>
+<summary>**Hint**</summary>
+In `specify()`, set `response` to `rent` without quotes.
+</details>
 
-```{r bootstrap_distribution-solution}
-# Generate bootstrap distribution of medians
-rent_med_ci <- manhattan |>
-  # Specify the variable of interest
-  specify(response = rent) |>  
-  # Generate 15000 bootstrap samples
-  generate(reps = 15000, type = "bootstrap") |>
-  # Calculate the median of each bootstrap sample
-  calculate(stat = "median")
-  
-# Take a peek
-glimpse(rent_med_ci)
-```
+<details>
+<summary>**Hint**</summary>
+In `generate()`, set `reps` to `15000` and `type` to `"bootstrap"`.
+</details>
+
+<details>
+<summary>**Hint**</summary>
+In `calculate()`, set `stat` to `"median"`.
+</details>
+
+<!-- ```{r bootstrap_distribution-solution} -->
+<!-- # Generate bootstrap distribution of medians -->
+<!-- rent_med_ci <- manhattan |> -->
+<!--   # Specify the variable of interest -->
+<!--   specify(response = rent) |>   -->
+<!--   # Generate 15000 bootstrap samples -->
+<!--   generate(reps = 15000, type = "bootstrap") |> -->
+<!--   # Calculate the median of each bootstrap sample -->
+<!--   calculate(stat = "median") -->
+
+<!-- # Take a peek -->
+<!-- glimpse(rent_med_ci) -->
+<!-- ``` -->
 
 ### 
 
-Then, plot a histogram of the bootstrap medians.
+**Exercise**
+
+Now plot a histogram of the bootstrap medians.
 
 - Using `rent_med_ci`, plot `stat` on the `x` axis.
 - Add a histogram layer with a binwidth of `50`.
@@ -296,19 +308,19 @@ ggplot(___, aes(___)) +
   ___
 ```
 
-```{r bootstrap_medians-hint, echo = FALSE}
- 
-- Use `ggplot()` with `rent_med_ci` as the dataset.
-- Inside `aes()`, map `stat` to `x`.
-- Add `geom_histogram()`, setting `binwidth` to `50`.
-```
+<!-- ```{r bootstrap_medians-hint, echo = FALSE} -->
 
-```{r bootstrap_medians-solution}
-# Plot the rent_med_ci statistic
-ggplot(rent_med_ci, aes(x = stat)) +
-  # Make it a histogram with a binwidth of 50
-  geom_histogram(binwidth = 50)
-```
+<!-- - Use `ggplot()` with `rent_med_ci` as the dataset. -->
+<!-- - Inside `aes()`, map `stat` to `x`. -->
+<!-- - Add `geom_histogram()`, setting `binwidth` to `50`. -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_medians-solution} -->
+<!-- # Plot the rent_med_ci statistic -->
+<!-- ggplot(rent_med_ci, aes(x = stat)) + -->
+<!--   # Make it a histogram with a binwidth of 50 -->
+<!--   geom_histogram(binwidth = 50) -->
+<!-- ``` -->
 
 ## Review: Percentile and standard error methods
 
@@ -376,6 +388,8 @@ rent_med_ci <- manhattan |>
 
 Next up is a 4 part exercise. First, calculate a 95% bootstrap confidence interval using the percentile method.
 
+**Exercise**
+
 - Summarize `rent_med_ci`'s statistic with appropriate lower and upper quantiles.
 
 
@@ -388,22 +402,28 @@ rent_med_ci |>
   ) 
 ```
 
-```{r bootstrap_interval-hint, echo = FALSE}
- 
-- Use `summarize()`, with `quantile(stat, 0.025)` for the 2.5th percentile.
-- The `probs` arguments for the `l` and `u` quantiles should add up to one.
-```
+<details>
+<summary>**Hint**</summary>
+Use `summarize()`, with `quantile(stat, 0.025)` for the 2.5th percentile.
+</details>
 
-```{r bootstrap_interval-solution}
-# Calculate bootstrap CI as lower and upper quantiles
-rent_med_ci |>
-  summarize(
-    l = quantile(stat, 0.025),
-    u = quantile(stat, 0.975)
-  ) 
-```
+<details>
+<summary>**Hint**</summary>
+The `probs` arguments for the `l` and `u` quantiles should add up to one.
+</details>
+
+<!-- ```{r bootstrap_interval-solution} -->
+<!-- # Calculate bootstrap CI as lower and upper quantiles -->
+<!-- rent_med_ci |> -->
+<!--   summarize( -->
+<!--     l = quantile(stat, 0.025), -->
+<!--     u = quantile(stat, 0.975) -->
+<!--   )  -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 Then, calculate the observed median rent.
 
@@ -422,29 +442,31 @@ rent_med_obs <- manhattan |>
 rent_med_obs
 ```
 
-```{r bootstrap_interval_2-hint, echo = FALSE}
- 
-- Use `summarize()` and `median_rent` to the median of `rent`.
-- Use `pull()` to extract the vector from the data frame.
-```
+<!-- ```{r bootstrap_interval_2-hint, echo = FALSE} -->
 
-```{r bootstrap_interval_2-solution}
-rent_med_obs <- manhattan |>
-  # Calculate observed median rent
-  summarize(median_rent = median(rent)) |>
-  # Pull out the value
-  pull()
-  
-# See the result
-rent_med_obs
-```
+<!-- - Use `summarize()` and `median_rent` to the median of `rent`. -->
+<!-- - Use `pull()` to extract the vector from the data frame. -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_interval_2-solution} -->
+<!-- rent_med_obs <- manhattan |> -->
+<!--   # Calculate observed median rent -->
+<!--   summarize(median_rent = median(rent)) |> -->
+<!--   # Pull out the value -->
+<!--   pull() -->
+
+<!-- # See the result -->
+<!-- rent_med_obs -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 Then, determine the critical value.
 
 - Calculate the degrees of freedom in the dataset.
-- Use the t-distribution to determine the critical value for a 95% confidence interval. *`qt()` takes the percentile of the t-distribution you want to find and the degrees of freedom as arguments.*
+- Use the t-distribution to determine the critical value for a 95% confidence interval.
 
 ```{r bootstrap_interval_3-setup, include=FALSE}
 rent_med_obs <- manhattan |>
@@ -460,21 +482,27 @@ degrees_of_freedom <- ___
 t_star <- ___
 ```
 
-```{r bootstrap_interval_3-hint, echo = FALSE}
- 
-- The degrees of freedom is n - 1.
-- Use `qt()`, setting `p` to `0.975` and `df` to the degrees of freedom.
-```
+<details>
+<summary>**Hint**</summary>
+`qt()` takes the percentile of the t-distribution you want to find and the degrees of freedom as arguments.
+</details>
 
-```{r bootstrap_interval_3-solution}
-# Calculate the degrees of freedom
-degrees_of_freedom <- nrow(manhattan) - 1  
-  
-# Determine the critical value
-t_star <- qt(0.975, df = degrees_of_freedom)
-```
+<details>
+<summary>**Hint**</summary>
+The degrees of freedom should be n - 1. Why?
+</details>
+
+<!-- ```{r bootstrap_interval_3-solution} -->
+<!-- # Calculate the degrees of freedom -->
+<!-- degrees_of_freedom <- nrow(manhattan) - 1   -->
+
+<!-- # Determine the critical value -->
+<!-- t_star <- qt(0.975, df = degrees_of_freedom) -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 And finally, complete the calculation of the 95% bootstrap confidence interval using the standard error method.
 
@@ -512,23 +540,23 @@ rent_med_ci |>
   )
 ```
 
-```{r bootstrap_interval_4-hint, echo = FALSE}
- 
-- Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
-- Use `summarize()` again, setting `l_se` to the observed median minus the critical value times the bootstrap standard error.
-```
+<!-- ```{r bootstrap_interval_4-hint, echo = FALSE} -->
 
-```{r bootstrap_interval_4-solution}
-# Calculate the CI using the std error method
-rent_med_ci |>
-  # Calculate the std error of the statistic
-  summarize(boot_se = sd(stat)) |>
-  # Calculate the lower and upper limits of the CI
-  summarize(
-    l_se = rent_med_obs - t_star * boot_se,
-    u_se = rent_med_obs + t_star * boot_se
-  )
-```
+<!-- - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`. -->
+<!-- - Use `summarize()` again, setting `l_se` to the observed median minus the critical value times the bootstrap standard error. -->
+<!-- ``` -->
+
+<!-- ```{r bootstrap_interval_4-solution} -->
+<!-- # Calculate the CI using the std error method -->
+<!-- rent_med_ci |> -->
+<!--   # Calculate the std error of the statistic -->
+<!--   summarize(boot_se = sd(stat)) |> -->
+<!--   # Calculate the lower and upper limits of the CI -->
+<!--   summarize( -->
+<!--     l_se = rent_med_obs - t_star * boot_se, -->
+<!--     u_se = rent_med_obs + t_star * boot_se -->
+<!--   ) -->
+<!-- ``` -->
 
 ```{r bootstrap_interval_5-setup, include=FALSE}
 # Set seed so that same bootstrap object can be reused later
@@ -540,6 +568,8 @@ rent_med_ci <- manhattan |>
   generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
+
+*TODO: check how this looks*
 
 ```{r bootstrap_interval_5, exercise = TRUE}
 # Recall the CI using the percentile method from step 1
@@ -598,12 +628,12 @@ quiz(
 ```
 
 
-```{r doctor_visit, exercise=TRUE}
 
-```
 ### Average number of doctor's visits
 
 Next, we construct a bootstrap interval for the average number of doctor's visits during pregnancy.
+
+**Exercise**
 
 First, filter `ncbirths` for rows where `visits` is not missing.
 
@@ -617,31 +647,32 @@ glimpse(ncbirths_complete_visits)
 
 ```
 
-```{r doctor-hint, echo = FALSE}
- 
-- Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
-- Use `summarize()` again, setting `l` to the observed median minus the critical value times the bootstrap standard error.
-- For `u`, change the minus to a plus.
-```
+<!-- ```{r doctor-hint, echo = FALSE} -->
 
-```{r doctor-solution}
-# Filter for rows with non-missing visits
-ncbirths_complete_visits <- ncbirths |>
-  filter(!is.na(visits))
-  
-# See the result
-glimpse(ncbirths_complete_visits)
-```
+<!-- - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`. -->
+<!-- - Use `summarize()` again, setting `l` to the observed median minus the critical value times the bootstrap standard error. -->
+<!-- - For `u`, change the minus to a plus. -->
+<!-- ``` -->
+
+<!-- ```{r doctor-solution} -->
+<!-- # Filter for rows with non-missing visits -->
+<!-- ncbirths_complete_visits <- ncbirths |> -->
+<!--   filter(!is.na(visits)) -->
+
+<!-- # See the result -->
+<!-- glimpse(ncbirths_complete_visits) -->
+<!-- ``` -->
 
 
 ###
 
-Then, generate 15000 bootstrap means of the number of visits.
+**Exercise**
+
+Then, generate 15000 bootstrap means of the number of visits:
 
 - Specify `visits` as the variable of interest.
 - Generate 15000 bootstrap replicates.
 - Calculate the mean.
-
 
 ```{r doctor_2, exercise=TRUE}
 # From previous step
@@ -658,33 +689,31 @@ visit_mean_ci <- ncbirths_complete_visits |>
   ___(stat = ___)
 ```
 
-```{r doctor_2-hint, echo = FALSE}
- 
-- Use `specify()`, setting `response` to `visits`.
-- Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
-- Use `calculate()`, setting `stat` to `"mean"`.
-```
+<!-- ```{r doctor_2-hint, echo = FALSE} -->
 
-```{r doctor_2-solution}
-# From previous step
-ncbirths_complete_visits <- ncbirths |>
-  filter(!is.na(visits))
+<!-- - Use `specify()`, setting `response` to `visits`. -->
+<!-- - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`. -->
+<!-- - Use `calculate()`, setting `stat` to `"mean"`. -->
+<!-- ``` -->
 
-# Generate 15000 bootstrap means
-visit_mean_ci <- ncbirths_complete_visits |>
-  # Specify visits as the response
-  specify(response = visits) |>
-  # Generate 15000 bootstrap replicates
-  generate(reps = 15000, type = "bootstrap") |>
-  # Calculate the mean
-  calculate(stat = "mean")
-```
+<!-- ```{r doctor_2-solution} -->
+<!-- # From previous step -->
+<!-- ncbirths_complete_visits <- ncbirths |> -->
+<!--   filter(!is.na(visits)) -->
+
+<!-- # Generate 15000 bootstrap means -->
+<!-- visit_mean_ci <- ncbirths_complete_visits |> -->
+<!--   # Specify visits as the response -->
+<!--   specify(response = visits) |> -->
+<!--   # Generate 15000 bootstrap replicates -->
+<!--   generate(reps = 15000, type = "bootstrap") |> -->
+<!--   # Calculate the mean -->
+<!--   calculate(stat = "mean") -->
+<!-- ``` -->
 
 ### 
 
 And finally, calculate the 90% confidence interval via percentile method.
-
-- Summarize to calculate appropriate quantiles of the bootstrap statistic.
 
 ```{r doctor_3, exercise=TRUE}
 # From previous steps
@@ -703,28 +732,32 @@ visit_mean_ci |>
   )
 ```
 
-```{r doctor_3-hint, echo = FALSE}
- 
-- Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
-- The `probs` arguments for the `l` and `u` quantiles should add up to one.
-```
+<details>
+<summary>**Hint**</summary>
+The `probs` arguments for the `l` and `u` quantiles should add up to one.
+</details>
 
-```{r doctor_3-solution}
-# From previous steps
-ncbirths_complete_visits <- ncbirths |>
-  filter(!is.na(visits))
-visit_mean_ci <- ncbirths_complete_visits |>
-  specify(response = visits) |>
-  generate(reps = 15000, type = "bootstrap") |>
-  calculate(stat = "mean")
-  
-# Calculate the 90% CI via percentile method
-visit_mean_ci |>
-  summarize(
-    l = quantile(stat, 0.05),
-    u = quantile(stat, 0.95)
-  )
-```
+<!-- ```{r doctor_3-hint, echo = FALSE} -->
+<!-- - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`. -->
+<!-- - The `probs` arguments for the `l` and `u` quantiles should add up to one. -->
+<!-- ``` -->
+
+<!-- ```{r doctor_3-solution} -->
+<!-- # From previous steps -->
+<!-- ncbirths_complete_visits <- ncbirths |> -->
+<!--   filter(!is.na(visits)) -->
+<!-- visit_mean_ci <- ncbirths_complete_visits |> -->
+<!--   specify(response = visits) |> -->
+<!--   generate(reps = 15000, type = "bootstrap") |> -->
+<!--   calculate(stat = "mean") -->
+
+<!-- # Calculate the 90% CI via percentile method -->
+<!-- visit_mean_ci |> -->
+<!--   summarize( -->
+<!--     l = quantile(stat, 0.05), -->
+<!--     u = quantile(stat, 0.95) -->
+<!--   ) -->
+<!-- ``` -->
 
 ### 
 
@@ -733,7 +766,9 @@ Fantastic! Quick mental check before you move on: How would you interpret this i
 
 ### SD of number of doctor's visits
 
-Suppose now we're interested in the standard deviation of the number of doctor's visits throughout pregnancy.
+Suppose now we're interested in the standard deviation of the number of doctor's visits throughout pregnancy, as opposed to the mean.
+
+**Exercise**
 
 For the number of doctor's visits, first generate 15000 bootstrap replicates and calculate their standard deviations.
 
@@ -748,25 +783,30 @@ visit_sd_ci <- ncbirths_complete_visits |>
 visit_sd_ci
 ```
 
-```{r doctor_4-hint, echo = FALSE}
- 
-- Use `specify()`, setting `response` to `visits`.
-- Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
-- Use `calculate()`, setting `stat` to `"sd"`.
-```
+<details>
+<summary>**Hint**</summary>
+The steps should all be similar to what you did above, except in `calculate()`, set `stat` to `"sd"`.
+</details>
 
-```{r doctor_4-solution}
-# Calculate 15000 bootstrap standard deviations of visits
-visit_sd_ci <- ncbirths_complete_visits |>
-  specify(response = visits) |>
-  generate(reps = 15000, type = "bootstrap") |>
-  calculate(stat = "sd")
-  
-# See the result
-visit_sd_ci
-```
+<!-- ```{r doctor_4-hint, echo = FALSE} -->
+<!-- - Use `specify()`, setting `response` to `visits`. -->
+<!-- - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`. -->
+<!-- ``` -->
+
+<!-- ```{r doctor_4-solution} -->
+<!-- # Calculate 15000 bootstrap standard deviations of visits -->
+<!-- visit_sd_ci <- ncbirths_complete_visits |> -->
+<!--   specify(response = visits) |> -->
+<!--   generate(reps = 15000, type = "bootstrap") |> -->
+<!--   calculate(stat = "sd") -->
+
+<!-- # See the result -->
+<!-- visit_sd_ci -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 Then, calculate a 90% confidence interval for the bootstrap standard deviations using the percentile method.
 
@@ -783,28 +823,32 @@ visit_sd_ci |>
     l = ___,
     u = ___
   )
+
+# TODO: make sure there's an output (for this and above)
 ```
 
-```{r doctor_5-hint, echo = FALSE}
- 
-- Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
-- The `probs` arguments for the `l` and `u` quantiles should add up to one.
-```
+<!-- ```{r doctor_5-hint, echo = FALSE} -->
 
-```{r doctor_5-solution}
-# From previous step
-visit_sd_ci <- ncbirths_complete_visits |>
-  specify(response = visits) |>
-  generate(reps = 15000, type = "bootstrap") |>
-  calculate(stat = "sd")
-  
-# Calculate the 90% CI via percentile method
-visit_sd_ci |>
-  summarize(
-    l = quantile(stat, 0.05),
-    u = quantile(stat, 0.95)
-  )
-```
+<!-- - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`. -->
+<!-- - The `probs` arguments for the `l` and `u` quantiles should add up to one. -->
+<!-- ``` -->
+
+<!-- ```{r doctor_5-solution} -->
+<!-- # From previous step -->
+<!-- visit_sd_ci <- ncbirths_complete_visits |> -->
+<!--   specify(response = visits) |> -->
+<!--   generate(reps = 15000, type = "bootstrap") |> -->
+<!--   calculate(stat = "sd") -->
+
+<!-- # Calculate the 90% CI via percentile method -->
+<!-- visit_sd_ci |> -->
+<!--   summarize( -->
+<!--     l = quantile(stat, 0.05), -->
+<!--     u = quantile(stat, 0.95) -->
+<!--   ) -->
+<!-- ``` -->
+
+Well done! You should now be familiar with how to create bootstrap confidence intervals for the mean and standard deviation of a sample.
 
 ## Re-centering a bootstrap distribution
 
@@ -821,6 +865,8 @@ Bootstrap distributions are by design centered at the observed sample statistic.
 However since in a hypothesis test we assume that the null hypothesis is true, we shift the bootstrap distribution to be centered at the null value.
 
 The p-value is then defined as the proportion of simulations that yield a sample statistic at least as favorable to the alternative hypothesis as the observed sample statistic.
+
+*TODO: check how this looks*
 
 
 ### Re-centering the bootstrap distribution - sketch
@@ -839,6 +885,8 @@ Let's turn our attention back to Manhattan apartments. We would like to evaluate
 # Set seed so that same bootstrap sample can be reused later
 set.seed(20170802)
 ```
+
+**Exercise**
 
 First, let's generate 15000 bootstrap samples centered at null. *The specify, generate, and calculate steps are completed for you.*
 
@@ -860,26 +908,28 @@ rent_med_ht <- manhattan |>
 rent_med_ht
 ```
 
-```{r apartments-hint, echo = FALSE}
- Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`.
-```
+<!-- ```{r apartments-hint, echo = FALSE} -->
+<!--  Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`. -->
+<!-- ``` -->
 
-```{r apartments-solution}
-n_replicates <- 15000
+<!-- ```{r apartments-solution} -->
+<!-- n_replicates <- 15000 -->
 
-# Generate 15000 bootstrap samples centered at null
-rent_med_ht <- manhattan |>
-  specify(response = rent) |>
-  # Use a point hypothesis with a median of 2500
-  hypothesize(null = "point", med = 2500) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "median")
-  
-# See the result
-rent_med_ht
-```
+<!-- # Generate 15000 bootstrap samples centered at null -->
+<!-- rent_med_ht <- manhattan |> -->
+<!--   specify(response = rent) |> -->
+<!--   # Use a point hypothesis with a median of 2500 -->
+<!--   hypothesize(null = "point", med = 2500) |>  -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   calculate(stat = "median") -->
+
+<!-- # See the result -->
+<!-- rent_med_ht -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 Then, calculate the observed median rent.
 
@@ -888,14 +938,6 @@ Then, calculate the observed median rent.
 
 
 ```{r apartments_2, exercise=TRUE}
-# From previous step
-n_replicates <- 15000
-rent_med_ht <- manhattan |>
-  specify(response = rent) |>
-  hypothesize(null = "point", med = 2500) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "median")
-  
 rent_med_obs <- manhattan |>
   # Calculate observed median rent
   ___(median_rent = ___) |>
@@ -906,32 +948,34 @@ rent_med_obs <- manhattan |>
 rent_med_obs
 ```
 
-```{r apartments_2-hint, echo = FALSE}
- 
-- Use `summarize()`, setting `median_rent` to the median of `rent`.
-- Use `pull()` to extract the vector from the data frame.
-```
+<!-- ```{r apartments_2-hint, echo = FALSE} -->
 
-```{r apartments_2-solution}
-# From previous step
-n_replicates <- 15000
-rent_med_ht <- manhattan |>
-  specify(response = rent) |>
-  hypothesize(null = "point", med = 2500) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "median")
-  
-rent_med_obs <- manhattan |>
-  # Calculate observed median rent
-  summarize(median_rent = median(rent)) |>
-  # Pull out the value
-  pull()
-  
-# See the result
-rent_med_obs
-```
+<!-- - Use `summarize()`, setting `median_rent` to the median of `rent`. -->
+<!-- - Use `pull()` to extract the vector from the data frame. -->
+<!-- ``` -->
+
+<!-- ```{r apartments_2-solution} -->
+<!-- # From previous step -->
+<!-- n_replicates <- 15000 -->
+<!-- rent_med_ht <- manhattan |> -->
+<!--   specify(response = rent) |> -->
+<!--   hypothesize(null = "point", med = 2500) |>  -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   calculate(stat = "median") -->
+
+<!-- rent_med_obs <- manhattan |> -->
+<!--   # Calculate observed median rent -->
+<!--   summarize(median_rent = median(rent)) |> -->
+<!--   # Pull out the value -->
+<!--   pull() -->
+
+<!-- # See the result -->
+<!-- rent_med_obs -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 And finally, calculate the p-value as the proportion of bootstrap statistics greater than the observed statistic.
 
@@ -939,54 +983,48 @@ And finally, calculate the p-value as the proportion of bootstrap statistics gre
 - Summarize to calculate `p_val` as the number of rows in the filtered dataset divided by the number of replicates.
 
 
-
 ```{r apartments_3, exercise=TRUE}
-# From previous step
-n_replicates <- 15000
-rent_med_ht <- manhattan |>
-  specify(response = rent) |>
-  hypothesize(null = "point", med = 2500) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "median")
-rent_med_obs <- manhattan |>
-  summarize(median_rent = median(rent)) |>
-  pull()
-  
 rent_med_ht |>
   # Filter for bootstrap stat greater than or equal to observed stat
   filter(___ >= ___) |>
   # Calculate the p-value
   summarize(p_val = ___ / ___)
+
+# TODO: check that there's an output
 ```
 
-```{r apartments_3-hint, echo = FALSE}
- 
-- Use `filter()`, using the condition `stat` greater than or equal to the observed median rent, `rent_med_obs`.
-- Use `summarize()`, setting `p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
-```
+<details>
+<summary>**Hint**</summary>
+In `filter()`, try using the condition `stat` greater than or equal to the observed median rent, `rent_med_obs`.
+</details>
 
-```{r apartments_3-solution}
-# From previous step
-n_replicates <- 15000
-rent_med_ht <- manhattan |>
-  specify(response = rent) |>
-  hypothesize(null = "point", med = 2500) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "median")
-rent_med_obs <- manhattan |>
-  summarize(median_rent = median(rent)) |>
-  pull()
-  
-rent_med_ht |>
-  # Filter for bootstrap stat greater than or equal to observed stat
-  filter(stat >= rent_med_obs) |>
-  # Calculate the p-value
-  summarize(p_val = n() / n_replicates)
-```
+<details>
+<summary>**Hint**</summary>
+In `summarize()`, try setting `p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
+</details>
+
+<!-- ```{r apartments_3-solution} -->
+<!-- # From previous step -->
+<!-- n_replicates <- 15000 -->
+<!-- rent_med_ht <- manhattan |> -->
+<!--   specify(response = rent) |> -->
+<!--   hypothesize(null = "point", med = 2500) |>  -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   calculate(stat = "median") -->
+<!-- rent_med_obs <- manhattan |> -->
+<!--   summarize(median_rent = median(rent)) |> -->
+<!--   pull() -->
+
+<!-- rent_med_ht |> -->
+<!--   # Filter for bootstrap stat greater than or equal to observed stat -->
+<!--   filter(stat >= rent_med_obs) |> -->
+<!--   # Calculate the p-value -->
+<!--   summarize(p_val = n() / n_replicates) -->
+<!-- ``` -->
 
 ### Conclude the hypothesis test on median
 
-The p-value you calculated in the previous exercise is available as `rent_p_value`.
+The p-value you calculated in the previous exercise is available as `rent_p_value`. *TODO: check*
 Recall the problem statement: We would like to evaluate whether this data provides evidence that the median rent of 1 BR apartments in Manhattan is greater than $2,500.
 
 
