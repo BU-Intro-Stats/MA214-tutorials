@@ -174,7 +174,7 @@ Time to put this into practice.
 
 Before we conduct inference, we should take a look at the distributions of vocabulary scores across the levels of (self-identified) social class.
 
-
+**Exercise**
 
 - Using `gss`, plot the distribution of vocabulary scores, `wordsum`.
 - Make this a histogram, using an appropriate binwidth.
@@ -191,21 +191,24 @@ ggplot(data = ___, mapping = aes(___)) +
   facet_wrap(~___)
 ```
 
-```{r vocabulary-hint}
- 
-- Use `gss` as the plot's `data` argument, then map `x` to `wordsum` in c`aes()`. 
-- Add a histogram layer with `geom_histogram()`. Vocabulary scores can only be whole numbers, so it doesn't make sense to have a `binwidth` narrower than one (1) point.
-- The faceting formula can be specified using `~class`.
-```
+<details>
+<summary>**Hint**</summary>
+Vocabulary scores can only be whole numbers - so what should the binwidth be?
+</details>
 
-```{r vocabulary-solution}
-# Using gss, plot wordsum
-ggplot(data = gss, mapping = aes(x = wordsum)) +
-  # Add a histogram layer
-  geom_histogram(binwidth = 1) +
-  # Facet by class
-  facet_wrap(~class)
-```
+<details>
+<summary>**Hint**</summary>
+The faceting formula can be specified using `~class`.
+</details>
+
+<!-- ```{r vocabulary-solution} -->
+<!-- # Using gss, plot wordsum -->
+<!-- ggplot(data = gss, mapping = aes(x = wordsum)) + -->
+<!--   # Add a histogram layer -->
+<!--   geom_histogram(binwidth = 1) + -->
+<!--   # Facet by class -->
+<!--   facet_wrap(~class) -->
+<!-- ``` -->
 
 ### 
 
@@ -406,6 +409,8 @@ __ANOVA for evaluation score vs. rank of professor__
 
 Let's conduct the ANOVA for evaluating whether there is a difference in the average evaluation score between the different ranks of professors at the University of Texas at Austin.
 
+**Exercise**
+
 Use the `evals` data to perform an ANOVA for evaluation `score` based on professor `rank`. Use the following steps: 
 
 - Use the `aov()` to perform the ANVOA, with inputs `score` and `rank`. 
@@ -421,21 +426,19 @@ aov_evals_rank <- aov(___, data = ___)
 tidy(aov_evals_rank)
 ```
 
-```{r vocabulary_2-hint}
- 
-- Call `aov()`, passing a formula of `score ~ rank`, using the `evals` dataset.
-- Call `tidy()`, passing the `aov_evals_rank` AOV model.
-```
+<details>
+<summary>**Hint**</summary>
+Call `aov()`, passing a formula of `score ~ rank`, using the `evals` dataset.
+</details>
 
+<!-- ```{r vocabulary_2-solution} -->
+<!-- # Run an analysis of variance on score vs. rank -->
+<!-- aov_evals_rank <- aov(score ~ rank, data = evals) -->
 
-```{r vocabulary_2-solution}
-# Run an analysis of variance on score vs. rank
-aov_evals_rank <- aov(score ~ rank, data = evals)
+<!-- # Tidy the model -->
+<!-- tidy(aov_evals_rank) -->
+<!-- ``` -->
 
-# Tidy the model
-tidy(aov_evals_rank)
-
-```
 
 Interpret the result in context of the data and the research question. If needed, use a 2.5% significance level.  
 
@@ -444,7 +447,7 @@ Would your conclusion change if you had used a 10% significance level?
 
 ## Conditions for ANOVA
 
-Just like any other statistical inference method we've encounter so far, there are mathematical conditions that need to be met for an ANOVA as well. Since we cannot mathematically "prove" that these conditions have been "met," we will use a careful eye to evaluate the degree to which each condition may be violated. 
+Just like any other statistical inference method we've encountered so far, there are mathematical conditions that need to be met for an ANOVA as well. Since we cannot mathematically "prove" that these conditions have been "met," we will use a careful eye to evaluate the degree to which each condition may be violated. 
 
 There are three main conditions for ANOVA. The first one is independence. Within groups the sampled observations must be independent of each other, and between groups the groups must be independent of each other as well. 
 
@@ -504,7 +507,9 @@ question("Which of the following provides the most complete information for chec
 
 In addition to checking the normality of distributions of vocabulary scores across levels of social class, we need to check that the variances from each are roughly constant.
 
-In the exercise below, you'll calculate the standard deviations of each social class. To do this: 
+**Exercise**
+
+Calculate the standard deviations of each social class. To do this: 
 
 1. `group_by()` social `class` 
 2 `summarize()` each group with the standard deviations (`sd()` ) of vocabulary scores (`wordsum`)
@@ -521,19 +526,18 @@ gss |>
   summarize(___ = ___)
 ```
 
-```{r vocabulary_3-hint}
- 
-- Call `group_by()`, passing `class` as the argument.
-- Call `summarize()`, setting `std_dev_wordsum` to `sd(wordsum)`.
-```
+<details>
+<summary>**Hint**</summary>
+Call `summarize()`, setting `std_dev_wordsum` to `sd(wordsum)`.
+</details>
 
-```{r vocabulary_3-solution}
-gss |>
-  # Group by class
-  group_by(class) |>
-  # Calculate the std dev of wordsum as std_dev_wordsum
-  summarize(sd_wordsum = sd(wordsum))
-```
+<!-- ```{r vocabulary_3-solution} -->
+<!-- gss |> -->
+<!--   # Group by class -->
+<!--   group_by(class) |> -->
+<!--   # Calculate the std dev of wordsum as std_dev_wordsum -->
+<!--   summarize(sd_wordsum = sd(wordsum)) -->
+<!-- ``` -->
 
 ### 
 
@@ -551,18 +555,19 @@ gss |>
   geom_density_ridges()
 ```
 
-```{r vocabulary_4-hint}
- 
-- Call `ggplot()`, passing `wordsum` to the `x` variable and `class` to the `y` variable. 
-```
+<details>
+<summary>**Hint**</summary>
+Call `ggplot()`, passing `wordsum` to the `x` variable and `class` to the `y` variable. 
+</details>
 
-```{r vocabulary_4-solution}
-gss |>
-  # Map wordsum to the x-axis and class to the y-axis
-  ggplot(aes(x = wordsum, y = class)) +
-  # Add density ridges to the plot! 
-  geom_density_ridges()
-```
+<!-- ```{r vocabulary_4-solution} -->
+<!-- gss |> -->
+<!--   # Map wordsum to the x-axis and class to the y-axis -->
+<!--   ggplot(aes(x = wordsum, y = class)) + -->
+<!--   # Add density ridges to the plot!  -->
+<!--   geom_density_ridges() -->
+<!-- ``` -->
+
 
 So, what do you think now? Is the equal variance condition violated? 
 
@@ -599,6 +604,8 @@ The next step is to simulate what we would expect for `wordsum`s to look like, i
 
 ###
 
+**Exercise**
+
 Let's start with steps 1-4. Using the code below, fill in the missing pieces necessary to simulate F-statistics that could have happened if the null hypothesis was true. 
 
 Once you've filled in the code, take a look at what the F-statistics stored inside of `null_dist` look like!
@@ -609,20 +616,22 @@ null_dist <- gss |>
   hypothesize(null = "___") |> 
   generate(reps = 1000, type = "permute") |> 
   calculate(stat = "___")
-
 ```
 
-```{r anova-sim-hint-1}
-specify(wordsum ~ class) 
-```
+<details>
+<summary>**Hint**</summary>
+Use `specify()`, with `wordsum ~ class`. 
+</details>
 
-```{r anova-sim-hint-2}
-hypothesise(null = "independence")
-```
+<details>
+<summary>**Hint**</summary>
+What is your null hypothesis?
+</details>
 
-```{r anova-sim-hint-3}
-calculate(stat = "F")
-```
+<details>
+<summary>**Hint**</summary>
+In `calculate()`, your stat should be `F`.
+</details>
 
 ###
 
@@ -696,14 +705,11 @@ There are 4 social classes, and the original significance level was 5%.
 *Hint:* For $k$ groups, there are $k \cdot (k - 1) / 2$ pairwise comparisons.
 
 ```{r quiz_3}
-question("",
-  correct = "Bonferroni would be so proud! The correction factor for $k$ classes is $k * (k - 1) / 2$.",
-  allow_retry = TRUE,
+question("", correct = "Bonferroni would be so proud! The correction factor for $k$ classes is $k * (k - 1) / 2$.", allow_retry = TRUE,
   answer("0.05", message = "No. You need to correct for the multiple comparisons of pairs of social classes."),
   answer("0.05 / 4", message = "No. You should correct for *pairwise* comparisons of social classes."),
   answer("0.05 / 6", correct = TRUE),
-  answer("0.05 / 12", message = "No. Comparing class `A` to class `B` is the same as comparing class `B` to class `A`, so you need to halve the correction factor.")
-)
+  answer("0.05 / 12", message = "No. Comparing class `A` to class `B` is the same as comparing class `B` to class `A`, so you need to halve the correction factor."))
 ```
 
 ### Compare pairwise means
@@ -725,6 +731,8 @@ Additionally, the `pairwise.t.test()` function takes three main inputs,
 
 ### 
 
+**Exercise**
+
 For this exercise, you are to conduct a pairwise t-test on vocabulary scores and social class.
 
 - Use the `pairwise.t.test()` function to obtain the pairwise $t$-tests. 
@@ -738,7 +746,6 @@ For this exercise, you are to conduct a pairwise t-test on vocabulary scores and
 t_test_results <- gss %$%  
   pairwise.t.test(x = ___, g = ___, p.adjust.method = "___")
 
-
 # Tidy the result
 tidy(___)
 
@@ -747,29 +754,27 @@ gss %$%
   pairwise.t.test(wordsum, class, p.adjust.method = "none")
 ```
 
-```{r vocabulary_5-hint}
- 
-- Use `wordsum` as `x`, `class` as `g`, and set `p.adjust.method` to `"bonferroni"`.
-- Call `tidy()`, passing `t_test_results`.
-```
+<details>
+<summary>**Hint**</summary>
+Use `wordsum` as `x`, `class` as `g`, and set `p.adjust.method` to `"bonferroni"`.
+</details>
 
-```{r vocabulary_5-solution}
-# Run a pairwise t-test on wordsum and class, with adjustment
-t_test_results <- gss %$%  
-  pairwise.t.test(x = wordsum, g = class, p.adjust.method = "bonferroni")
+<!-- ```{r vocabulary_5-solution} -->
+<!-- # Run a pairwise t-test on wordsum and class, with adjustment -->
+<!-- t_test_results <- gss %$%   -->
+<!--   pairwise.t.test(x = wordsum, g = class, p.adjust.method = "bonferroni") -->
 
-## Alternative method 
-t_test_results <- pairwise.t.test(gss$wordsum, gss$class, p.adjust.method = "bonferroni")
+<!-- ## Alternative method  -->
+<!-- t_test_results <- pairwise.t.test(gss$wordsum, gss$class, p.adjust.method = "bonferroni") -->
 
-# Tidy the result
-tidy(t_test_results)
+<!-- # Tidy the result -->
+<!-- tidy(t_test_results) -->
 
-## Compare with un-adjusted pairwise t-tests
-gss %$% 
-  pairwise.t.test(wordsum, class, p.adjust.method = "none") |> 
-  tidy()
-
-```
+<!-- ## Compare with un-adjusted pairwise t-tests -->
+<!-- gss %$%  -->
+<!--   pairwise.t.test(wordsum, class, p.adjust.method = "none") |>  -->
+<!--   tidy() -->
+<!-- ``` -->
 
 ### 
 
