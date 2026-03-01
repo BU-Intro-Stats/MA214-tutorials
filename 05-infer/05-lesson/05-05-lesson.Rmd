@@ -390,7 +390,7 @@ Next up is a 4 part exercise. First, calculate a 95% bootstrap confidence interv
 
 **Exercise**
 
-- Summarize `rent_med_ci`'s statistic with appropriate lower and upper quantiles.
+Summarize `rent_med_ci`'s statistic with appropriate lower and upper quantiles.
 
 
 ```{r bootstrap_interval, exercise=TRUE}
@@ -398,8 +398,7 @@ Next up is a 4 part exercise. First, calculate a 95% bootstrap confidence interv
 rent_med_ci |>
   summarize(
     l = quantile(___, ___),
-    u = ___
-  ) 
+    u = ___) 
 ```
 
 <details>
@@ -489,7 +488,7 @@ t_star <- ___
 
 <details>
 <summary>**Hint**</summary>
-The degrees of freedom should be n - 1. Why?
+The degrees of freedom should be n - 1.
 </details>
 
 <!-- ```{r bootstrap_interval_3-solution} -->
@@ -536,8 +535,9 @@ rent_med_ci |>
   # Calculate the lower and upper limits of the CI
   summarize(
     l = ___ - ___ * ___,
-    u = ___ + ___ * ___
-  )
+    u = ___ + ___ * ___)
+
+print(rent_med_ci)
 ```
 
 <!-- ```{r bootstrap_interval_4-hint, echo = FALSE} -->
@@ -569,15 +569,12 @@ rent_med_ci <- manhattan |>
   calculate(stat = "median")
 ```
 
-*TODO: check how this looks*
-
-```{r bootstrap_interval_5, exercise = TRUE}
+```{r bootstrap_interval_5, echo = TRUE}
 # Recall the CI using the percentile method from step 1
 rent_med_ci |>
   summarize(
     l = quantile(stat, 0.025),
-    u = quantile(stat, 0.975)
-  )
+    u = quantile(stat, 0.975))
 ```
 
 
@@ -589,14 +586,10 @@ Whew! The standard error method sure is more work, but often it provides a bette
 
 
 ```{r quiz_1}
-quiz(
-  question("Which method is more appropriate for calculating the bootstrap confidence interval for the median rent of 1 BR apartments in Manhattan?", 
-           correct = "Great job! The standard error method is more appropriate here.", 
-           allow_retry = TRUE,
+quiz(question("Which method is more appropriate for calculating the bootstrap confidence interval for the median rent of 1 BR apartments in Manhattan?",
+              correct = "Great job! The standard error method is more appropriate here.", allow_retry = TRUE,
     answer("Percentile method.", message = "This method doesn't always give the best results."),
-    answer("Standard error method.", correct = TRUE)
-  ), caption = ""
-)
+    answer("Standard error method.", correct = TRUE)), caption = "")
 ```
 
 ```{r}
@@ -615,16 +608,12 @@ ggplot(data = rent_med_ci, mapping = aes(x = stat)) +
 The state of North Carolina released to the public a large data set containing information on births recorded in this state. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. The `ncbirths` dataset (which is already loaded for you) is a random sample of 1000 cases from this data set. Among other variables, the number of doctor's visits (`visits`) the mother had throughout the pregnancy is recorded. 
 
 ```{r quiz_2}
-quiz(
-  question("Which of the following is **false** about the distribution of `visits`?", 
-           correct = "Correct! Filtering the dataset for `is.na(visits)` values reveals missing values for several mothers.", 
-           allow_retry = TRUE,
+quiz(question("Which of the following is **false** about the distribution of `visits`?", correct = "Correct! Filtering the dataset for `is.na(visits)` values reveals missing values for several mothers.", allow_retry = TRUE,
     answer("On average, mothers visit the doctor approximately 12 times throughout pregnancy.", message = "No, this is true. Calculate the mean and median of the `visits` column of `ncbirths`."),
     answer("The distribution of number of doctor's visits is unimodal and roughly symmetric.", message = "No, this is true. Plot a histogram of the distribution of the `visits` column of `ncbirths`."),
     answer("The median number of doctor's visits throughout the pregnancy is roughly equal to the mean number of visits.", message = "No, this is true. Calculate the mean and median of the `visits` column of `ncbirths`."),
     answer("The number of doctor's visits for one of the mothers in the dataset is missing.", correct = TRUE)
-  ), caption = ""
-)
+  ), caption = "")
 ```
 
 
@@ -644,7 +633,6 @@ ncbirths_complete_visits <- ncbirths |>
   
 # See the result
 glimpse(ncbirths_complete_visits)
-
 ```
 
 <!-- ```{r doctor-hint, echo = FALSE} -->
@@ -716,20 +704,14 @@ visit_mean_ci <- ncbirths_complete_visits |>
 And finally, calculate the 90% confidence interval via percentile method.
 
 ```{r doctor_3, exercise=TRUE}
-# From previous steps
-ncbirths_complete_visits <- ncbirths |>
-  filter(!is.na(visits))
-visit_mean_ci <- ncbirths_complete_visits |>
-  specify(response = visits) |>
-  generate(reps = 15000, type = "bootstrap") |>
-  calculate(stat = "mean")
-  
 # Calculate the 90% CI via percentile method
 visit_mean_ci |>
   summarize(
     l = ___,
-    u = ___
-  )
+    u = ___)
+
+# See the result
+visit_mean_ci
 ```
 
 <details>
@@ -811,12 +793,6 @@ The steps should all be similar to what you did above, except in `calculate()`, 
 Then, calculate a 90% confidence interval for the bootstrap standard deviations using the percentile method.
 
 ```{r doctor_5, exercise=TRUE}
-# From previous step
-visit_sd_ci <- ncbirths_complete_visits |>
-  specify(response = visits) |>
-  generate(reps = 15000, type = "bootstrap") |>
-  calculate(stat = "sd")
-  
 # Calculate the 90% CI via percentile method
 visit_sd_ci |>
   ___(
@@ -824,7 +800,8 @@ visit_sd_ci |>
     u = ___
   )
 
-# TODO: make sure there's an output (for this and above)
+# See the result
+visit_sd_ci
 ```
 
 <!-- ```{r doctor_5-hint, echo = FALSE} -->
@@ -865,8 +842,6 @@ Bootstrap distributions are by design centered at the observed sample statistic.
 However since in a hypothesis test we assume that the null hypothesis is true, we shift the bootstrap distribution to be centered at the null value.
 
 The p-value is then defined as the proportion of simulations that yield a sample statistic at least as favorable to the alternative hypothesis as the observed sample statistic.
-
-*TODO: check how this looks*
 
 
 ### Re-centering the bootstrap distribution - sketch
@@ -989,8 +964,6 @@ rent_med_ht |>
   filter(___ >= ___) |>
   # Calculate the p-value
   summarize(p_val = ___ / ___)
-
-# TODO: check that there's an output
 ```
 
 <details>
@@ -1029,16 +1002,11 @@ Recall the problem statement: We would like to evaluate whether this data provid
 
 
 ```{r quiz_3}
-quiz(
-  question("What is the conclusion of the hypothesis test at the 5% significance level?", 
-           correct = "Correct! The p-value is above the significance level, so we fail to reject the null hypothesis, and conclude that the data do not provide convincing evidence for the alternative hypothesis.", 
-           allow_retry = TRUE,
+quiz(question("What is the conclusion of the hypothesis test at the 5% significance level?", correct = "Correct! The p-value is above the significance level, so we fail to reject the null hypothesis, and conclude that the data do not provide convincing evidence for the alternative hypothesis.", allow_retry = TRUE,
     answer("We reject $H_0$ since the p-value is above the significance level, and conclude that the data provide convincing evidence that median rent of 1 BR apartments in Manhattan is greater than $2500.", message = "No. A p-value above the significance level means we should not reject the null hypothesis."),
     answer("We fail to reject $H_0$ since the p-value is above the significance level, and conclude that the data provide convincing evidence that median rent of 1 BR apartments in Manhattan is greater than $2500.", message = "No. A p-value above the significance level means that the data do not provide convincing evidence of the alternative hypothesis."),
     answer("We reject $H_0$ since the p-value is below the significance level, and conclude that the data do not provide convincing evidence that median rent of 1 BR apartments in Manhattan is greater than $2500.", message = "No. The p-value is above the significance level."),
-    answer("We fail to reject $H_0$ since the p-value is above the significance level, and conclude that the data do not provide convincing evidence that median rent of 1 BR apartments in Manhattan is greater than $2500.", correct = TRUE)
-  ), caption = ""
-)
+    answer("We fail to reject $H_0$ since the p-value is above the significance level, and conclude that the data do not provide convincing evidence that median rent of 1 BR apartments in Manhattan is greater than $2500.", correct = TRUE)), caption = "")
 ```
 
 ```{r apartments_4-setup, echo=TRUE}
@@ -1083,27 +1051,29 @@ weight_mean_ht <- ncbirths |>
   ___
 ```
 
-```{r babies-hint, echo = FALSE}
- 
-- Use `specify()`, setting `response` to `weight`.
-- Use `hypothesize()`, setting `null` to `"point"` and `mu` to `7`.
-- Use `generate()`, setting `reps` to `n_replicates` and `type` to `"bootstrap"`.
-- Use `calculate()`, setting `stat` to `"sd"`.
-```
+<details>
+<summary>**Hint**</summary>
+Use `hypothesize()`, setting `null` to `"point"` and `mu` to `7`.
+</details>
 
-```{r babies-solution}
-n_replicates <- 1500
+<details>
+<summary>**Hint**</summary>
+Use `generate()`, setting `reps` to `n_replicates` and `type` to `"bootstrap"`.
+</details>
 
-weight_mean_ht <- ncbirths |>
-  # Specify weight as the response
-  specify(response = weight) |>
-  # Set the hypothesis that weights are 7 pounds
-  hypothesize(null = "point", mu = 7) |> 
-  # Generate 1500 bootstrap replicates
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  # Calculate the mean
-  calculate(stat = "mean")
-```
+<!-- ```{r babies-solution} -->
+<!-- n_replicates <- 1500 -->
+
+<!-- weight_mean_ht <- ncbirths |> -->
+<!--   # Specify weight as the response -->
+<!--   specify(response = weight) |> -->
+<!--   # Set the hypothesis that weights are 7 pounds -->
+<!--   hypothesize(null = "point", mu = 7) |>  -->
+<!--   # Generate 1500 bootstrap replicates -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   # Calculate the mean -->
+<!--   calculate(stat = "mean") -->
+<!-- ``` -->
 
 ###
 
@@ -1111,13 +1081,6 @@ First, calculate the mean observed weight and pull out the value.
 
 
 ```{r babies_2, exercise=TRUE}
-n_replicates <- 1500
-weight_mean_ht <- ncbirths |>
-  specify(response = weight) |>
-  hypothesize(null = "point", mu = 7) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "mean")
-
 # Calculate observed mean
 weight_mean_obs <- ncbirths |>
   # Summarize to calculate the mean observed weight
@@ -1126,50 +1089,33 @@ weight_mean_obs <- ncbirths |>
   ___
 ```
 
-```{r babies_2-hint, echo = FALSE}
- 
-- Use `summarize()`, setting `mean_weight` to the mean of `weight`.
-- Use `pull()` to extract the vector from the data frame.
-```
+<!-- ```{r babies_2-solution} -->
+<!-- # From previous step -->
+<!-- n_replicates <- 1500 -->
+<!-- weight_mean_ht <- ncbirths |> -->
+<!--   specify(response = weight) |> -->
+<!--   hypothesize(null = "point", mu = 7) |>  -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   calculate(stat = "mean") -->
 
-```{r babies_2-solution}
-# From previous step
-n_replicates <- 1500
-weight_mean_ht <- ncbirths |>
-  specify(response = weight) |>
-  hypothesize(null = "point", mu = 7) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "mean")
-
-# Calculate observed mean
-weight_mean_obs <- ncbirths |>
-  # Summarize to calculate the mean observed weight
-  summarize(mean_weight = mean(weight)) |>
-  # Pull out the value
-  pull()
-```
+<!-- # Calculate observed mean -->
+<!-- weight_mean_obs <- ncbirths |> -->
+<!--   # Summarize to calculate the mean observed weight -->
+<!--   summarize(mean_weight = mean(weight)) |> -->
+<!--   # Pull out the value -->
+<!--   pull() -->
+<!-- ``` -->
 
 ### 
 
 Then, calculate the two-sided p-value.
 
-- Filter for rows where the bootstrap median is greater than or equal to the observed median.
+- Filter for rows where the bootstrap mean is greater than or equal to the observed mean.
 - Summarize to calculate `one_sided_p_val` as the number of rows in the filtered dataset divided by the number of replicates.
 - Calculate `two_sided_p_val` from `one_sided_p_val`.
 
 
 ```{r babies_3, exercise=TRUE}
-# From previous steps
-n_replicates <- 1500
-weight_mean_ht <- ncbirths |>
-  specify(response = weight) |>
-  hypothesize(null = "point", mu = 7) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "mean")
-weight_mean_obs <- ncbirths |>
-  summarize(mean_weight = mean(weight)) |>
-  pull()
-
 # Calculate p-value
 weight_mean_ht |>
   # Filter on stat greater than or equal to weight_mean_obs
@@ -1177,42 +1123,43 @@ weight_mean_ht |>
   # p_val is twice the number of filtered rows divided by the total number of rows
   summarize(
     one_sided_p_val = ___ / ___,
-    two_sided_p_val = ___ * ___
-  )
+    two_sided_p_val = ___ * ___)
 ```
 
-```{r babies_3-hint, echo = FALSE}
- 
-- Use `filter()`, using the condition `stat` greater than or equal to the observed median rent.
-- Use `summarize()`, setting `one_sided_p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
-- Inside `summarize()`, set `two_sided_p_val` to double `one_sided_p_val`.
-```
+<details>
+<summary>**Hint**</summary>
+Use `filter()`, using the condition `stat` greater than or equal to the observed mean weight.
+</details>
 
-```{r babies_3-solution}
-# From previous steps
-n_replicates <- 1500
-weight_mean_ht <- ncbirths |>
-  specify(response = weight) |>
-  hypothesize(null = "point", mu = 7) |> 
-  generate(reps = n_replicates, type = "bootstrap") |> 
-  calculate(stat = "mean")
-weight_mean_obs <- ncbirths |>
-  summarize(mean_weight = mean(weight)) |>
-  pull()
+<details>
+<summary>**Hint**</summary>
+ Use `summarize()`, setting `one_sided_p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
+</details>
 
-# Calculate p-value
-weight_mean_ht |>
-  # Filter on stat greater than or equal to weight_mean_obs
-  filter(stat >= weight_mean_obs) |>
-  # p_val is twice the number of filtered rows divided by the total number of rows
-  summarize(
-    one_sided_p_val = n() / n_replicates,
-    two_sided_p_val = 2 * one_sided_p_val
-  )
-```
+<!-- ```{r babies_3-solution} -->
+<!-- # From previous steps -->
+<!-- n_replicates <- 1500 -->
+<!-- weight_mean_ht <- ncbirths |> -->
+<!--   specify(response = weight) |> -->
+<!--   hypothesize(null = "point", mu = 7) |>  -->
+<!--   generate(reps = n_replicates, type = "bootstrap") |>  -->
+<!--   calculate(stat = "mean") -->
+<!-- weight_mean_obs <- ncbirths |> -->
+<!--   summarize(mean_weight = mean(weight)) |> -->
+<!--   pull() -->
 
+<!-- # Calculate p-value -->
+<!-- weight_mean_ht |> -->
+<!--   # Filter on stat greater than or equal to weight_mean_obs -->
+<!--   filter(stat >= weight_mean_obs) |> -->
+<!--   # p_val is twice the number of filtered rows divided by the total number of rows -->
+<!--   summarize( -->
+<!--     one_sided_p_val = n() / n_replicates, -->
+<!--     two_sided_p_val = 2 * one_sided_p_val -->
+<!--   ) -->
+<!-- ``` -->
 
-
+Great work!
 
 
 ## Submit
