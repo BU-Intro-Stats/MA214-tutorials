@@ -1007,7 +1007,6 @@ Use the argument `df = 3` again.
 
 At this point you should be familiar with this diagram
 
-### Classic inference
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-2.png")
@@ -1052,7 +1051,7 @@ knitr::include_graphics("images/3-4-6.png")
 
 ### 
 
-True chi squared parameter? What would that even mean? We know how to think about a difference in two parameters as being a meaningful parameter, but a chi squared? It turns out that the chi squared is only really a useful statistic in the context of a hypothesis test. You're unlikely to ever see a confidence interval here.
+Is the chi squared statistic a estimate of a meaningful population parameter like the mean or the proportion or the difference in two proportions? It turns out the answer is "no": the chi squared statistic is only really useful in the context of a hypothesis test. Constructing a confidence interval wouldn't tell you anything interesting. 
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/4-3-6-2.png")
@@ -1060,7 +1059,7 @@ knitr::include_graphics("images/4-3-6-2.png")
 
 ### 
 
-So we can just scratch this approach. There you have it. The shortest lesson ever!
+So, it's important to not unthinkingly move from hypothesis testing to constructing confidence intervals. For a confidence interval, you need to make sure your statistic is estimating a meaningful popultion quantity, which is not the case here. 
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-7.png")
