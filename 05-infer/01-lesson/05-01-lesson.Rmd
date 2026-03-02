@@ -15,7 +15,6 @@ library(broom)
 library(knitr)
 library(tidyverse)
 library(infer)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
@@ -245,7 +244,7 @@ The methods used in these tutorials and described in [Introduction to Modern Sta
 
 The 95% confidence interval can be calculated as the sample proportion plus or minus two standard errors of the sample proportion:
 
-$$(\hat{p} - 2 \times SE, \hat{p} + 2 \times SE)$$
+$$(\widehat{p} - 2 \times SE, \widehat{p} + 2 \times SE)$$
 
 We can estimate the standard error by using the bootstrap. Let's review how we can construct the bootstrap distribution.
 
@@ -267,7 +266,7 @@ knitr::include_graphics("images/boot-02.png")
 
 ### 
 
-Next we draw a sample from that variable with replacement that is of the same size as our original dataset. This recreates the random variation that creeps in when you draw a sample from a population.
+Next we draw a sample from that variable with replacement that is of the same size as our original dataset. This recreates the random variation that occurs when you draw a sample from a population.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/boot-03.png")
@@ -342,7 +341,7 @@ knitr::include_graphics("images/boot-11.png")
 
 To implement this, we start with our gss2016 data and then *specify* that we will focus on the happy column. Next we *generate* 500 replicate data sets through bootstrapping and for each one *calculate* the proportion that are "happy". 
 
-When we print this new object, we see we now have a data frame that contains 500 $\hat{p}\text{s}$ (p-hats). 
+When we print this new object, we see we now have a data frame that contains 500 $\widehat{p}\text{s}$ (p-hats). 
 
 ```{r echo = TRUE}
 boot_dist_happy <- gss2016 |>
@@ -378,7 +377,7 @@ SE_happy
 
 We can use this value, along with our point estimate, to roughly calculate a 95% confidence interval:
 
-$$(\hat{p} - 2 \times SE, \hat{p} + 2 \times SE)$$ 
+$$(\widehat{p} - 2 \times SE, \widehat{p} + 2 \times SE)$$ 
 
 ```{r echo = TRUE}
 c(p_hat_happy - 2 * SE_happy, p_hat_happy + 2 * SE_happy)
@@ -388,6 +387,8 @@ c(p_hat_happy - 2 * SE_happy, p_hat_happy + 2 * SE_happy)
 
 The General Social Survey asks about far more topics than just happiness. Next we'll turn our attention to the question of how much confidence people had in the scientific community in 2016, which is captured in the `consci` variable.
 
+**Exercise**
+
 The `gss2016` data frame and the tidyverse package are already loaded for you. Construct a bar plot of the distribution of `consci`. 
 
 ```{r ex1, exercise=TRUE}
@@ -395,19 +396,21 @@ ggplot(gss2016, aes(x = ___)) +
   ___
 ```
 
-```{r ex1-hint}
-ggplot(gss2016, aes(x = ___)) +
-  geom_bar()
-```
+<!-- ```{r ex1-hint} -->
+<!-- ggplot(gss2016, aes(x = ___)) + -->
+<!--   geom_bar() -->
+<!-- ``` -->
 
-```{r ex1-solution}
-ggplot(gss2016, aes(x = consci)) +
-  geom_bar()
-```
+<!-- ```{r ex1-solution} -->
+<!-- ggplot(gss2016, aes(x = consci)) + -->
+<!--   geom_bar() -->
+<!-- ``` -->
 
 ##
 
-Next, we compute the sample proportion of people that reported having "High" confidence.
+**Exercise**
+
+Next, compute the sample proportion of people that reported having "High" confidence.
 
 ```{r ex2, exercise=TRUE}
 p_hat_consci <- ___ |>
@@ -417,22 +420,24 @@ p_hat_consci <- ___ |>
 p_hat_consci
 ```
 
-```{r ex2-hint}
- Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
-```
+<details>
+<summary>**Hint**</summary>
+Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
+</details>
 
+<!-- ```{r ex2-solution} -->
+<!-- p_hat_consci <- gss2016 |> -->
+<!--   summarize(prop_high = mean(consci == "High")) |> -->
+<!--   pull() -->
 
-```{r ex2-solution}
-p_hat_consci <- gss2016 |>
-  summarize(prop_high = mean(consci == "High")) |>
-  pull()
-
-p_hat_consci
-```
+<!-- p_hat_consci -->
+<!-- ``` -->
 
 ### Generating via bootstrap
 
 To quantify your uncertainty in this estimate of the number of people that have "High" confidence in the scientific community, you need to calculate the standard error. To do so, we'll start by considering how different the data might look in just a single bootstrap sample.
+
+**Exercise**
 
 Using the `gss2016` data, create a single bootstrap data set. The infer package is already loaded for you.
 
@@ -457,40 +462,44 @@ ggplot(___) +
   ___
 ```
 
-```{r ex3-hint-1}
-boot_1_consci <- gss2016 |>
-  specify(response = consci, success = "___") |>
-  ___(reps = ___, type = "___")
-```
+<!-- ```{r ex3-hint-1} -->
+<!-- boot_1_consci <- gss2016 |> -->
+<!--   specify(response = consci, success = "___") |> -->
+<!--   ___(reps = ___, type = "___") -->
+<!-- ``` -->
 
-```{r ex3-hint-2}
-boot_1_consci <- gss2016 |>
-  specify(response = consci, success = "High") |>
-  ___(reps = ___, type = "___")
-```
+<!-- ```{r ex3-hint-2} -->
+<!-- boot_1_consci <- gss2016 |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   ___(reps = ___, type = "___") -->
+<!-- ``` -->
 
-```{r ex3-hint-3}
-boot_1_consci <- gss2016 |>
-  specify(response = consci, success = "High") |>
-  generate(reps = ___, type = "___")
-```
+<!-- ```{r ex3-hint-3} -->
+<!-- boot_1_consci <- gss2016 |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = ___, type = "___") -->
+<!-- ``` -->
 
-```{r ex3-solution}
-# Create single bootstrap data set
-boot_1_consci <- gss2016 |>
-  # Specify the response
-  specify(response = consci, success = "High") |>
-  # Generate one bootstrap replicate
-  generate(reps = 1, type = "bootstrap")
+<!-- ```{r ex3-solution} -->
+<!-- # Create single bootstrap data set -->
+<!-- boot_1_consci <- gss2016 |> -->
+<!--   # Specify the response -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   # Generate one bootstrap replicate -->
+<!--   generate(reps = 1, type = "bootstrap") -->
 
-# See the result
-ggplot(boot_1_consci, aes(x = consci)) +
-  geom_bar()
-```
+<!-- # See the result -->
+<!-- ggplot(boot_1_consci, aes(x = consci)) + -->
+<!--   geom_bar() -->
+<!-- ``` -->
 
 ### 
 
-We can guess-timate what the sample proportion of people that reported having "High" confidence based on the bar plot and we can also calculate it directly.
+We can guess-timate what the sample proportion of people that reported having "High" confidence based on the bar plot. 
+
+**Exercise**
+
+Calculate the sample proportion directly.
 
 ```{r ex4, exercise=TRUE}
 # Calculate proportion with High confidence
@@ -499,24 +508,27 @@ boot_1_consci |>
   pull()
 ```
 
-```{r ex4-hint}
- Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
-```
+<details>
+<summary>**Hint**</summary>
+Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
+</details>
 
-```{r ex4-solution}
-# Calculate proportion with High confidence
-boot_1_consci |>
-  summarize(prop_high = mean(consci == "High")) |>
-  pull()
-```
+<!-- ```{r ex4-solution} -->
+<!-- # Calculate proportion with High confidence -->
+<!-- boot_1_consci |> -->
+<!--   summarize(prop_high = mean(consci == "High")) |> -->
+<!--   pull() -->
+<!-- ``` -->
 
 ### Constructing the CI
 
-You've seen one example of how $\hat{p}$ can vary upon resampling, but we need to do this many many times to get a good estimate of its variability.  Here you will compute a full bootstrap distribution to estimate the standard error (SE) that will be used to form a confidence interval. You'll use an additional verb from infer, `calculate()`, to streamline this process of calculating many statistics from many data sets.
+You've seen one example of how $\widehat{p}$ can vary upon resampling, but we need to do this many many times to get a good estimate of its variability.  Here you will compute a full bootstrap distribution to estimate the standard error (SE) that will be used to form a confidence interval. You'll use an additional verb from infer, `calculate()`, to streamline this process of calculating many statistics from many data sets.
 
 Take a moment to inspect the output of calculate. This function reduces your data frame to just two columns: one for the "stat"s and another for the "replicate" they correspond to.
 
 When you plot your bootstrap distribution, you'll find that it's bell-shaped. It's this shape that allows you to add and subtract two SEs to get a 95% interval.
+
+**Exercise**
 
 Create a bootstrap distribution called `boot_dist_consci` using the following steps:
 
@@ -542,56 +554,60 @@ boot_dist_consci <- gss2016 |>
 boot_dist_consci
 ```
 
-```{r ex5-hint-1}
-boot_dist_consci <- gss2016 |>
-  specify(response = consci, success = "High") |>
-  generate(___ = ___, type = "bootstrap") |>
-  calculate(stat = "___")
-```
+<!-- ```{r ex5-hint-1} -->
+<!-- boot_dist_consci <- gss2016 |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(___ = ___, type = "bootstrap") |> -->
+<!--   calculate(stat = "___") -->
+<!-- ``` -->
 
-```{r ex5-hint-2}
-boot_dist_consci <- gss2016 |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(stat = "___")
-```
+<!-- ```{r ex5-hint-2} -->
+<!-- boot_dist_consci <- gss2016 |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(stat = "___") -->
+<!-- ``` -->
 
-```{r ex5-solution}
-# Create bootstrap distribution for proportion with High conf
-boot_dist_consci <- gss2016 |>
-  # Specify the response and success
-  specify(response = consci, success = "High") |>
-  # Generate 500 bootstrap reps
-  generate(reps = 500, type = "bootstrap") |>
-  # Calculate proportions
-  calculate(stat = "prop")
+<!-- ```{r ex5-solution} -->
+<!-- # Create bootstrap distribution for proportion with High conf -->
+<!-- boot_dist_consci <- gss2016 |> -->
+<!--   # Specify the response and success -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   # Generate 500 bootstrap reps -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   # Calculate proportions -->
+<!--   calculate(stat = "prop") -->
 
-# See the result
-boot_dist_consci
-```
+<!-- # See the result -->
+<!-- boot_dist_consci -->
+<!-- ``` -->
 
 ### Visualizing the CI
 
-Next, let's visualize the bootstrap distribution you constructed earlier, `boot_dist_consci`, in a density plot using `geom_density()`.
+**Exercise**
+
+Next, visualize the bootstrap distribution you constructed earlier, `boot_dist_consci`, in a density plot using `geom_density()`.
 
 ```{r ex6, exercise=TRUE}
 ggplot(boot_dist_consci, aes(x = ___)) +
   ___
 ```
 
-```{r ex6-hint}
-ggplot(boot_dist_consci, aes(x = ___)) +
-  geom_density()
-```
+<!-- ```{r ex6-hint} -->
+<!-- ggplot(boot_dist_consci, aes(x = ___)) + -->
+<!--   geom_density() -->
+<!-- ``` -->
 
-```{r ex6-solution}
-ggplot(boot_dist_consci, aes(x = stat)) +
-  geom_density()
-```
+<!-- ```{r ex6-solution} -->
+<!-- ggplot(boot_dist_consci, aes(x = stat)) + -->
+<!--   geom_density() -->
+<!-- ``` -->
 
 ### Calculating the bootstrap SE
 
-And let's also calculate the standard error by `summarize`ing the distribution with its standard deviation, `sd()`, then `pull()` it out.
+**Exercise**
+
+Now calculate the standard error by `summarize`ing the distribution with its standard deviation, `sd()`, then `pull()` it out.
 
 ```{r ex7, exercise=TRUE}
 SE_consci <- boot_dist_consci |>
@@ -601,47 +617,48 @@ SE_consci <- boot_dist_consci |>
 SE_consci
 ```
 
-```{r ex7-hint-1}
-boot_dist_consci |>
-  summarize(se = sd(___)) |>
-  ___
-```
+<!-- ```{r ex7-hint-1} -->
+<!-- boot_dist_consci |> -->
+<!--   summarize(se = sd(___)) |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex7-hint-2}
-boot_dist_consci |>
-  summarize(se = sd(stat)) |>
-  ___
-```
+<!-- ```{r ex7-hint-2} -->
+<!-- boot_dist_consci |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex7-solution}
-SE_consci <- boot_dist_consci |>
-  summarize(se = sd(stat)) |>
-  pull()
+<!-- ```{r ex7-solution} -->
+<!-- SE_consci <- boot_dist_consci |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   pull() -->
 
-SE_consci
-```
+<!-- SE_consci -->
+<!-- ``` -->
 
 ### 
 
-And finally, let's use that SE to construct an approximate 95% confidence interval around `p_hat_consci` by adding and subtracting twice the standard error (this is the same `p_hat_consci` that you calculated in a previous exercise).
+**Exercise**
+
+And finally, use that SE to construct an approximate 95% confidence interval around `p_hat_consci` by adding and subtracting twice the standard error (this is the same `p_hat_consci` that you calculated in a previous exercise).
 
 ```{r ex8, exercise=TRUE}
 c(___, ___)
 ```
 
-```{r ex8-hint}
- The lower bound of the confidence interval is `p_hat - 2 * SE`.
-```
+<details>
+<summary>**Hint**</summary>
+The lower bound of the confidence interval is `p_hat - 2 * SE`.
+</details>
 
-```{r ex8-solution}
-c(p_hat_consci - 2 * SE_consci, p_hat_consci + 2 * SE_consci)
-```
+<!-- ```{r ex8-solution} -->
+<!-- c(p_hat_consci - 2 * SE_consci, p_hat_consci + 2 * SE_consci) -->
+<!-- ``` -->
 
 ### Why more bootstraps?
 
 If we had used 5000 instead of 500 bootstrap samples, which of the following would be true?
-
-*Hint:* Remember, bootstrapping is a method for approximating a distribution. The more samples you have, the better your approximation is.
 
 ```{r mc1}
 question("If we had used 5000 instead of 500 bootstrap samples, which of the following would be true?",
@@ -652,6 +669,11 @@ question("If we had used 5000 instead of 500 bootstrap samples, which of the fol
   allow_retry = TRUE
 )
 ```
+
+<details>
+<summary>**Hint**</summary>
+Remember, bootstrapping is a method for approximating a distribution. The more samples you have, the better your approximation is.
+</details>
 
 ## Interpreting a Confidence Interval
 
@@ -665,7 +687,7 @@ Let's look deeper into this by starting with the confidence interval that we've 
 
 ### Happiness in 2016
 
-The data from which this interval was constructed is from 2016, and we can plot both $\hat{p}$ and the resulting interval on a number line here. To understand what is meant by confident, we need to consider how this interval fits into the big picture.
+The data from which this interval was constructed is from 2016, and we can plot both $\widehat{p}$ and the resulting interval on a number line here. To understand what is meant by confident, we need to consider how this interval fits into the big picture.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/confidence-interval.png")
@@ -689,7 +711,7 @@ knitr::include_graphics("images/p-02.png")
 
 ### 
 
-calculated $\hat{p}$ to estimate the parameter, $p$,
+calculated $\widehat{p}$ to estimate the parameter, $p$,
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/p-03.png")
@@ -713,7 +735,7 @@ knitr::include_graphics("images/p-05.png")
 
 ### 
 
-of the same size from that population and come up with a new $\hat{p}$ and a new interval. It wouldn't be the same as our first, but it'd likely be similar.
+of the same size from that population and come up with a new $\widehat{p}$ and a new interval. It wouldn't be the same as our first, but it'd likely be similar.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/p-06.png")
@@ -729,7 +751,7 @@ knitr::include_graphics("images/p-07.png")
 
 ### 
 
-a new $\hat{p}$ and a new interval.
+a new $\widehat{p}$ and a new interval.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/p-08.png")
@@ -819,7 +841,7 @@ knitr::include_graphics("images/gss2012-happy.png")
 
 ### 
 
-If we were to continue this process many times, we'd get many different $\hat{p}$s and many different intervals. These intervals aren't arbitrary: they're designed to capture that unknown population parameter $p$.
+If we were to continue this process many times, we'd get many different $\widehat{p}$s and many different intervals. These intervals aren't arbitrary: they're designed to capture that unknown population parameter $p$.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/gssMany-happy.png")
@@ -853,7 +875,7 @@ In the following exercises you'll get the chance to explore these factors and ho
 
 We learned that for a 95% confidence interval (a confidence level of .95), if we were to take many samples of the same size and compute many intervals, we would expect 95% of the resulting intervals to contain the parameter. Based on the set of confidence intervals plotted here, what is your best guess at the confidence level used in these intervals?
 
-The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from its $\hat{p}$. Intervals that capture the true value are in green; those that miss it are in red.
+The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from its $\widehat{p}$. Intervals that capture the true value are in green; those that miss it are in red.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/gssMany-happy-nocapture_65.png")
@@ -876,6 +898,8 @@ question("What is your best guess at the confidence level used in these interval
 The less data that you have to make an estimate, the more uncertainty you will have in that estimate. This is reflected in the standard error. In this exercise you'll develop a feel for this relationship by looking at data sets of different sizes.
 
 Two new smaller data sets have been created for you from `gss2016`: `gss2016_small`, which contains 50 observations, and `gss2016_smaller` which contains just 10 observations.
+
+**Exercise**
 
 Using `gss2016_small`, create a bootstrap distribution called `boot_dist_small_n` using the familiar steps:
 
@@ -901,42 +925,44 @@ boot_dist_small_n <- ___ |>
 glimpse(boot_dist_small_n)
 ```
 
-```{r ex9-hint-1}
-boot_dist_small_n <- gss2016_small |>
-  specify(response = consci, success = "High") |>
-  ___ |>
-  ___
-```
+<!-- ```{r ex9-hint-1} -->
+<!-- boot_dist_small_n <- gss2016_small |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   ___ |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex9-hint-2}
-boot_dist_small_n <- gss2016_small |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  ___
-```
+<!-- ```{r ex9-hint-2} -->
+<!-- boot_dist_small_n <- gss2016_small |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex9-hint-3}
-boot_dist_small_n <- gss2016_small |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(stat = "___")
-```
+<!-- ```{r ex9-hint-3} -->
+<!-- boot_dist_small_n <- gss2016_small |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(stat = "___") -->
+<!-- ``` -->
 
-```{r ex9-solution}
-# Create bootstrap distribution for proportion
-boot_dist_small_n <- gss2016_small |>
-  # Specify the variable and success
-  specify(response = consci, success = "High") |>
-  # Generate 500 bootstrap reps
-  generate(reps = 500, type = "bootstrap") |>
-  # Calculate the statistic
-  calculate(stat = "prop")
+<!-- ```{r ex9-solution} -->
+<!-- # Create bootstrap distribution for proportion -->
+<!-- boot_dist_small_n <- gss2016_small |> -->
+<!--   # Specify the variable and success -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   # Generate 500 bootstrap reps -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   # Calculate the statistic -->
+<!--   calculate(stat = "prop") -->
 
-# See the result
-glimpse(boot_dist_small_n)
-```
+<!-- # See the result -->
+<!-- glimpse(boot_dist_small_n) -->
+<!-- ``` -->
 
 ### 
+
+**Exercise**
 
 Next, summarize the `boot_dist_small_n`'s SE with its standard deviation then pull it out and save it to `SE_small_n`.
 
@@ -957,25 +983,27 @@ SE_small_n <- ___ |>
 SE_small_n
 ```
 
-```{r ex10-hint}
-SE_small_n <- boot_dist_small_n |>
-  summarize(se = sd(___)) |>
-  pull()
+<!-- ```{r ex10-hint} -->
+<!-- SE_small_n <- boot_dist_small_n |> -->
+<!--   summarize(se = sd(___)) |> -->
+<!--   pull() -->
 
-SE_small_n
-```
+<!-- SE_small_n -->
+<!-- ``` -->
 
-```{r ex10-solution}
-SE_small_n <- boot_dist_small_n |>
-  summarize(se = sd(stat)) |>
-  pull()
+<!-- ```{r ex10-solution} -->
+<!-- SE_small_n <- boot_dist_small_n |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   pull() -->
 
-SE_small_n
-```
+<!-- SE_small_n -->
+<!-- ``` -->
 
 ### 
 
-Now repeat the process of generating the bootstrap distribution for `gss2016_smaller` and save it to `boot_dist_smaller_n`. *Save yourself some time by copying and pasting the previous code block and swapping the dataset name.*
+**Exercise**
+
+Now repeat the process of generating the bootstrap distribution for `gss2016_smaller` and save it to `boot_dist_smaller_n`.
 
 ```{r ex11-setup}
 set.seed(47)
@@ -990,39 +1018,41 @@ boot_dist_smaller_n <-___ |>
 glimpse(boot_dist_smaller_n)
 ```
 
-```{r ex11-hint-1}
-boot_dist_smaller_n <- gss2016_smaller |>
-  specify(response = consci, success = "High") |>
-  ___ |>
-  ___
-```
+<!-- ```{r ex11-hint-1} -->
+<!-- boot_dist_smaller_n <- gss2016_smaller |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   ___ |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex11-hint-2}
-boot_dist_smaller_n <- gss2016_smaller |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  ___
-```
+<!-- ```{r ex11-hint-2} -->
+<!-- boot_dist_smaller_n <- gss2016_smaller |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   ___ -->
+<!-- ``` -->
 
-```{r ex11-hint-3}
-boot_dist_smaller_n <- gss2016_smaller |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(___)
-```
+<!-- ```{r ex11-hint-3} -->
+<!-- boot_dist_smaller_n <- gss2016_smaller |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(___) -->
+<!-- ``` -->
 
-```{r ex11-solution}
-boot_dist_smaller_n <- gss2016_smaller |>
-  specify(response = consci, success = "High") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(stat = "prop")
+<!-- ```{r ex11-solution} -->
+<!-- boot_dist_smaller_n <- gss2016_smaller |> -->
+<!--   specify(response = consci, success = "High") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(stat = "prop") -->
 
-glimpse(boot_dist_smaller_n)
-```
+<!-- glimpse(boot_dist_smaller_n) -->
+<!-- ``` -->
 
 ### 
 
-Also repeat this process of extracting the SE of `boot_dist_smaller_n` and save it to `SE_smaller_n`. *Copy and paste comes in handy here again.*
+**Exercise**
+
+Also repeat this process of extracting the SE of `boot_dist_smaller_n` and save it to `SE_smaller_n`. 
 
 ```{r ex12-setup}
 set.seed(47)
@@ -1040,21 +1070,21 @@ SE_smaller_n <- ___ |>
 SE_smaller_n
 ```
 
-```{r ex12-hint}
-SE_smaller_n <- boot_dist_smaller_n |>
-  summarize(se = sd(stat)) |>
-  ___
+<!-- ```{r ex12-hint} -->
+<!-- SE_smaller_n <- boot_dist_smaller_n |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   ___ -->
 
-SE_smaller_n
-```
+<!-- SE_smaller_n -->
+<!-- ``` -->
 
-```{r ex12-solution}
-SE_smaller_n <- boot_dist_smaller_n |>
-  summarize(se = sd(stat)) |>
-  pull()
+<!-- ```{r ex12-solution} -->
+<!-- SE_smaller_n <- boot_dist_smaller_n |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   pull() -->
 
-SE_smaller_n
-```
+<!-- SE_smaller_n -->
+<!-- ``` -->
 
 ### 
 
@@ -1105,6 +1135,8 @@ ggplot(gss2016, aes(x = meta_region)) +
 
 ### 
 
+**Exercise**
+
 Create the bootstrap distribution for the proportion of people that live in the `"pacific"` `meta_region`. Then, calculate the SE of the bootstrap distribution, and compare the SE you calculated to the one from earlier (this is available in your environment as `SE_consci`).
 
 ```{r ex14-setup}
@@ -1127,34 +1159,34 @@ SE_low_p <- boot_dist_low_p |>
 SE_low_p
 ```
 
-```{r ex14-hint-1}
-boot_dist_low_p <- gss2016 |>
-  specify(response = meta_region, success = "pacific") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(stat = "prop")
-```
+<!-- ```{r ex14-hint-1} -->
+<!-- boot_dist_low_p <- gss2016 |> -->
+<!--   specify(response = meta_region, success = "pacific") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(stat = "prop") -->
+<!-- ``` -->
 
-```{r ex14-hint-2}
-SE_low_p <- boot_dist_low_p |>
-  summarize(se = sd(stat)) |>
-  pull()
-```
+<!-- ```{r ex14-hint-2} -->
+<!-- SE_low_p <- boot_dist_low_p |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r ex14-solution}
-# Construct the bootstrap distribution
-boot_dist_low_p <- gss2016 |>
-  specify(response = meta_region, success = "pacific") |>
-  generate(reps = 500, type = "bootstrap") |>
-  calculate(stat = "prop")
+<!-- ```{r ex14-solution} -->
+<!-- # Construct the bootstrap distribution -->
+<!-- boot_dist_low_p <- gss2016 |> -->
+<!--   specify(response = meta_region, success = "pacific") |> -->
+<!--   generate(reps = 500, type = "bootstrap") |> -->
+<!--   calculate(stat = "prop") -->
 
-# Calculate the standard error
-SE_low_p <- boot_dist_low_p |>
-  summarize(se = sd(stat)) |>
-  pull()
+<!-- # Calculate the standard error -->
+<!-- SE_low_p <- boot_dist_low_p |> -->
+<!--   summarize(se = sd(stat)) |> -->
+<!--   pull() -->
 
-# Compare SEs
-c(SE_low_p, SE_consci)
-```
+<!-- # Compare SEs -->
+<!-- c(SE_low_p, SE_consci) -->
+<!-- ``` -->
 
 ## The approximation shortcut
 
@@ -1162,7 +1194,7 @@ c(SE_low_p, SE_consci)
 
 You calculated two new standard errors.
 
-One when there was less data, and the other where $\hat{p}$ was low. 
+One when there was less data, and the other where $\widehat{p}$ was low. 
 
 The different values that you observed demonstrate some important properties of standard errors: they will increase  when n is small and also when p is close to 0.5.
 
@@ -1190,7 +1222,7 @@ knitr::include_graphics("images/bootstrap_two.png")
 
 ### The normal distribution
 
-A.K.A the "bell curve".
+A.K.A the "bell curve". Recall that the Central Limit Theorem (CLT) says:
 
 **If** 
 
@@ -1199,17 +1231,17 @@ A.K.A the "bell curve".
 
 **Then** 
 
-- $\hat{p}$ follows a normal distribution  
+- $\widehat{p}$ follows a normal distribution  
 
 ```{r echo=FALSE, out.width = '50%'}
 knitr::include_graphics("images/normal-curve.png")
 ```
 
-That approximation is the normal distribution, also known as the bell curve. A useful result in mathematics says that if you have independent observations and a sufficiently large sample size, then $\hat{p}$ will follow a normal distribution with a known standard deviation. This distribution is called the sampling distribution of $\hat{p}$ and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
+That approximation is the normal distribution, also known as the bell curve. This distribution is called the sampling distribution of $\widehat{p}$ and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
 
 ### Standard deviation
 
-$$\sqrt{\frac{ \hat{p} \times (1 - \hat{p})}{n}}$$ 
+$$\sqrt{\frac{ \widehat{p} \times (1 - \widehat{p})}{n}}$$ 
 
 This standard deviation formula, then, can be used to estimate the standard error for use in a confidence interval.
 
@@ -1221,16 +1253,16 @@ How do we check "observations are independent"?
 
 What does "n is large" mean? 
 
-- $n \times \hat{p} \gt 10$ 
-- $n \times(1 - \hat{p}) \gt 10$ 
+- $n \times \widehat{p} \gt 10$ 
+- $n \times(1 - \widehat{p}) \gt 10$ 
 
-When applying this result in practice, it's important to be sure that the assumptions of independence and a large sample aren't wildly off base. To assess independence, you need to consider the method by which the data was collected. A handy rule of thumb to determine if your sample size is large enough is to check that n times $\hat{p}$ and n times 1 - $\hat{p}$ are both greater than or equal to 10.
+When applying this result in practice, it's important to be sure that the assumptions of independence and a large sample aren't wildly off base. To assess independence, you need to consider the method by which the data was collected. A handy rule of thumb to determine if your sample size is large enough is to check that n times $\widehat{p}$ and n times 1 - $\widehat{p}$ are both greater than or equal to 10.
 
 ### Calculating standard error: approximation
 
-OK, let's try our hand at using this shortcut to find the standard error for the proportion of people that were happy. Let's recompute $\hat{p}$, then ask the number of rows in the `gss2016`. That's the sample size, `n`. 
+OK, let's try our hand at using this shortcut to find the standard error for the proportion of people that were happy. Let's recompute $\widehat{p}$, then ask the number of rows in the `gss2016`. That's the sample size, `n`. 
 
-Let's check the rule-of-thumb to see if our sample size is large enough by multiplying n times $\hat{p}$ and n times 1 minus $\hat{p}$. This gives 116 and 35, so our sample size should be sufficiently large. We also know that the gss uses random sampling to draw these observations, so is safe to assume that one person's answer is independent of the next. 
+Let's check the rule-of-thumb to see if our sample size is large enough by multiplying n times $\widehat{p}$ and n times 1 minus $\widehat{p}$. This gives 116 and 35, so our sample size should be sufficiently large. We also know that the gss uses random sampling to draw these observations, so is safe to assume that one person's answer is independent of the next. 
 
 ```{r echo=TRUE}
 p_hat_happy <- gss2016 |>
@@ -1251,7 +1283,7 @@ SE_happy_approx
 
 ### Calculating standard error: computation
 
-How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for $\hat{p}$, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.035. Those are remarkably similar values! Let's go a step farther.
+How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for $\widehat{p}$, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.035. Those are remarkably similar values! Let's go a step farther.
 
 ```{r echo=TRUE}
 boot_dist_happy <- gss2016 |>
@@ -1275,7 +1307,7 @@ ggplot(boot_dist_happy, aes(x = stat)) +
 
 ### 
 
-Let's add a layer to this plot that contains the normal curve that's centered at $\hat{p}$ has uses the equation to find the standard deviation. And yes, let's make that curve purple.
+Let's add a layer to this plot that contains the normal curve that's centered at $\widehat{p}$ has uses the equation to find the standard deviation. And yes, let's make that curve purple.
 
 ```{r echo=TRUE}
 ggplot(boot_dist_happy, aes(x = stat)) +
@@ -1301,6 +1333,8 @@ When building _any_ confidence interval, note that you use three ingredients: th
 
 ### CI for meta region
 
+**Exercise**
+
 - Calculate the sample size, `n`, which is the number of rows in the `gss2016` data frame.
 - Calculated the observed statistic, `p_hat`, as the proportion of people in the "pacific" meta-region.
 
@@ -1322,36 +1356,38 @@ p_hat_meta <- gss2016 |>
 p_hat_meta
 ```
 
-```{r ex15-hint-1}
-n <- nrow(gss2016)
-```
+<!-- ```{r ex15-hint-1} -->
+<!-- n <- nrow(gss2016) -->
+<!-- ``` -->
 
-```{r ex15-hint-2}
-p_hat_meta <- gss2016 |>
-  summarize(prop_pacific = mean(meta_region == "pacific")) |>
-  pull()
-```
+<!-- ```{r ex15-hint-2} -->
+<!-- p_hat_meta <- gss2016 |> -->
+<!--   summarize(prop_pacific = mean(meta_region == "pacific")) |> -->
+<!--   pull() -->
+<!-- ``` -->
 
-```{r ex15-solution}
-# Calculate n as the number of rows
-n <- nrow(gss2016)
+<!-- ```{r ex15-solution} -->
+<!-- # Calculate n as the number of rows -->
+<!-- n <- nrow(gss2016) -->
 
-# Calculate p_hat as the proportion in pacific meta region
-p_hat_meta <- gss2016 |>
-  summarize(prop_pacific = mean(meta_region == "pacific")) |>
-  pull()
+<!-- # Calculate p_hat as the proportion in pacific meta region -->
+<!-- p_hat_meta <- gss2016 |> -->
+<!--   summarize(prop_pacific = mean(meta_region == "pacific")) |> -->
+<!--   pull() -->
 
-# View the result
-p_hat_meta
-```
+<!-- # View the result -->
+<!-- p_hat_meta -->
+<!-- ``` -->
 
 
 ### 
 
 Now we'll construct the confidence interval around this proportion.
 
+**Exercise**
+
 - Check the rules-of-thumb for the normal distribution being a decent approximation.
-- Calculate the standard error using the approximation formula $\sqrt{\frac{\hat{p} (1 - \hat{p})}{n}}$.
+- Calculate the standard error using the approximation formula $\sqrt{\frac{\widehat{p} (1 - \widehat{p})}{n}}$.
 - Use `SE_meta_approx` to form a confidence interval for `p_hat`. The limits should be two standard errors either side of `p_hat`.
 
 ```{r ex16-setup, include=FALSE}
@@ -1377,38 +1413,36 @@ SE_meta_approx <- ___
 c(___, ___)
 ```
 
-```{r ex16-hint-1}
-n * p_hat_meta >= 10
-n * (1 - p_hat_meta) >= 10
-```
+<!-- ```{r ex16-hint-1} -->
+<!-- n * p_hat_meta >= 10 -->
+<!-- n * (1 - p_hat_meta) >= 10 -->
+<!-- ``` -->
 
-```{r ex16-hint-2}
-SE_approx <- sqrt(p_hat_meta * (1 - p_hat_meta) / n)
-```
+<!-- ```{r ex16-hint-2} -->
+<!-- SE_approx <- sqrt(p_hat_meta * (1 - p_hat_meta) / n) -->
+<!-- ``` -->
 
-```{r ex16-solution}
-# From previous step
-n <- nrow(gss2016)
-p_hat <- gss2016 |>
-  summarize(prop_pacific = mean(meta_region == "pacific")) |>
-  pull()
+<!-- ```{r ex16-solution} -->
+<!-- # From previous step -->
+<!-- n <- nrow(gss2016) -->
+<!-- p_hat <- gss2016 |> -->
+<!--   summarize(prop_pacific = mean(meta_region == "pacific")) |> -->
+<!--   pull() -->
 
-# Check conditions
-n * p_hat >= 10
-n * (1 - p_hat) >= 10
+<!-- # Check conditions -->
+<!-- n * p_hat >= 10 -->
+<!-- n * (1 - p_hat) >= 10 -->
 
-# Calculate SE
-SE_approx <- sqrt(p_hat * (1 - p_hat) / n)
+<!-- # Calculate SE -->
+<!-- SE_approx <- sqrt(p_hat * (1 - p_hat) / n) -->
 
-# Form 95% CI
-c(p_hat - 2 * SE_approx, p_hat + 2 * SE_approx)
-```
+<!-- # Form 95% CI -->
+<!-- c(p_hat - 2 * SE_approx, p_hat + 2 * SE_approx) -->
+<!-- ``` -->
 
 ### Methods compared
 
 Now you have seen two ways to construct a confidence interval for a proportion. Which of the following about the two methods is true?
-
-*Hint:* The approximation method is the classical approach. Computers are needed to make bootstrapping possible, and they haven't been common for that long.
 
 ```{r mc3, echo=FALSE}
 question(
@@ -1419,6 +1453,10 @@ question(
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+The approximation method is the classical approach. Computers are needed to make bootstrapping possible, and they haven't been common for that long.
+</details>
 
 ## Submit
 

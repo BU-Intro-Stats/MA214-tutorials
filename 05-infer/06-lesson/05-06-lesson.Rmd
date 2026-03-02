@@ -13,7 +13,6 @@ library(learnr)
 library(tidyverse)
 library(infer)
 library(openintro)
-library(emo)
 
 # knitr options ----------------------------------------------------------------
 
