@@ -470,7 +470,7 @@ Using `gss_party`, first specify that you'd like to study `natspace` as a functi
 # Create one permuted data set
 ___ <- ___
   # Specify the variables of interest
-  ___
+  # ___
   # Set up the null
   ___
   # Generate a single permuted data set
@@ -780,7 +780,7 @@ Like the normal distribution, the chi-squared distribution only becomes a good a
 
 There are three new data sets in your environment, `ds1`, `ds2`, and `ds3`, that all contain two columns of categorical data. You can test the independence of the two variables for all three data sets using a *permutation* chi-squared test, however the chi-squared *approximation* method will only be accurate for one of them. Which one?
 
-Note: since these data sets only have two columns, you can form a contingency table by simply running `table()` on the original data frame.
+<!-- Note: since these data sets only have two columns, you can form a contingency table by simply running `table()` on the original data frame. -->
 
 ```{r}
 ds1 <- tibble(var1 = rep(c("A", "B"), times = c(22, 24)),
@@ -793,6 +793,10 @@ ds2 <- tibble(var1 = rep(c("A", "B", "C"), times = c(22, 24, 11)),
 ds3 <- tibble(var1 = rep(c("A", "B"), times = c(47, 62)),
               var2 = c(rep(c("X", "Y", "Z"), times = c(14, 11, 22)),
                      rep(c("X", "Y", "Z"), times = c(28, 20, 14))))
+
+print(ds1 |> table())
+print(ds2 |> table())
+print(ds3 |> table())
 ```
 
 
