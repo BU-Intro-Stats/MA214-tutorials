@@ -10,12 +10,11 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(openintro)
-library(mosaic)
+library(mosaicData)
 library(broom)
 library(knitr)
 library(infer)
 library(tidyverse)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
@@ -240,8 +239,6 @@ In the previous lesson you saw that sometimes the mathematical model was not app
 
 ### What are the technical conditions?
 
-
-
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
 
 $$\epsilon \sim N(0, \sigma_\epsilon)$$ 
@@ -259,10 +256,7 @@ ggplot(lineardata, aes(x=explanatory, y=response)) + geom_point() +
 
 Because your goal in this tutorial is to perform inferential calculations on the linear regression model, it is important that the sampling distribution for the estimated slope has the expected form.  That is, we will be able to apply our methods only if the points are linear, independent, normally distributed, and have equal variability around the line.  Note that the conditions are given by the linear model equation as well as spelled out using the LINE mnemonic.
 
-
 If the sampling distribution isn't accurate, the p-values and confidence intervals that you calculate could be wrong.
-
-
 
 ### Linear model: residuals
 

@@ -16,7 +16,6 @@ library(tidyverse)
 library(MASS)
 library(infer)
 library(mosaicData)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
@@ -145,18 +144,12 @@ hash_encoder_ui <- {
 ```
 
 
-## Welcome 
-
-Welcome to Inference for Linear Regression. We are assuming that you've already worked through the first few tutorials in this series.
 
 ## Variability in regression lines
 
 
-### In this tutorial you will
+### Overview
 
-- Make inferential claims about models. 
-- Use least squares estimation.
-- Create confidence intervals for the slope. 
 
 In this tutorial, you will be building on your previous work to now make inferential (instead of descriptive) claims based on linear models.  In particular, we will use the least squares regression line to test whether or not there is a relationship between two continuous variables.  And we will also estimate confidence intervals which quantify the slope of the linear regression line.
 
@@ -175,7 +168,7 @@ We will be working primarily with two continuous variables.  Consider the scatte
 
 ### Fat & calories: linear model
 
-```{r echo = FALSE}
+```{r echo = TRUE}
 starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") +
   geom_smooth(method="lm", se=FALSE)
@@ -222,34 +215,25 @@ ggplot(starbucks2, aes(x=Fat, y=Calories)) + geom_point(color="#569BBD") +
 
 When the two samples are plotted on the same figure, we see that the least squares regression lines are not identical.  That is, there is variability in the regression line from sample to sample.  The concept of sampling variability is something you've seen before, but in this lesson, you will focus on the variability of the line instead of the variability of a single statistic.
 
-### Sampling variability
-
-
-
-- Variability in the regression line 
-
-
-That is, there is variability in the regression line from sample to sample.  The concept of the sampling variability is something you've seen before, but in this lesson, you will focus on the variability of the line instead of the variability of a single statistic.
-
-
 
 ### Fat & calories: many samples
 
-```{r echo = FALSE}
+Indeed, when we take repeated samples of size 20 (here we took 50 different samples), every single line is different.  The `rep_sample_n` command lets take many samples of size 20 and ggplot fit the linear model separately for each of those samples.
+
+```{r echo = TRUE}
 ggplot(starbucks_many, aes(x=Fat, y=Calories, group=replicate)) + 
   geom_point() + 
   ggtitle("Fat vs. Calories for Starbucks Food Items") + 
   geom_smooth(method="lm", se=FALSE)
 ```  
 
-Indeed, when we take repeated samples of size 20 (here we took 50 different samples), every single line is different.  Notice that the `rep_sample_n` command let us take many samples of size 20 and ggplot fit the linear model separately for each of those samples.
-
 
 
 ### Fat & calories: sampling distribution of slopes
 
+We can characterize the sampling distribution of the slopes by making a density plot  showing the variability associated with the different slopes.  The R code uses the `tidy` function in the **broom** package to pull out the slope coefficient for each of the separate models.  Using ggplot, we can plot the different slope estimates.
 
-```{r echo = FALSE}
+```{r echo = TRUE}
 starbucks_many_lm <- starbucks_many |> 
   group_by(replicate) |> 
   do(tidy(lm(Calories ~ Fat, data=.))) |>
@@ -259,30 +243,13 @@ ggplot(starbucks_many_lm, aes(x=estimate)) + geom_density() +
   xlim(5,20)
 ```
 
-We can characterize the sampling distribution of the slopes by making a density plot (a smoothed histogram) showing the variability associated with the different slopes.
-
-
-### Interpret the density plot
-
-
-- Slopes between 8 and 17
-- None close to zero 
-- Strong evidence the association is positive
-
-
-
-
-We can characterize the sampling distribution of the slopes by making a density plot (a smoothed histogram) showing the variability associated with the different slopes.  The R code uses the `tidy` function in the **broom** package to pull out the slope coefficient for each of the separate models.  Using ggplot, we can plot the different slope estimates.
 
 We can see that the slopes vary from about 8 to about 17.  In no sample did the slope come anywhere close to zero.  that is, there is a lot of evidence that the relationship between fat and calories is positive.
 
 
-We can see that the slopes vary from about 9 to about 16.  In no sample did the slope come anywhere close to zero.  that is, there is a lot of evidence that the relationship between fat and calories is positive.
-
-
-
 ### Fat & carbohydrates: many samples
 
+The same analysis can be done with different variables.  Here, consider fat and carbohydrates.  Again, for each of 50 samples of size 20, a different regression line (and different slope) is calculated.
 
 
 ```{r echo = TRUE}
@@ -291,7 +258,6 @@ ggplot(starbucks_many, aes(x=Fat, y=Carbs, group=replicate)) + geom_point() +
   geom_smooth(method="lm", se=FALSE)
 ```
 
-The same analysis can be done with different variables.  Here, consider fat and carbohydrates.  Again, for each of 50 samples of size 20, a different regression line (and different slope) is calculated.
 
 
 
@@ -314,13 +280,6 @@ Unlike the relationship between fat & calories, however, some of the sample slop
 
 ### Interpreting the density plot
 
-
-- Some slopes close to zero
-- High variability 
-- We can't make any conclusions 
-
-
-
 The high sampling variability makes it impossible to make conclusions about the relationship between fat and carbohydrates.  Although the relationship is possibly positive, we are unable to make conclusions due to the large amount of sampling variability.
 
 
@@ -333,7 +292,7 @@ First you'll review how to run the linear model using the **broom** package, the
 
 The following code provides two equivalent methods for calculating the most important pieces of the linear model output.  Recall that the p-value is the probability of the observed data (or more extreme) given the null hypothesis is true.  As with inference in other settings, you will need the sampling distribution for the statistic (here the slope) assuming the null hypothesis is true.  You will generate the null sampling distribution in later lessons, but for now, assume that the null sampling distribution is correct.   Additionally, notice that the standard error of the slope and intercept estimates describe the variability of those estimates.
 
-- Load the **mosaicData** package and load the `RailTrail` data. The `RailTrail` data contains information about the number of users of a trail in Florence, MA and the weather for each day.
+- The `RailTrail` data is already loaded and contains information about the number of users of a trail in Florence, MA and the weather for each day.
 - Using the `lm()` function, run a linear model regressing the `volume` of riders on the `hightemp` for the day.  Assign the output of the `lm()` function to the object `ride_lm`.
 - Use the `summary()` function on the linear model output to see the inferential analysis (including the p-value for the slope).
 - Additionally, `tidy()` the linear model output to make it easier to use later.
@@ -773,7 +732,7 @@ Last, the information for testing whether either the intercept or the slope is z
 
 The slope, on the other hand, has a significant p-value of 0.03, but the p-value tells us that if there is no relationship between protein and carbs in the population, we would see data like these about 3 percent of the time.
 
-If the original research question had been one sided (that is, are protein and carbs positively associated), the p-value should be divided by two to arrive at a one sided p-value of about 0.015.  the data are substantially more significant when testing a one-sided hypothesis, although the one sided test should only happen if the original research question is one-sided.
+If the original research question had been one sided (that is, are protein and carbs positively associated), the p-value should be divided by two to arrive at a one sided p-value of about 0.015. 
 
 ### Regression hypothesis
 
