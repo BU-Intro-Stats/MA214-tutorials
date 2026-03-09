@@ -382,8 +382,8 @@ In the last line, call `pull()` and pass `estimate`.
 
 
 
-
 **Exercise**
+
 
 Simulate 10 slopes.
 
@@ -541,6 +541,7 @@ You can add a density geom using `geom_density()`.
 
 **Exercise**
 
+
 - Use `ungroup()` without arguments to ungroup the dataset.
 - Use `summarize()` to calculate summary statistics.
     - Calculate `mean_stat` as the mean of `stat`.
@@ -671,6 +672,7 @@ The last line, with `abs()`, needs no arguments.
 
 
 **Exercise**
+
 
 - Mutate `perm_slope` to add a column, `abs_perm_slope`, equal to the absolute value of `stat`.
 - Summarize to calculate `p_value`, equal to the proportion of rows where `abs_perm_slope` is greater than or equal to `abs_obs_slope`.
@@ -921,7 +923,7 @@ Inside `summarize()`, `lower` is calculated as the `mean()` of `stat` minus `2` 
 </details>
 
 <details>
-<summary>**Hint 1**</summary>
+<summary>**Hint 2**</summary>
 Change the minus to a plus to calculate `upper`.
 </details>
 
