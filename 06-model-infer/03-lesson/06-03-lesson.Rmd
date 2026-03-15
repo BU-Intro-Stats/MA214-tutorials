@@ -1314,7 +1314,7 @@ The foster twin IQ predictions that you calculated last time are provided as `pr
 
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, include=FALSE, eval=FALSE}
 alpha <- 0.05
 degrees_of_freedom <- nrow(twins) - 2
 confidence_level <- 1 - alpha
