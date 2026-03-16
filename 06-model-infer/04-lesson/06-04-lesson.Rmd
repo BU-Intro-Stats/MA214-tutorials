@@ -276,10 +276,10 @@ ggplot(linear_lm,
 
 
 fitted value: 
-$\hat{Y}_i = b_0 + b_1 X_i$
+$\widehat{Y}_i = b_0 + b_1 X_i$
 
 residual:
-$e_i= Y_i - \hat{Y}_i$
+$e_i= Y_i - \widehat{Y}_i$
 
 
 ```{r}
@@ -332,10 +332,10 @@ ggplot(nonlinear_lm,
 
 
 fitted value: 
-$\hat{Y}_i = b_0 + b_1 X_i$
+$\widehat{Y}_i = b_0 + b_1 X_i$
 
 residual:
-$e_i= Y_i - \hat{Y}_i$
+$e_i= Y_i - \widehat{Y}_i$
 
 
 The residuals associated with the quadratic model also look curved.  For the technical conditions to hold, you need a non-patterned scattering of points.  Just like the original scatter plot, the residual plot with fitted value on the x-axis, and residual on the y-axis continues to demonstrates a violation of the linear technical condition.
@@ -381,10 +381,10 @@ ggplot(nonnormal_lm,
 ```
 
 fitted value: 
-$\hat{Y}_i = b_0 + b_1 X_i$
+$\widehat{Y}_i = b_0 + b_1 X_i$
 
 residual:
-$e_i= Y_i - \hat{Y}_i$
+$e_i= Y_i - \widehat{Y}_i$
 
 
 The residual plot makes it even easier to see the violation of the technical condition related to normality.  If the residuals were normally distributed around the line, they would be equally far from the line in the positive and negative direction.  Here, the points below the line do not spread out nearly as far as the points above the line.
@@ -429,11 +429,11 @@ ggplot(nonequal_lm,
 
 fitted value:
 
-$\hat{Y}_i = b_0 + b_1 X_i$
+$\widehat{Y}_i = b_0 + b_1 X_i$
 
 residual:
 
-$e_i= Y_i - \hat{Y}_i$
+$e_i= Y_i - \widehat{Y}_i$
 
 
 Once again, the residual plot accentuates the technical condition violation by demonstrating the increasing variability of the residuals around the line as the fitted value increases.
