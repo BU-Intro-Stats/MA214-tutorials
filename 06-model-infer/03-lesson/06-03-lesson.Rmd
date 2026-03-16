@@ -14,7 +14,6 @@ library(broom)
 library(knitr)
 library(infer)
 library(tidyverse)
-library(emo)
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
@@ -291,7 +290,7 @@ ggplot(starbucks, aes(x=Fiber, y=Protein)) + geom_point() +
   geom_smooth(method="lm", se=FALSE)
 ```
 
-Unlike the relationship between fat and calories, fiber and protein does not seem to have an obvious linear model. although the least squares fit produces a line with a positive slope, the points don't seem to indicate a strong positive relationship.
+Unlike the relationship between fat and calories, fiber and protein does not seem to have an obvious linear model. Although the least squares fit produces a line with a positive slope, the points don't seem to indicate a strong positive relationship.
 
 
 
@@ -305,7 +304,7 @@ ggplot(starProFib, aes(x=statistic)) +
 ```
 
 
-we can repeat the bootstrap analysis to identify whether the mathematical model fits the sampling distribution of the slopes when dealing with variables that do not seem to show a strong linear trend. we will argue that although the red line is not extremely different from the histogram, it is different enough to indicate concerns with the mathematical model used to describe fiber and protein.
+We can repeat the bootstrap analysis to identify whether the mathematical model fits the sampling distribution of the slopes when dealing with variables that do not seem to show a strong linear trend. We will argue that although the red line is not extremely different from the histogram, it is different enough to indicate concerns with the mathematical model used to describe fiber and protein.
 
 Note that we again use the `dt` function, but the fit is not as good as it was with fat and calorie. R won't know when the fit is good and when it isn't, so R will always use the t-distribution to calculate p-values, even when it isn't a good idea.
 
@@ -323,10 +322,10 @@ ggplot(starProFib, aes(x=statistic)) +
 ```
 
 
-indeed, we are again most concerned with the fit of the t-distribution to the histogram in the tails of the distribution. 
+Indeed, we are again most concerned with the fit of the t-distribution to the histogram in the tails of the distribution. 
 
 
-in looking at the left tail, notice that the red line is above the histogram values. that means, we are unlikely to see values as extreme if the null hypothesis is true. indeed, the p-value with the mathematical model will overestimate the true p-value.
+In looking at the left tail, notice that the red line is above the histogram values. That means, we are unlikely to see values as extreme if the null hypothesis is true. Indeed, the p-value with the mathematical model will overestimate the true p-value.
 
 
 
@@ -357,7 +356,6 @@ So far we've talked about the mathematical model and how sometimes it can lead t
 
 Instead of simulating a null distribution (using permutations), the t-distribution can be used to calculate p-values and confidence intervals. The theoretical result provides a t-distribution fit for the sampling distribution of the standardized slope statistic. Why does it matter if the sampling distribution is accurate?
 
-*Hint:* Lots of things can go wrong if the distribution doesn't match the assumptions.
 
 ```{r option-a, echo=FALSE}
 question("Why does it matter if the sampling distribution is accurate?",
@@ -370,12 +368,18 @@ question("Why does it matter if the sampling distribution is accurate?",
 )
 ```
 
+<details>
+<summary>**Hint**</summary>
+Lots of things can go wrong if the distribution doesn't match the assumptions.
+</details>
 
 ### t-statistic
 
 
 Using the permuted datasets (recall, the randomization forces the null hypothesis to be true), investigate the distribution of the standardized slope statistics (the slope, which has been divided by the standard error). Note that the distribution of the standardized slope is well described by a t-distribution.
 
+
+**Exercise**
 
 - Filter `twins_perm` for rows where `term` equals `"Biological_perm"`.
 - Calculated the degrees of freedom of `twins`, as the number of its rows minus two.
@@ -393,29 +397,34 @@ biological_perm <- twins_perm |>
 degrees_of_freedom <- ___
 ```
 
+<details>
+<summary>**Hint**</summary>
+Recall that the degrees of freedom for the t distribution should be $n-2$. How do you get $n$?
+</details>
 
-
-```{r ex31-hint}
-- Call `filter()`, passing the condition `term` equal to `"Biological_perm"`.
-- Use `nrow()` to calculate the number of rows of `twins`.
-```
-
-
-
-```{r ex31-solution}
-# Look at the data
-twins_perm
-
-# Filter for Biological_perm
-biological_perm <- twins_perm |>
-  filter(term == "Biological_perm")
-
-# Calculate degrees of freedom of twins
-degrees_of_freedom <- nrow(twins) - 2
-```
+<!-- ```{r ex31-hint} -->
+<!-- - Call `filter()`, passing the condition `term` equal to `"Biological_perm"`. -->
+<!-- - Use `nrow()` to calculate the number of rows of `twins`. -->
+<!-- ``` -->
 
 
 
+<!-- ```{r ex31-solution} -->
+<!-- # Look at the data -->
+<!-- twins_perm -->
+
+<!-- # Filter for Biological_perm -->
+<!-- biological_perm <- twins_perm |> -->
+<!--   filter(term == "Biological_perm") -->
+
+<!-- # Calculate degrees of freedom of twins -->
+<!-- degrees_of_freedom <- nrow(twins) - 2 -->
+<!-- ``` -->
+
+
+
+
+**Exercise**
 
 
 - Using `biological_perm`, plot `statistic`.
@@ -427,11 +436,6 @@ degrees_of_freedom <- nrow(twins) - 2
 
 
 ```{r ex33, exercise=TRUE}
-# From previous step
-biological_perm <- twins_perm |>
-  filter(term == "Biological_perm")
-degrees_of_freedom <- nrow(twins) - 2
-
 # Using biological_perm, plot statistic
 ___ + 
   # Add a histogram layer, with density on the y axis
@@ -441,28 +445,34 @@ ___ +
 ```
 
 
+<details>
+<summary>**Hint 1**</summary>
+Add `geom_histogram()`, and inside `aes()`, map `y` to `..density..`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+Inside `stat_function()`, set `fun` to `dt`, `args` to a list with `df` set to `degrees_of_freedom`, and `color` set to `"red"`.
+</details>
+
+<!-- ```{r ex33-hint} -->
+<!-- - Call `ggplot()` with `biological_term` as the data argument. Inside `aes()`, map `x` to `statistic`. -->
+<!-- ``` -->
 
 
-```{r ex33-hint}
-- Call `ggplot()` with `biological_term` as the data argument. Inside `aes()`, map `x` to `statistic`.
-- Add `geom_histogram()`, and inside `aes()`, map `y` to `..density..`.
-- Add `stat_function()`, setting `fn` to `dt` (without parentheses), `args` to a list with `df` set to `degrees_of_freedom`, and `color` set to `"red"`.
-```
+<!-- ```{r ex33-solution} -->
+<!-- # From previous step -->
+<!-- biological_perm <- twins_perm |> -->
+<!--   filter(term == "Biological_perm") -->
+<!-- degrees_of_freedom <- nrow(twins) - 2 -->
 
-
-```{r ex33-solution}
-# From previous step
-biological_perm <- twins_perm |>
-  filter(term == "Biological_perm")
-degrees_of_freedom <- nrow(twins) - 2
-
-# Using biological_perm, plot statistic
-ggplot(biological_perm, aes(x = statistic)) + 
-  # Add a histogram layer, with density on the y axis
-  geom_histogram(aes(y = ..density..)) + 
-  # Add a t-distribution function stat, colored red
-  stat_function(fun = dt, args = list(df = degrees_of_freedom), color = "red")
-```
+<!-- # Using biological_perm, plot statistic -->
+<!-- ggplot(biological_perm, aes(x = statistic)) +  -->
+<!--   # Add a histogram layer, with density on the y axis -->
+<!--   geom_histogram(aes(y = ..density..)) +  -->
+<!--   # Add a t-distribution function stat, colored red -->
+<!--   stat_function(fun = dt, args = list(df = degrees_of_freedom), color = "red") -->
+<!-- ``` -->
 
 
 
@@ -474,11 +484,10 @@ The p-value given by the `lm` output is a two-sided p-value by default. In the t
 
 The linear regression model of `Foster` vs. `Biological`, `model`, is provided in the script.
 
+**Exercise**
 
-- Get the Biological coefficient from the model.
-    - Tidy the model.
-    - Filter for the `term` `"Biological"`.
-- Add a column, `one_sided_p_value`, of the one-sided p-value.
+- Get the Biological coefficient from the model: first, tidy the model and then filter for the `term` `"Biological"`.
+- Add a column, `one_sided_p_value`, for the one-sided p-value.
 
 
 ```{r ex34, exercise=TRUE}
@@ -496,28 +505,31 @@ biological_term |>
   ___(one_sided_p_value = ___)
 ```
 
+<details>
+<summary>**Hint**</summary>
+Call `mutate()`, setting `one_sided_p_value` equal to half of `p.value`.
+</details>
 
-```{r ex34-hint}
-- Call `tidy()`, without arguments.
-- Call `filter()`, with the condition `term` equal to `"Biological"`.
-- Call `mutate()`, setting `one_sided_p_value` equal to half of `p.value`.
-```
+<!-- ```{r ex34-hint} -->
+<!-- - Call `tidy()`, without arguments. -->
+<!-- - Call `filter()`, with the condition `term` equal to `"Biological"`. -->
+<!-- ``` -->
 
 
-```{r ex34-solution}
-model <- lm(Foster ~ Biological, data = twins)
+<!-- ```{r ex34-solution} -->
+<!-- model <- lm(Foster ~ Biological, data = twins) -->
 
-# Get the Biological model coefficient
-biological_term <- model |> 
-  # Tidy the model
-  tidy() |> 
-  # Filter for term equal to "Biological"
-  filter(term == "Biological")
+<!-- # Get the Biological model coefficient -->
+<!-- biological_term <- model |>  -->
+<!--   # Tidy the model -->
+<!--   tidy() |>  -->
+<!--   # Filter for term equal to "Biological" -->
+<!--   filter(term == "Biological") -->
 
-biological_term |>
-  # Add a column of one-sided p-values
-  mutate(one_sided_p_value = p.value / 2)
-```
+<!-- biological_term |> -->
+<!--   # Add a column of one-sided p-values -->
+<!--   mutate(one_sided_p_value = p.value / 2) -->
+<!-- ``` -->
 
 
 
@@ -535,19 +547,19 @@ If the hypothesis that the slope equals one is true, then the new test statistic
 The biological term from the model is available as `biological_term`.
 
 
+**Exercise**
+
+
 - Calculate the degrees of freedom of the `twins` dataset.
-- Calculate the two-sided p-value  for the alternative hypothesis that the true slope is different than 1. Build up the calculation in stages.
-    - Calculate the test statistic as the slope `estimate` minus `1`, all divided by the standard error.
-    - Calculate the one-sided p-value of the test statistic using the cumulative distribution function of the t-distribution, `pt()`, at the `test_statistic`, with the degrees of freedom you just calculated.
-    - Calculate the two-sided p-value as double the one-sided p-value.
-
-
+- Calculate the test statistic as the slope `estimate` minus `1`, all divided by the standard error.
+- Calculate the one-sided p-value of the test statistic using the cumulative distribution function of the t-distribution, `pt()`, at the `test_statistic`, with the degrees of freedom you just calculated.
+- Calculate the two-sided p-value as double the one-sided p-value.
 
 
 
 ```{r ex35, exercise=TRUE}
 # Calculate the degrees of freedom of twins
-degrees_of_freedom <- nrow(twins) - 2
+degrees_of_freedom <- ___
 
 biological_term |>
   mutate(
@@ -561,43 +573,53 @@ biological_term |>
 ```
 
 
+<details>
+<summary>**Hint 1**</summary>
+Recall that the degrees of freedom is the number of rows of data minus two. How do you get the number of rows?
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+Q: What is the test statistic here?
+</details>
+
+<details>
+<summary>**Hint 3**</summary>
+To calculate the one-sided p-value, call `pt()`, passing `test_statistic` and setting `df` to `degrees_of_freedom`. The two-sided p-value should be twice the one-sided p-value.
+</details>
 
 
 
+<!-- ```{r ex35-solution} -->
+<!-- # Calculate the degrees of freedom of twins -->
+<!-- degrees_of_freedom <- nrow(twins) - 2 -->
 
-```{r ex35-hint}
-- The degrees of freedom are the number of rows of data minus two.
-- The test statistic is the `estimate` minus `1` (in parentheses), divided by `std.error`.
-- To calculate the one-sided p-value, call `pt()`, passing `test_statistic` and setting `df` to `degrees_of_freedom`.
-- The two-sided p-value is `2` times `one_sided_p_value_of_test_statistic`.
-```
+<!-- biological_term |> -->
+<!--   mutate( -->
+<!--     # Calculate the test statistic -->
+<!--     test_statistic = (estimate - 1) / std.error, -->
+<!--     # Calculate its one-sided p-value -->
+<!--     one_sided_p_value_of_test_statistic = pt(test_statistic, df = degrees_of_freedom), -->
+<!--     # ... and its two-sided p-value -->
+<!--     two_sided_p_value_of_test_statistic = 2 * one_sided_p_value_of_test_statistic -->
+<!--   ) -->
+<!-- ``` -->
 
-```{r ex35-solution}
-# Calculate the degrees of freedom of twins
-degrees_of_freedom <- nrow(twins) - 2
+Great, now you have the two-sided p-value for the alternative hypothesis that the true slope is different from 1. Is your result significant?
 
-biological_term |>
-  mutate(
-    # Calculate the test statistic
-    test_statistic = (estimate - 1) / std.error,
-    # Calculate its one-sided p-value
-    one_sided_p_value_of_test_statistic = pt(test_statistic, df = degrees_of_freedom),
-    # ... and its two-sided p-value
-    two_sided_p_value_of_test_statistic = 2 * one_sided_p_value_of_test_statistic
-  )
-```
 
 ### Comparing randomization inference and t-inference
 
-When technical conditions hold (see next lesson) , the inference from the randomization test and the t-distribution test should give equivalent conclusions. They will not provide the exact same answer because they are based on different methods. But they should give p-values and confidence intervals that are reasonably close.
+When technical conditions hold (see next lesson) , the inference from the randomization test and the t-distribution test should give equivalent conclusions. They will not provide the exact same answer because they are based on different methods, but they should give p-values and confidence intervals that are reasonably close.
 
+**Exercise**
 
 - Calculate the absolute value of the observed slope, `obs_slope`.
 - Add a column to `perm_slope` of the absolute value of the slope in each permuted replicate. The slope column is called `stat`.
 - In the call to `summarize()`, calculate the p-value as the proportion of absolute estimates of slope that are at least as extreme as the absolute observed estimate of slope.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=FALSE, include=FALSE, eval=FALSE}
 set.seed(4747)
 perm_slope <- twins |>
   specify(Foster ~ Biological) |>
@@ -624,42 +646,35 @@ abs_obs_slope <- ___
 # Find the p-value
 perm_slope |>
   # Add a column for the absolute value of stat
-  ___ |>
+  mutuate(abs_perm_slope = ___) |>
   summarize(
     # Calculate prop'n permuted values at least as extreme as observed
     p_value = ___
   )
 ```
 
+<details>
+<summary>**Hint**</summary>
+Recall that you can calculate a proportion for `x` values "at least as extreme as `y`" using `mean(x >= y)`.
+</details>
 
+<!-- ```{r ex36-solution} -->
+<!-- # The slope in the observed data and each permutation replicate -->
+<!-- obs_slope -->
+<!-- perm_slope -->
 
+<!-- # Calculate the absolute value of the observed slope -->
+<!-- abs_obs_slope <- abs(obs_slope) -->
 
-```{r ex36-hint}
-- `abs_obs_slope` is the `abs()`olute value of `obs_slope`.
-- `abs_perm_slope` is the absolute value of `stat`.
-- Recall that you can calculate a proportion using `mean(x >= y)`.
-- "`x` is at least as extreme as `y`" means "the absolute value of `x` is greater than or equal to the absolute value of `y`".
-```
-
-
-
-```{r ex36-solution}
-# The slope in the observed data and each permutation replicate
-obs_slope
-perm_slope
-
-# Calculate the absolute value of the observed slope
-abs_obs_slope <- abs(obs_slope)
-
-# Find the p-value
-perm_slope |>
-  # Add a column for the absolute value of stat
-  mutate(abs_perm_slope = abs(stat)) |>
-  summarize(
-    # Calculate prop'n permuted values at least as extreme as observed
-    p_value = mean(abs_perm_slope >= abs_obs_slope)
-  )
-```
+<!-- # Find the p-value -->
+<!-- perm_slope |> -->
+<!--   # Add a column for the absolute value of stat -->
+<!--   mutate(abs_perm_slope = abs(stat)) |> -->
+<!--   summarize( -->
+<!--     # Calculate prop'n permuted values at least as extreme as observed -->
+<!--     p_value = mean(abs_perm_slope >= abs_obs_slope) -->
+<!--   ) -->
+<!-- ``` -->
 
 
 ## Intervals in regression
@@ -735,7 +750,7 @@ tidy_mod |>
 ```
 
 
-the confidence interval for the intercept parameter goes from 118.3kcal to 177.65 kcal. In this particular case, we can interpret the intercept in terms of the problem, because zero fat is a plausible value for the explanatory variable. Oftentimes, a zero value represents extrapolation outside of the plausible range, so it is important to be careful with the interpretation of the intercept.
+The confidence interval for the intercept parameter goes from 118.3kcal to 177.65 kcal. In this particular case, we can interpret the intercept in terms of the problem, because zero fat is a plausible value for the explanatory variable. Oftentimes, a zero value represents extrapolation outside of the plausible range, so it is important to be careful with the interpretation of the intercept.
 
 Here we say that for the set of food items with zero fat, we are 95% confident that their average calories will be between 118.3 and 177.7.
 
@@ -749,7 +764,6 @@ tidy_mod <- lm(Calories ~ Fat, data = starbucks) |>
   tidy(conf.int = TRUE, conf.level=1-alpha)
 
 tidy_mod
-
 ```
 
 
@@ -757,15 +771,14 @@ tidy_mod
 tidy_mod |> 
   filter(term == "Fat") |> 
   select(conf.low, conf.high)
-  
 ```
 
 
-The confidence interval for the slope parameter is 11.1 to 14.4. that means, for each set of foods with one additional gram of fat, we expect the average calorie content to be an additional 11.1 to 14.4 kcal. 
+The confidence interval for the slope parameter is 11.1 to 14.4. That means, for each set of foods with one additional gram of fat, we expect the average calorie content to be an additional 11.1 to 14.4 kcal. 
 
-note that a regression model cannot tell you anything about causation. that is, we can't say that one additional gram of fat *adds* between 11.1 to 14.4 calories to a food item. Of course, in this case, nutritional science can tell us how many calories a gram of fat has, but that doesn't mean that an additional gram of fat will add exactly that amount to a specific food item because the make-up of the food item includes many other components as well.
+Note that a regression model cannot tell you anything about causation. That is, we can't say that one additional gram of fat *adds* between 11.1 to 14.4 calories to a food item. Of course, in this case, nutritional science can tell us how many calories a gram of fat has, but that doesn't mean that an additional gram of fat will add exactly that amount to a specific food item because the make-up of the food item includes many other components as well.
 
-the correct interpretation of the confidence interval for the slope parameter is to indicate that you are 95% confident that foods with one higher gram of fat will have, on average, between 11.1 and 14.4 additional calories.
+The correct interpretation of the confidence interval for the slope parameter is to indicate that you are 95% confident that foods with one higher gram of fat will have, on average, between 11.1 and 14.4 additional calories.
 
 
 
@@ -787,7 +800,7 @@ BS_slope |>
 
 In addition to using the mathematical theory to create a confidence interval for the slope, you can also use bootstrap sampling to estimate the variability of the slope associated with re-samples.
 
-In the example above, you can see that the bootstrap confidence interval ranges from 11.2 to 14.3 (very close to the mathematical approximation which went from 11.1 to 14.4).
+In the example above, you can see that the bootstrap confidence interval ranges from 11.2 to 14.5 (very close to the mathematical approximation which went from 11.1 to 14.4).
 
 ### CI using t-theory
 
@@ -798,11 +811,11 @@ Create a CI for the slope parameter using both the default `tidy()` call as well
 `alpha` has been set to `0.05` and the degrees of freedom of the `twins` dataset is given to you.
 
 
+**Exercise**
 
 - Calculate the confidence level as one minus `alpha`.
 - Calculate the upper percentile cutoff from `alpha`.
 - Calculate the critical value from the inverse cumulative density function of the t-distribution, `qt()`. Pass it the upper percentile cutoff and the degrees of freedom.
-
 
 
 ```{r ex39, exercise=TRUE}
@@ -819,46 +832,42 @@ p_upper <- ___
 critical_value <- ___
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+The upper percentile cutoff should be `1` minus (`alpha` divided by `2`). Why?
+</details>
 
-```{r ex39-hint}
-- Set `confidence_level` to `1` minus `alpha`.
-- Set `p_upper` to `1` minus (`alpha` divided by `2`).
-- Calculate `critical_value` as `qt()` of `p_upper` and `degrees_of_freedom`.
-```
-
-
-```{r ex39-solution}
-alpha <- 0.05
-degrees_of_freedom <- nrow(twins) - 2
-
-# Calculate the confidence level
-confidence_level <- 1 - alpha
-
-# Calculate the upper percentile cutoff
-p_upper <- 1 - alpha / 2
-
-# Find the critical value from the t-distribution
-critical_value <- qt(p_upper, df = degrees_of_freedom)
-
-critical_value
-```
+<details>
+<summary>**Hint 2**</summary>
+Use `qt()` with `p_upper` and `degrees_of_freedom` for computing the `critical_value`.
+</details>
 
 
 
+<!-- ```{r ex39-solution} -->
+<!-- alpha <- 0.05 -->
+<!-- degrees_of_freedom <- nrow(twins) - 2 -->
 
+<!-- # Calculate the confidence level -->
+<!-- confidence_level <- 1 - alpha -->
+
+<!-- # Calculate the upper percentile cutoff -->
+<!-- p_upper <- 1 - alpha / 2 -->
+
+<!-- # Find the critical value from the t-distribution -->
+<!-- critical_value <- qt(p_upper, df = degrees_of_freedom) -->
+
+<!-- critical_value -->
+<!-- ``` -->
+
+
+
+**Exercise**
 
 - Tidy the linear regression model, including a confidence interval by setting `conf.int` to `TRUE`, and setting the confidence level, `conf.level`, to `confidence_level`.
 - Manually calculate the same confidence interval as the estimate plus or minus the critical value times the standard error.
 
-
 ```{r ex310, exercise=TRUE}
-# From previous step
-alpha <- 0.05
-degrees_of_freedom <- nrow(twins) - 2
-confidence_level <- 1 - alpha
-p_upper <- 1 - alpha / 2
-critical_value <- qt(p_upper, df = degrees_of_freedom)
-
 tidied_model <- lm(Foster ~ Biological, data = twins) |> 
   # Tidy the model, with a confidence interval
   ___ 
@@ -871,35 +880,39 @@ tidied_model |>
   )
 ```
 
-```{r ex310-hint}
-- Call `tidy()`, setting `conf.int` to `TRUE` and `conf.level` to `confidence_level`.
-- Inside `mutate()`, set `lower` to `estimate` minus `critical_value` times `std.error`.
-- For `upper`, change the minus to a plus.
-```
+<details>
+<summary>**Hint 1**</summary>
+Call `tidy()`, setting `conf.int` to `TRUE` and `conf.level` to `confidence_level`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+Inside `mutate()`, set `lower` to `estimate` minus `critical_value` times `std.error`. How would you adjust this for computing `upper`?
+</details>
 
 
 
 
 
-```{r ex310-solution}
-# From previous step
-alpha <- 0.05
-degrees_of_freedom <- nrow(twins) - 2
-confidence_level <- 1 - alpha
-p_upper <- 1 - alpha / 2
-critical_value <- qt(p_upper, df = degrees_of_freedom)
+<!-- ```{r ex310-solution} -->
+<!-- # From previous step -->
+<!-- alpha <- 0.05 -->
+<!-- degrees_of_freedom <- nrow(twins) - 2 -->
+<!-- confidence_level <- 1 - alpha -->
+<!-- p_upper <- 1 - alpha / 2 -->
+<!-- critical_value <- qt(p_upper, df = degrees_of_freedom) -->
 
-tidied_model <- lm(Foster ~ Biological, data = twins) |> 
-  # Tidy the model, with a confidence interval
-  tidy(conf.int = TRUE, conf.level = confidence_level)
+<!-- tidied_model <- lm(Foster ~ Biological, data = twins) |>  -->
+<!--   # Tidy the model, with a confidence interval -->
+<!--   tidy(conf.int = TRUE, conf.level = confidence_level) -->
 
-tidied_model |>
-  # Manually calculate the same interval
-  mutate(
-    lower = estimate - critical_value * std.error,
-    upper = estimate + critical_value * std.error
-  )
-```
+<!-- tidied_model |> -->
+<!--   # Manually calculate the same interval -->
+<!--   mutate( -->
+<!--     lower = estimate - critical_value * std.error, -->
+<!--     upper = estimate + critical_value * std.error -->
+<!--   ) -->
+<!-- ``` -->
 
 ### Comparing randomization CIs and t-based CIs
 
@@ -918,7 +931,7 @@ boot_slope <- twins |>
 
 
 
-
+**Exercise**
 
 Calculate the confidence level and the lower and upper percentile cutoffs from alpha.
 
@@ -938,45 +951,32 @@ p_upper <- ___
 ```
 
 
+<!-- ```{r ex11-solution} -->
+<!-- alpha <- 0.05 -->
 
-```{r ex11-hint}
-- Calculate the confidence level as one minus `alpha`.
-- Calculate the lower percentile cutoff as half of `alpha`.
-- Calculate the upper percentile cutoff as one minus half of `alpha`.
-```
+<!-- # Calculate the confidence level -->
+<!-- confidence_level <- 1 - alpha -->
 
-```{r ex11-solution}
-alpha <- 0.05
+<!-- # Calculate lower percentile cutoff -->
+<!-- p_lower <- alpha / 2 -->
 
-# Calculate the confidence level
-confidence_level <- 1 - alpha
+<!-- # ... and the upper one -->
+<!-- p_upper <- 1 - alpha / 2 -->
 
-# Calculate lower percentile cutoff
-p_lower <- alpha / 2
-
-# ... and the upper one
-p_upper <- 1 - alpha / 2
-
-p_lower
-p_upper
-```
+<!-- p_lower -->
+<!-- p_upper -->
+<!-- ``` -->
 
 
 
 
-
+**Exercise**
 
 - Tidy the linear regression model, including a confidence interval, and set the confidence level to `confidence_level`.
 - Summarize the bootstrap replicates to calculate a confidence interval using quantiles of `stat`. Use `p_lower` and `p_upper` for the quantiles.
 
 
 ```{r ex12a, exercise=TRUE}
-# From previous step
-alpha <- 0.05
-confidence_level <- 1 - alpha
-p_lower <- alpha / 2
-p_upper <- 1 - alpha / 2
-
 # Tidy the model, including a confidence interval
 tidied_model <- lm(Foster ~ Biological, data = twins) |> 
    ___
@@ -994,39 +994,40 @@ boot_slope |>
   )
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+Call `tidy()`, setting `conf.int` to `TRUE` and `conf.level` to `confidence_level`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+Inside `summarize()`, calculate `lower` by calling `quantile()` with `stat` and `p_lower`. How would you adjust this to calculate `upper`?
+</details>
 
 
-```{r ex12a-hint}
-- Call `tidy()`, setting `conf.int` to `TRUE` and `conf.level` to `confidence_level`.
-- Inside `summarize()`, calculate `lower` by calling `quantile()` with `stat` and `p_lower`.
-- For `upper`, change `p_lower` to `p_upper`.
+<!-- ```{r ex12a-solution} -->
+<!-- # From previous step -->
+<!-- alpha <- 0.05 -->
+<!-- confidence_level <- 1 - alpha -->
+<!-- p_lower <- alpha / 2 -->
+<!-- p_upper <- 1 - alpha / 2 -->
 
-```
+<!-- # Tidy the model, including a confidence interval -->
+<!-- tidied_model <- lm(Foster ~ Biological, data = twins) |>  -->
+<!--    tidy(conf.int = TRUE, conf.level = confidence_level) -->
 
+<!-- # Recall the t-confidence interval -->
+<!-- tidied_model |> -->
+<!--   filter(term == "Biological") |> -->
+<!--   select(conf.low, conf.high) -->
 
-```{r ex12a-solution}
-# From previous step
-alpha <- 0.05
-confidence_level <- 1 - alpha
-p_lower <- alpha / 2
-p_upper <- 1 - alpha / 2
-
-# Tidy the model, including a confidence interval
-tidied_model <- lm(Foster ~ Biological, data = twins) |> 
-   tidy(conf.int = TRUE, conf.level = confidence_level)
-
-# Recall the t-confidence interval
-tidied_model |>
-  filter(term == "Biological") |>
-  select(conf.low, conf.high)
-
-# Create the bootstrap confidence interval
-boot_slope |> 
-  summarize(
-    lower = quantile(stat, p_lower), 
-    upper = quantile(stat, p_upper)
-  )
-```
+<!-- # Create the bootstrap confidence interval -->
+<!-- boot_slope |>  -->
+<!--   summarize( -->
+<!--     lower = quantile(stat, p_lower),  -->
+<!--     upper = quantile(stat, p_upper) -->
+<!--   ) -->
+<!-- ``` -->
 
 
 ## Different types of Intervals
@@ -1089,7 +1090,7 @@ Notice that the CI (`118.3 to 177.7`) at zero grams of fat is the same as the CI
 
 The 95% confidence interval (`258.7 to 292.4`) representing the average calorie content for foods with 10g of fat is 258.7 calories to 292.4 calories.
 
-Additionally, you can see the intervals which capture the average calorie content with 95% confidence for foods that are 20g of fat (`388 and 418`) and 30g of fat (`505 to 556.7`).
+Additionally, you can see the intervals which capture the average calorie content with 95% confidence for foods that are 20g of fat (`388.5 and 417.8`) and 30g of fat (`504.9 to 556.6`).
 
 
 
@@ -1186,7 +1187,7 @@ critical_value <- qt(p_upper, df = degrees_of_freedom)
 ```
 
 
-
+**Exercise**
 
 Call `augment()` on `model` to see the observation-level data in the model.
 
@@ -1200,22 +1201,22 @@ ___
 ```
 
 
-```{r ex12-hint}
-Call `augment()`, passing `model` as the only input.
-```
+<!-- ```{r ex12-hint} -->
+<!-- Call `augment()`, passing `model` as the only input. -->
+<!-- ``` -->
 
 
-```{r ex12-solution}
-model <- lm(Foster ~ Biological, data = twins)
+<!-- ```{r ex12-solution} -->
+<!-- model <- lm(Foster ~ Biological, data = twins) -->
 
-# Get observation-level values from the model
-augment(model, se_fit = TRUE)
-```
-
-
+<!-- # Get observation-level values from the model -->
+<!-- augment(model, se_fit = TRUE) -->
+<!-- ``` -->
 
 
 
+
+**Exercise**
 
 - Create a new twins dataset of Biological IQs to make predictions of Foster IQs on. Create a `data.frame` with a column named `Biological`, taking values as a `seq`uence from `70` to `130` in steps of `15`.
 - Augment the model with the new dataset. Set `augment()`'s `newdata` argument to `new_twins`.
@@ -1234,43 +1235,40 @@ augmented_model <- ___
 augmented_model
 ```
 
+<details>
+<summary>**Hint**</summary>
+Call `augment()`, passing `model` and setting `newdata` to `new_twins`. Remember to set `se_fit = TRUE`.
+</details>
+
+<!-- ```{r ex313-hint} -->
+<!-- - Call `data.frame()`, setting `Biological` to `70`, `85`, ..., `130`. -->
+<!-- ``` -->
 
 
-```{r ex313-hint}
-- Call `data.frame()`, setting `Biological` to `70`, `85`, ..., `130`.
-- Call `augment()`, passing `model` and setting `newdata` to `new_twins`. Remember to set `se_fit = TRUE`.
-```
+<!-- ```{r ex313-solution} -->
+<!-- # From previous step -->
+<!-- model <- lm(Foster ~ Biological, data = twins) -->
 
+<!-- # Create a dataframe of new observations -->
+<!-- new_twins <- data.frame(Biological = seq(70, 130, 15)) -->
 
-```{r ex313-solution}
-# From previous step
-model <- lm(Foster ~ Biological, data = twins)
+<!-- # Augment the model with the new dataset -->
+<!-- augmented_model <- model |>    -->
+<!--   augment(newdata = new_twins, se_fit = TRUE) -->
 
-# Create a dataframe of new observations
-new_twins <- data.frame(Biological = seq(70, 130, 15))
-
-# Augment the model with the new dataset
-augmented_model <- model |>   
-  augment(newdata = new_twins, se_fit = TRUE)
-
-# See the result
-augmented_model
-```
+<!-- # See the result -->
+<!-- augmented_model -->
+<!-- ``` -->
 
 
 
-
+**Exercise**
 
 Calculate a confidence interval of the predicted IQs of the foster twin, based on the augmented model. This is the predicted value, `.fitted`, plus or minus the critical value times the standard error of the prediction, `.se.fit`.
 
 
 
 ```{r ex314, exercise=TRUE}
-# From previous steps
-model <- lm(Foster ~ Biological, data = twins)
-new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
-
 augmented_model |>
   # Calculate a confidence interval on the predicted values
   mutate(
@@ -1279,27 +1277,26 @@ augmented_model |>
   )
 ```
 
-
-```{r ex314-hint}
-- Inside `mutate()`, calculate `lower_mean_prediction` as `.fitted` minus `critical_value` times `.se.fit`.
-- For `upper_mean_prediction`, change the minus to a plus.
-```
-
+<details>
+<summary>**Hint**</summary>
+Inside `mutate()`, calculate `lower_mean_prediction` as `.fitted` minus `critical_value` times `.se.fit`. How would you adjust this to calculate `upper_mean_prediction`?
+</details>
 
 
-```{r ex314-solution}
-# From previous steps
-model <- lm(Foster ~ Biological, data = twins)
-new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
 
-augmented_model |>
-  # Calculate a confidence interval on the predicted values
-  mutate(
-    lower_mean_prediction = .fitted - critical_value * .se.fit,
-    upper_mean_prediction = .fitted + critical_value * .se.fit
-  )
-```
+<!-- ```{r ex314-solution} -->
+<!-- # From previous steps -->
+<!-- model <- lm(Foster ~ Biological, data = twins) -->
+<!-- new_twins <- data.frame(Biological = seq(70, 130, 15)) -->
+<!-- augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE) -->
+
+<!-- augmented_model |> -->
+<!--   # Calculate a confidence interval on the predicted values -->
+<!--   mutate( -->
+<!--     lower_mean_prediction = .fitted - critical_value * .se.fit, -->
+<!--     upper_mean_prediction = .fitted + critical_value * .se.fit -->
+<!--   ) -->
+<!-- ``` -->
 
 
 
@@ -1316,14 +1313,8 @@ Note that the calculation of the regression line is more stable at the center, s
 The foster twin IQ predictions that you calculated last time are provided as `predictions`. These predictions are shown in a plot using `geom_smooth()`.
 
 
-Manually create what `geom_smooth()` does, using `predictions`. Provide the aesthetics and data to each geom.
 
-- Add a point layer of `Foster` vs. `Biological`, using the `data = twins` dataset.
-- Add a line layer of `.fitted` vs. `Biological`, using the `data = predictions` dataset. Color the line `"blue"`.
-- Add a ribbon layer with `x` mapped to `Biological`, `ymin` mapped to `lower_mean_prediction` and `ymax` mapped to `upper_mean_prediction`. Use the `data = predictions` dataset and set the transparency, `alpha` to `0.2`.
-
-
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, include=FALSE, eval=FALSE}
 alpha <- 0.05
 degrees_of_freedom <- nrow(twins) - 2
 confidence_level <- 1 - alpha
@@ -1346,6 +1337,14 @@ ggplot(twins, aes(x = Biological, y = Foster)) +
 ```
 
 
+You will now manually create what `geom_smooth()` does, using `predictions`. Provide the aesthetics and data to each geom.
+
+**Exercise**
+
+- Add a point layer of `Foster` vs. `Biological`, using the `data = twins` dataset.
+- Add a line layer of `.fitted` vs. `Biological`, using the `data = predictions` dataset. Color the line `"blue"`.
+- Add a ribbon layer with `x` mapped to `Biological`, `ymin` mapped to `lower_mean_prediction` and `ymax` mapped to `upper_mean_prediction`. Use the `data = predictions` dataset and set the transparency, `alpha` to `0.2`.
+
 ```{r ex315, exercise=TRUE}
 # This plot is shown
 ggplot(twins, aes(x = Biological, y = Foster)) + 
@@ -1362,34 +1361,40 @@ ggplot() +
   ___
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+For the aesthetics of `geom_point()`, be sure to map `x` to `Biological` and `y` to `Foster`. Set `data` to `twins`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+For the aesthetics of `geom_line()`, you'll need to instead map `y` to `.fitted` from the `predictions` data. What do you need to set `data` to?
+</details>
+
+<details>
+<summary>**Hint 3**</summary>
+Finally, for the aesthetics of `geom_ribbon()`, you'll need to map `ymin` to `lower_mean_prediction` and `ymax` to `upper_mean_prediction`. What do you need to set `data` to? Don't forget to set `alpha` to 0.2.
+</details>
 
 
+<!-- ```{r ex315-solution} -->
+<!-- # This plot is shown -->
+<!-- ggplot(twins, aes(x = Biological, y = Foster)) +  -->
+<!--   geom_point() + -->
+<!--   geom_smooth(method = "lm")  -->
 
-
-```{r ex315-hint}
-- Add `geom_point()`. Inside `aes()`, map `x` to `Biological` and `y` to `Foster`. Set `data` to `twins`.
-- Add `geom_line()`. Inside `aes()`, map `x` to `Biological` and `y` to `.fitted`. Set `data` to `predictions`.
-- Add `geom_ribbon()`. Inside `aes()`, map `x` to `Biological`, `ymin` to `lower_mean_prediction`, and `ymax` to `upper_mean_prediction`. Set `data` to `predictions`, and `alpha` to `0.2`.
-```
-
-```{r ex315-solution}
-# This plot is shown
-ggplot(twins, aes(x = Biological, y = Foster)) + 
-  geom_point() +
-  geom_smooth(method = "lm") 
-
-ggplot() + 
-  # Add a point layer of Foster vs. Biological, using twins
-  geom_point(aes(x = Biological, y = Foster), data = twins) +
-  # Add a line layer of .fitted vs Biological, using predictions, colored blue
-  geom_line(aes(x = Biological, y = .fitted), data = predictions, color = "blue") +
-  # Add a ribbon layer of lower_mean_prediction to upper_mean_prediction vs Biological, 
-  # using predictions, transparency of 0.2
-  geom_ribbon(
-    aes(x = Biological, ymin = lower_mean_prediction, ymax = upper_mean_prediction), 
-    data = predictions, alpha = 0.2
-  )
-```
+<!-- ggplot() +  -->
+<!--   # Add a point layer of Foster vs. Biological, using twins -->
+<!--   geom_point(aes(x = Biological, y = Foster), data = twins) + -->
+<!--   # Add a line layer of .fitted vs Biological, using predictions, colored blue -->
+<!--   geom_line(aes(x = Biological, y = .fitted), data = predictions, color = "blue") + -->
+<!--   # Add a ribbon layer of lower_mean_prediction to upper_mean_prediction vs Biological,  -->
+<!--   # using predictions, transparency of 0.2 -->
+<!--   geom_ribbon( -->
+<!--     aes(x = Biological, ymin = lower_mean_prediction, ymax = upper_mean_prediction),  -->
+<!--     data = predictions, alpha = 0.2 -->
+<!--   ) -->
+<!-- ``` -->
 
 
 
@@ -1429,9 +1434,9 @@ model <- lm(Foster ~ Biological, data = twins)
 ```
 
 
+**Exercise**
 
-
-- Find the natural variability of the points around the prediction line.
+- Find the natural variability of the points around the prediction line:
     - Use `glance()` to get the model-level information from `model`. 
     - Pull out the `sigma` element.
 - Calculate the standard error of the predictions as the square root of the sum of (`twins_sigma` squared and `.se.fit` squared).
@@ -1450,24 +1455,22 @@ predictions |>
   mutate(std_err_of_predictions = ___)
 ```
 
+<details>
+<summary>**Hint**</summary>
+Inside `mutate()`, `std_err_of_predictions` should be the `sqrt()` of (`twins_sigma` to the power `2`) plus (`.se.fit` to the power `2`). 
+</details>
 
-```{r ex316-hint}
-- From `model`, pipe to `glance()` then `pull()`, passing `sigma` as the only argument to the latter.
-- Inside `mutate()`, `std_err_of_predictions` should be the `sqrt()` of (`twins_sigma` to the power `2`) plus (`.se.fit` to the power `2`). Add the two together versus using the `sum()` function!
+<!-- ```{r ex316-solution} -->
+<!-- twins_sigma <- model |> -->
+<!--   # Get model-level information -->
+<!--   glance() |> -->
+<!--   # Pull out sigma -->
+<!--   pull(sigma) -->
 
-```
-
-```{r ex316-solution}
-twins_sigma <- model |>
-  # Get model-level information
-  glance() |>
-  # Pull out sigma
-  pull(sigma)
-
-predictions |>
-  # Calculate the std err of the predictions
-  mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
-```
+<!-- predictions |> -->
+<!--   # Calculate the std err of the predictions -->
+<!--   mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2)) -->
+<!-- ``` -->
 
 
 
@@ -1475,15 +1478,13 @@ predictions |>
 
 `critical_value` has already been loaded into your workspace.
 
-- Calculate the prediction interval for the foster twins' IQ as the model prediction, `.fitted` plus or minus the critical value times the standard error of the predictions.
+
+**Exercise**
+
+Calculate the prediction interval for the foster twins' IQ as the model prediction, `.fitted` plus or minus the critical value times the standard error of the predictions.
 
 
 ```{r ex317, exercise=TRUE}
-# From previous step
-twins_sigma <- model |> glance() |> pull(sigma)
-predictions2 <- predictions |>
-  mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
-
 predictions3 <- predictions2 |>
   # Calculate the prediction intervals
   mutate(
@@ -1495,33 +1496,31 @@ predictions3 <- predictions2 |>
 predictions3
 ```
 
+<details>
+<summary>**Hint**</summary>
+Calculate `lower_response_prediction` as `.fitted` minus `critical_value` times `std_err_of_predictions`. How would you adjust this to calculate `upper_response_prediction`?
+</details>
 
+<!-- ```{r ex317-solution} -->
+<!-- # From previous step -->
+<!-- twins_sigma <- model |> glance() |> pull(sigma) -->
+<!-- predictions2 <- predictions |> -->
+<!--   mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2)) -->
 
-```{r ex317-hint}
-- Calculate `lower_response_prediction` as `.fitted` minus `critical_value` times `std_err_of_predictions`.
-- For `upper_response_prediction`, swap the minus for a plus.
-```
+<!-- predictions3 <- predictions2 |> -->
+<!--   # Calculate the prediction intervals -->
+<!--   mutate( -->
+<!--     lower_response_prediction = .fitted - critical_value * std_err_of_predictions, -->
+<!--     upper_response_prediction = .fitted + critical_value * std_err_of_predictions -->
+<!--   ) -->
 
-```{r ex317-solution}
-# From previous step
-twins_sigma <- model |> glance() |> pull(sigma)
-predictions2 <- predictions |>
-  mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
-
-predictions3 <- predictions2 |>
-  # Calculate the prediction intervals
-  mutate(
-    lower_response_prediction = .fitted - critical_value * std_err_of_predictions,
-    upper_response_prediction = .fitted + critical_value * std_err_of_predictions
-  )
-
-# See the result
-predictions3
-```
-
+<!-- # See the result -->
+<!-- predictions3 -->
+<!-- ``` -->
 
 
 
+**Exercise**
 
 Update the plot to add a ribbon layer of prediction intervals.
 
@@ -1533,15 +1532,6 @@ Update the plot to add a ribbon layer of prediction intervals.
 
 
 ```{r ex318, exercise=TRUE}
-# From previous step3
-twins_sigma <- model |> glance() |> pull(sigma)
-predictions3 <- predictions |>
-  mutate(
-    std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2),
-    lower_response_prediction = .fitted - critical_value * std_err_of_predictions,
-    upper_response_prediction = .fitted + critical_value * std_err_of_predictions
-  )
-
 # Update the plot
 ggplot() + 
   geom_point(aes(x = Biological, y = Foster), data = twins) +
@@ -1560,39 +1550,39 @@ ggplot() +
 ```
 
 
-```{r ex318-hint}
-- Add `geom_ribbon()`.
-- Inside `aes()`, map `x` to `Biological`, `ymin` to `lower_response_prediction`, and `ymax` to `upper_response_prediction`.
-- Set `data` to `predictions3`, `alpha` to `0.2`, and `fill` to `"red"`.
-```
+<!-- ```{r ex318-hint} -->
+<!-- - Add `geom_ribbon()`. -->
+<!-- - Inside `aes()`, map `x` to `Biological`, `ymin` to `lower_response_prediction`, and `ymax` to `upper_response_prediction`. -->
+<!-- - Set `data` to `predictions3`, `alpha` to `0.2`, and `fill` to `"red"`. -->
+<!-- ``` -->
 
 
-```{r ex318-solution}
-# From previous step3
-twins_sigma <- model |> glance() |> pull(sigma)
-predictions3 <- predictions |>
-  mutate(
-    std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2),
-    lower_response_prediction = .fitted - critical_value * std_err_of_predictions,
-    upper_response_prediction = .fitted + critical_value * std_err_of_predictions
-  )
+<!-- ```{r ex318-solution} -->
+<!-- # From previous step3 -->
+<!-- twins_sigma <- model |> glance() |> pull(sigma) -->
+<!-- predictions3 <- predictions |> -->
+<!--   mutate( -->
+<!--     std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2), -->
+<!--     lower_response_prediction = .fitted - critical_value * std_err_of_predictions, -->
+<!--     upper_response_prediction = .fitted + critical_value * std_err_of_predictions -->
+<!--   ) -->
 
-# Update the plot
-ggplot() + 
-  geom_point(aes(x = Biological, y = Foster), data = twins) +
-  geom_smooth(aes(x = Biological, y = Foster), data = twins, method = "lm") + 
-  # Add a ribbon layer
-  geom_ribbon(
-    # ... of lower_response_prediction to upper_response_prediction vs. Biological
-    aes(x = Biological, ymin = lower_response_prediction, ymax = upper_response_prediction), 
-    # ... using the predictions3 dataset
-    data = predictions3, 
-    # ... with transparency set to 0.2
-    alpha = 0.2, 
-    # ... and fill color red
-    fill = "red"
-  )
-```
+<!-- # Update the plot -->
+<!-- ggplot() +  -->
+<!--   geom_point(aes(x = Biological, y = Foster), data = twins) + -->
+<!--   geom_smooth(aes(x = Biological, y = Foster), data = twins, method = "lm") +  -->
+<!--   # Add a ribbon layer -->
+<!--   geom_ribbon( -->
+<!--     # ... of lower_response_prediction to upper_response_prediction vs. Biological -->
+<!--     aes(x = Biological, ymin = lower_response_prediction, ymax = upper_response_prediction),  -->
+<!--     # ... using the predictions3 dataset -->
+<!--     data = predictions3,  -->
+<!--     # ... with transparency set to 0.2 -->
+<!--     alpha = 0.2,  -->
+<!--     # ... and fill color red -->
+<!--     fill = "red" -->
+<!--   ) -->
+<!-- ``` -->
 
 
 

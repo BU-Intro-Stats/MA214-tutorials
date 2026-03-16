@@ -14,7 +14,7 @@ library(openintro)
 library(broom)
 library(knitr)
 library(infer)
-library(emo)
+
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
@@ -169,7 +169,7 @@ This figure now demonstrates the act of permuting the foster twins so that the I
 
 ### Permuted data (1) plotted
 
-Original data
+<!-- Original data -->
 
 ```{r echo = FALSE}
 
@@ -180,7 +180,7 @@ ggplot(data=twins, aes(x=Biological, y=Foster)) + geom_point() +
 ```
 
 
-Permuted data (1)
+<!-- Permuted data (1) -->
 
 ```{r echo = FALSE}
 set.seed(474704)
@@ -198,10 +198,9 @@ The permuted data are plotted in the same way that the original data were plotte
 
 ### Permuted data (2) plotted
 
+A different permutation shows the same idea:  when each point is no longer associated with one *pair* of twins, there is not an association between the IQ values:
 
-
-
-Original data
+<!-- Original data -->
 
 ```{r echo = FALSE}
 
@@ -211,7 +210,7 @@ ggplot(data=twins, aes(x=Biological, y=Foster)) + geom_point() +
 
 ```
 
-Permuted data (2)
+<!-- Permuted data (2) -->
 
 
 ```{r echo = FALSE}
@@ -222,13 +221,14 @@ ggplot(data=twins, aes(x=Biological, y=sample(Foster))) + geom_point() +
 
 ```
 
-A different permutation shows the same idea:  when each point is no longer associated with one *pair* of twins, there is not an association between the IQ values.
+
 
 
 ### Permuted data (1) and (2)
 
+Now let's compare the two permuted datasets:
 
-Permuted data (1)
+<!-- Permuted data (1) -->
 
 ```{r echo = FALSE}
 set.seed(474704)
@@ -239,7 +239,7 @@ ggplot(data=twins, aes(x=Biological, y=sample(Foster))) + geom_point() +
 ```
 
 
-Permuted data (2)
+<!-- Permuted data (2) -->
 
 ```{r echo = FALSE}
 set.seed(40)
@@ -249,7 +249,7 @@ ggplot(data=twins, aes(x=Biological, y=sample(Foster))) + geom_point() +
 
 ```
 
-Note that the two permuted datasets are not identical.  Indeed, by permuting the data, we get information about how the line would *vary* if there was not a relationship between IQs in the biological and foster kids.  That is, how does the line vary if the null hypothesis is true and the slope is actually zero?
+Note that they are not identical.  Indeed, by permuting the data, we get information about how the line would *vary* if there was not a relationship between IQs in the biological and foster kids.  That is, how does the line vary if the null hypothesis is true and the slope is actually zero?
 
 
 ### Linear model on permuted data
@@ -263,7 +263,7 @@ twins |>
 ```
 
 
-Using the infer package, we repeatedly sample the response variable so that any pattern in the linear model is due to random chance (and not an underlying relationship).  As with the infer package on other statistics, the steps used here are:
+Using the `infer` package, we repeatedly sample the response variable so that any pattern in the linear model is due to random chance (and not an underlying relationship).  As with the infer package on other statistics, the steps used here are:
 
 1. specify the linear model that we are predicting Foster IQ from Biological IQ
 2. provide the null hypothesis that the two variables are independent
@@ -331,7 +331,7 @@ In the mid-20th century, a study was conducted that tracked down identical twins
 
 In this exercise you'll use the `pull()` function. This function takes a data frame and returns a selected column as a vector (similar to `$`).
 
-
+**Exercise**
 
 - Run a linear regression of `Foster` vs. `Biological` on the `twins` dataset.
 - Tidy the result.
@@ -344,8 +344,8 @@ In this exercise you'll use the `pull()` function. This function takes a data fr
 # Run a lin. reg. of Foster vs. Biological on the twins data
 obs_slope <- ___(___, ___) |>
   # Tidy the result
-  ___() |>   
-  # Filter for rows where term equal Biological
+  tidy() |>   
+  # Filter for rows where term is Biological
   ___(___) |>
   # Pull out the estimate column
   ___(___) 
@@ -354,35 +354,35 @@ obs_slope <- ___(___, ___) |>
 obs_slope
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+In your linear regression, be sure to set `formula` to `Foster ~ Biological` and `data` to `twins`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+In the last line, call `pull()` and pass `estimate`.
+</details>
 
 
-```{r exer20-hint}
-- Call `lm()`, setting `formula` to `Foster ~ Biological` and `data` to `twins`.
-- Call `tidy()` without arguments.
-- Call `filter()` with the condition `term == "Biological"`.
-- Call `pull()`, passing `estimate`.
+<!-- ```{r exer20-solution} -->
+<!-- # Calculate the observed slope -->
+<!-- # Run a lin. reg. of Foster vs. Biological on the twins data -->
+<!-- obs_slope <- lm(Foster ~ Biological, data = twins) |> -->
+<!--   # Tidy the result -->
+<!--   tidy() |>    -->
+<!--   # Filter for rows where term equal Biological -->
+<!--   filter(term == "Biological") |> -->
+<!--   # Pull out the estimate column -->
+<!--   pull(estimate)   -->
 
-```
-
-
-```{r exer20-solution}
-# Calculate the observed slope
-# Run a lin. reg. of Foster vs. Biological on the twins data
-obs_slope <- lm(Foster ~ Biological, data = twins) |>
-  # Tidy the result
-  tidy() |>   
-  # Filter for rows where term equal Biological
-  filter(term == "Biological") |>
-  # Pull out the estimate column
-  pull(estimate)  
-
-# See the result
-obs_slope
-```
+<!-- # See the result -->
+<!-- obs_slope -->
+<!-- ``` -->
 
 
 
-
+**Exercise**
 
 
 Simulate 10 slopes.
@@ -411,35 +411,38 @@ perm_slope <- twins |>
 perm_slope
 ```
 
+<details>
+<summary>**Hint**</summary>
+In the last line, be sure to set `stat` to `"slope"` when you call `calculate()`.
+</details>
+
+
+<!-- ```{r exer21-hint} -->
+<!-- - Call `specify()`, passing `Foster ~ Biological`. -->
+<!-- - Call `hypothesize()`, setting `null` to `"independence"`. -->
+<!-- - Call `generate()`, setting `reps` to `10` and `type` to `"permute"`. -->
+<!-- - Call `calculate()`, setting `stat` to `"slope"`. -->
+<!-- ``` -->
 
 
 
-```{r exer21-hint}
-- Call `specify()`, passing `Foster ~ Biological`.
-- Call `hypothesize()`, setting `null` to `"independence"`.
-- Call `generate()`, setting `reps` to `10` and `type` to `"permute"`.
-- Call `calculate()`, setting `stat` to `"slope"`.
-```
+<!-- ```{r exer21-solution} -->
+<!-- set.seed(4747)  -->
 
+<!-- # Simulate 10 slopes with a permuted dataset -->
+<!-- perm_slope <- twins |> -->
+<!--   # Specify Foster vs. Biological -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   # Use a null hypothesis of independence -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generate 10 permutation replicates -->
+<!--   generate(reps = 10, type = "permute") |> -->
+<!--   # Calculate the slope statistic -->
+<!--   calculate(stat = "slope")  -->
 
-
-```{r exer21-solution}
-set.seed(4747) 
-
-# Simulate 10 slopes with a permuted dataset
-perm_slope <- twins |>
-  # Specify Foster vs. Biological
-  specify(Foster ~ Biological) |>
-  # Use a null hypothesis of independence
-  hypothesize(null = "independence") |>
-  # Generate 10 permutation replicates
-  generate(reps = 10, type = "permute") |>
-  # Calculate the slope statistic
-  calculate(stat = "slope") 
-
-# See the result
-perm_slope
-```
+<!-- # See the result -->
+<!-- perm_slope -->
+<!-- ``` -->
 
 
 ### SE of the slope
@@ -449,16 +452,9 @@ The previous exercise generated 10 different slopes under a model of no (i.e., n
 
 
 
+**Exercise**
 
-
-Simulate 500 slopes.
-
-- Use `specify()` to specify `Foster` vs. `Biological` (same formula as for a linear regression).
-- Use `hypothesize()`, to set a `null` hypothesis of `"independence"`.
-- Use `generate()` to generate `500` replicates (`reps`) of `type` `"permute"`.
-- Use `calculate()` to calculate the summary `stat`istic `"slope"`.
-
-
+Repeat the above, but this time simulate 500 slopes.
 
 ```{r ex22, exercise=TRUE}
 # Simulate 500 slopes with a permuted dataset
@@ -471,36 +467,39 @@ perm_slope <- twins |>
   ___ |>
   # Calculate the slope statistic
   ___ 
+
+# See the result
+perm_slope
 ```
 
 
-```{r ex22-hint}
-- Call `specify()`, passing `Foster ~ Biological`.
-- Call `hypothesize()`, setting `null` to `"independence"`.
-- Call `generate()`, setting `reps` to `500` and `type` to `"permute"`.
-- Call `calculate()`, setting `stat` to `"slope"`.
-```
+<!-- ```{r ex22-hint} -->
+<!-- - Call `specify()`, passing `Foster ~ Biological`. -->
+<!-- - Call `hypothesize()`, setting `null` to `"independence"`. -->
+<!-- - Call `generate()`, setting `reps` to `500` and `type` to `"permute"`. -->
+<!-- - Call `calculate()`, setting `stat` to `"slope"`. -->
+<!-- ``` -->
 
 
 
-```{r ex22-solution}
-# Simulate 500 slopes with a permuted dataset
-perm_slope <- twins |>
-  # Specify Foster vs. Biological
-  specify(Foster ~ Biological) |>
-  # Use a null hypothesis of independence
-  hypothesize(null = "independence") |>
-  # Generate 500 permutation replicates
-  generate(reps = 500, type = "permute") |>
-  # Calculate the slope statistic
-  calculate(stat = "slope") 
-```
+<!-- ```{r ex22-solution} -->
+<!-- # Simulate 500 slopes with a permuted dataset -->
+<!-- perm_slope <- twins |> -->
+<!--   # Specify Foster vs. Biological -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   # Use a null hypothesis of independence -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   # Generate 500 permutation replicates -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   # Calculate the slope statistic -->
+<!--   calculate(stat = "slope")  -->
+<!-- ``` -->
 
 
 
+**Exercise**
 
-
-- Using the `perm_slope` data, plot the `stat` you calculated with a density geom.
+Using the `perm_slope` data, plot the `stat` you calculated with a density geom.
 
 
 ```{r ex23, exercise=TRUE}
@@ -518,34 +517,35 @@ ___ +
 ```
 
 
-```{r ex23-hint}
-- You can add a density geom using `geom_density()`.
-
-```
-
-```{r ex23-solution}
-# From previous step
-perm_slope <- twins |>
-  specify(Foster ~ Biological) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "slope")
-
-# Using perm_slope, plot stat
-ggplot(perm_slope, aes(x = stat)) + 
-  # Add a density layer
-  geom_density()
-```
+<details>
+<summary>**Hint**</summary>
+You can add a density geom using `geom_density()`.
+</details>
 
 
+<!-- ```{r ex23-solution} -->
+<!-- # From previous step -->
+<!-- perm_slope <- twins |> -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "slope") -->
 
+<!-- # Using perm_slope, plot stat -->
+<!-- ggplot(perm_slope, aes(x = stat)) +  -->
+<!--   # Add a density layer -->
+<!--   geom_density() -->
+<!-- ``` -->
+
+
+
+**Exercise**
 
 
 - Use `ungroup()` without arguments to ungroup the dataset.
 - Use `summarize()` to calculate summary statistics.
     - Calculate `mean_stat` as the mean of `stat`.
     - Calculate `std_err_stat` as the standard error of `stat`, using `sd()`.
-
 
 
 ```{r ex24, exercise=TRUE}
@@ -564,37 +564,38 @@ perm_slope |>
     # Mean of stat
     mean_stat = ___, 
     # Std error of stat
-    std_err_stat = ___
-  )
+    std_err_stat = ___)
 ```
 
+<details>
+<summary>**Hint**</summary>
+In the first blank line, call `ungroup()` without arguments.
+</details>
+
+<!-- ```{r ex24-hint} -->
+<!-- - Call `summarize()`, setting `mean_stat` to the `mean()` of `stat` and `std_err_stat` to the `sd()` of `stat`. -->
+<!-- ``` -->
 
 
-```{r ex24-hint}
-- Call `ungroup()` without arguments.
-- Call `summarize()`, setting `mean_stat` to the `mean()` of `stat` and `std_err_stat` to the `sd()` of `stat`.
-```
+<!-- ```{r ex24-solution} -->
+<!-- # From previous step -->
+<!-- perm_slope <- twins |> -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   hypothesize(null = "independence") |> -->
+<!--   generate(reps = 500, type = "permute") |> -->
+<!--   calculate(stat = "slope") -->
 
-
-```{r ex24-solution}
-# From previous step
-perm_slope <- twins |>
-  specify(Foster ~ Biological) |>
-  hypothesize(null = "independence") |>
-  generate(reps = 500, type = "permute") |>
-  calculate(stat = "slope")
-
-perm_slope |> 
-  # Ungroup the dataset
-  ungroup() |> 
-  # Calculate summary statistics
-  summarize(
-    # Mean of stat
-    mean_stat = mean(stat), 
-    # Std error of stat
-    std_err_stat = sd(stat)
-  )
-```
+<!-- perm_slope |>  -->
+<!--   # Ungroup the dataset -->
+<!--   ungroup() |>  -->
+<!--   # Calculate summary statistics -->
+<!--   summarize( -->
+<!--     # Mean of stat -->
+<!--     mean_stat = mean(stat),  -->
+<!--     # Std error of stat -->
+<!--     std_err_stat = sd(stat) -->
+<!--   ) -->
+<!-- ``` -->
 
 
 
@@ -616,13 +617,13 @@ perm_slope <- twins |>
 ```
 
 
+**Exercise**
 
 - Run a linear regression of `Foster` vs. `Biological` on the `twins` dataset.
 - Tidy the result.
 - Filter for rows where `term` equals `"Biological"`.
 - Use `pull()` to pull out the `estimate` column.
 - Use `abs()` to calculate the absolute value of the slopes.
-
 
 
 ```{r ex25, exercise=TRUE}
@@ -638,35 +639,39 @@ abs_obs_slope <- ___ |>
   ___
 ```
 
+<details>
+<summary>**Hint**</summary>
+The last line, with `abs()`, needs no arguments.
+</details>
 
-
-```{r ex25-hint}
-- Call `lm()`, setting `formula` to `Foster ~ Biological` and `data` to `twins`.
-- Call `tidy()` without arguments.
-- Call `filter()` with the condition `term == "Biological"`.
-- Call `pull()`, passing `estimate`.
-```
-
-
-
-```{r ex25-solution}
-# Run a lin. reg. of Foster vs. Biological on twins
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
-  # Tidy the result
-  tidy() |>   
-  # Filter for rows where term equals Biological
-  filter(term == "Biological") |>
-  # Pull out the estimate
-  pull(estimate) |>
-  # Take the absolute value
-  abs()
-
-abs_obs_slope
-```
+<!-- ```{r ex25-hint} -->
+<!-- - Call `lm()`, setting `formula` to `Foster ~ Biological` and `data` to `twins`. -->
+<!-- - Call `tidy()` without arguments. -->
+<!-- - Call `filter()` with the condition `term == "Biological"`. -->
+<!-- - Call `pull()`, passing `estimate`. -->
+<!-- ``` -->
 
 
 
+<!-- ```{r ex25-solution} -->
+<!-- # Run a lin. reg. of Foster vs. Biological on twins -->
+<!-- abs_obs_slope <- lm(Foster ~ Biological, data = twins) |> -->
+<!--   # Tidy the result -->
+<!--   tidy() |>    -->
+<!--   # Filter for rows where term equals Biological -->
+<!--   filter(term == "Biological") |> -->
+<!--   # Pull out the estimate -->
+<!--   pull(estimate) |> -->
+<!--   # Take the absolute value -->
+<!--   abs() -->
 
+<!-- abs_obs_slope -->
+<!-- ``` -->
+
+
+
+
+**Exercise**
 
 
 - Mutate `perm_slope` to add a column, `abs_perm_slope`, equal to the absolute value of `stat`.
@@ -674,13 +679,6 @@ abs_obs_slope
 
 
 ```{r ex26, exercise=TRUE}
-# From previous step
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
-  tidy() |>   
-  filter(term == "Biological") |>
-  pull(estimate) |>
-  abs()
-
 # Compute the p-value  
 perm_slope |> 
   # Add a column of the absolute value of the slope
@@ -693,30 +691,30 @@ perm_slope |>
 ```
 
 
-```{r ex26-hint}
-- Call `mutate()`, setting `abs_perm_slope` to the `abs()`olute value of `stat`.
-- Call `summarize()`, setting `p_value` to the `mean()` of `abs_perm_slope >= abs_obs_slope`.
-```
+<!-- ```{r ex26-hint} -->
+<!-- - Call `mutate()`, setting `abs_perm_slope` to the `abs()`olute value of `stat`. -->
+<!-- - Call `summarize()`, setting `p_value` to the `mean()` of `abs_perm_slope >= abs_obs_slope`. -->
+<!-- ``` -->
 
-```{r ex26-solution}
-# From previous step
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
-  tidy() |>   
-  filter(term == "Biological") |>
-  pull(estimate) |>
-  abs()
+<!-- ```{r ex26-solution} -->
+<!-- # From previous step -->
+<!-- abs_obs_slope <- lm(Foster ~ Biological, data = twins) |> -->
+<!--   tidy() |>    -->
+<!--   filter(term == "Biological") |> -->
+<!--   pull(estimate) |> -->
+<!--   abs() -->
 
-# Compute the p-value  
-perm_slope |> 
-  # Add a column of the absolute value of the slope
-  mutate(abs_perm_slope = abs(stat)) |>
-  # Calculate a summary statistic
-  summarize(
-    # Get prop. cases where abs. permuted slope is greater than or equal to abs. observed slope
-    p_value = mean(abs_perm_slope >= abs_obs_slope)
-  )
+<!-- # Compute the p-value   -->
+<!-- perm_slope |>  -->
+<!--   # Add a column of the absolute value of the slope -->
+<!--   mutate(abs_perm_slope = abs(stat)) |> -->
+<!--   # Calculate a summary statistic -->
+<!--   summarize( -->
+<!--     # Get prop. cases where abs. permuted slope is greater than or equal to abs. observed slope -->
+<!--     p_value = mean(abs_perm_slope >= abs_obs_slope) -->
+<!--   ) -->
 
-```
+<!-- ``` -->
 
 
 
@@ -786,7 +784,7 @@ Applying resampling techniques to the same dataset can help us understand the di
 The main difference between these two plots is that the permuted slopes are all centered at the flat line (in black on the left) whereas the bootstrapped slopes are centered around the observed regression line (in black on the right).
 
 
-### Permutation vs. boostrap code
+### Permutation vs. bootstrap code
 
 
 
@@ -838,6 +836,8 @@ When the permuted and bootstrapped data are compared, we can see, for example, t
 
 Using the **infer** package with `type = "bootstrap"`, you can repeatedly sample from the dataset to estimate the sampling distribution and standard error of the slope coefficient. Using the sampling distribution will allow you to directly find a confidence interval for the underlying population slope.
 
+**Exercise**
+
 Use the **infer** steps to bootstrap the `twins` data 1000 times. You don't have to `hypothesize()` because now you're creating confidence intervals, not hypothesis testing!
 
 - Specify `Foster` versus `Biological`.
@@ -863,29 +863,29 @@ boot_slope
 ```
 
 
-```{r ex28-hint}
-- Call `specify()`, passing a formula with `Foster` as the response variable and `Biological` as the explanatory variable.
-- Call `generate()`, setting `reps` to `1000` and `type` to `"bootstrap"`.
-- Call `calculate()`, setting `stat` to `"slope"`.
-```
+<!-- ```{r ex28-hint} -->
+<!-- - Call `specify()`, passing a formula with `Foster` as the response variable and `Biological` as the explanatory variable. -->
+<!-- - Call `generate()`, setting `reps` to `1000` and `type` to `"bootstrap"`. -->
+<!-- - Call `calculate()`, setting `stat` to `"slope"`. -->
+<!-- ``` -->
 
 
-```{r ex28-solution}
-# Set the seed for reproducibility
-set.seed(4747)
+<!-- ```{r ex28-solution} -->
+<!-- # Set the seed for reproducibility -->
+<!-- set.seed(4747) -->
 
-# Calculate 1000 bootstrapped slopes
-boot_slope <- twins |>
-  # Specify Foster vs. Biological
-  specify(Foster ~ Biological) |>
-  # Generate 1000 bootstrap replicates
-  generate(reps = 1000, type = "bootstrap") |>
-  # Calculate the slope statistic
-  calculate(stat = "slope") 
+<!-- # Calculate 1000 bootstrapped slopes -->
+<!-- boot_slope <- twins |> -->
+<!--   # Specify Foster vs. Biological -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   # Generate 1000 bootstrap replicates -->
+<!--   generate(reps = 1000, type = "bootstrap") |> -->
+<!--   # Calculate the slope statistic -->
+<!--   calculate(stat = "slope")  -->
 
-# See the result  
-boot_slope
-```
+<!-- # See the result   -->
+<!-- boot_slope -->
+<!-- ``` -->
 
 
 
@@ -899,25 +899,16 @@ Recall that one way to create a confidence interval for a statistic is to calcul
 
 The `twins` data is already loaded in your workspace.
 
+**Exercise**
 
-- As with the previous exercise, use the **infer** steps on the `twins` data to specify a `Foster` vs. `Biological` model, generate 1000 bootstrapped replicates, and calculate the slope statistic.
-- Calculate the confidence interval of `stat` as the mean plus or minus two standard deviations.
+Calculate the confidence interval of `stat` as the mean plus or minus two standard deviations.
 
 
 
 ```{r ex29, exercise=TRUE}
 set.seed(4747)
 
-# Calculate the slope statistic 
-# from 1000 bootstrap replicates of
-# the Foster vs. Biological model
-# of the twins dataset
-boot_slope <- ___
-
-
-
-
-# Create a confidence interval of stat
+# Create a confidence interval of the boot_slope stat using
 # 2 std devs each side of the mean
 boot_slope |> 
   summarize(
@@ -926,35 +917,37 @@ boot_slope |>
   )
 ```
 
+<details>
+<summary>**Hint 1**</summary>
+Inside `summarize()`, `lower` is calculated as the `mean()` of `stat` minus `2` times the `sd()` of `stat`.
+</details>
+
+<details>
+<summary>**Hint 2**</summary>
+Change the minus to a plus to calculate `upper`.
+</details>
 
 
-```{r ex29-hint}
-- `boot_slope` is calculated in the same way as the previous exercise.
-- Inside `summarize()`, `lower` is calculated as the `mean()` of `stat` minus `2` times the `sd()` of `stat`.
-- Change the minus to a plus to calculate `upper`.
-```
+<!-- ```{r ex29-solution} -->
+<!-- set.seed(4747) -->
 
+<!-- # Calculate the slope statistic  -->
+<!-- # from 1000 bootstrap replicates of -->
+<!-- # the Foster vs. Biological model -->
+<!-- # of the twins dataset -->
+<!-- boot_slope <- twins |> -->
+<!--   specify(Foster ~ Biological) |> -->
+<!--   generate(reps = 1000, type = "bootstrap") |> -->
+<!--   calculate(stat = "slope")  -->
 
-```{r ex29-solution}
-set.seed(4747)
-
-# Calculate the slope statistic 
-# from 1000 bootstrap replicates of
-# the Foster vs. Biological model
-# of the twins dataset
-boot_slope <- twins |>
-  specify(Foster ~ Biological) |>
-  generate(reps = 1000, type = "bootstrap") |>
-  calculate(stat = "slope") 
-
-# Create a confidence interval of stat
-# 2 std devs each side of the mean
-boot_slope |> 
-  summarize(
-    lower = mean(stat) - 2 * sd(stat),
-    upper = mean(stat) + 2 * sd(stat)
-  )
-```
+<!-- # Create a confidence interval of stat -->
+<!-- # 2 std devs each side of the mean -->
+<!-- boot_slope |>  -->
+<!--   summarize( -->
+<!--     lower = mean(stat) - 2 * sd(stat), -->
+<!--     upper = mean(stat) + 2 * sd(stat) -->
+<!--   ) -->
+<!-- ``` -->
 
 
 
@@ -965,6 +958,7 @@ Alternatively, a CI for the slope can be created using the percentiles of the di
 
 The bootstrapped estimates of `slope`, `boot_slope`, are loaded in your workspace.
 
+**Exercise**
 
 - Set `alpha` to be 0.05 (although for your own work, feel free to use a different confidence level).
 - Calculate the relevant percentiles needed to create the confidence interval.
@@ -973,7 +967,7 @@ The bootstrapped estimates of `slope`, `boot_slope`, are loaded in your workspac
 - Create the confidence interval of `stat` using `quantile()` and the percentile cutoffs. Your interval ends should be named `lower` and `upper`.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=FALSE, include=FALSE}
 set.seed(4747)
 boot_slope <- twins |>
   specify(Foster ~ Biological) |>
@@ -997,32 +991,40 @@ boot_slope |>
   ___
 ```
 
+<details>
+<summary>**Hint**</summary>
+Your lower and upper percentile cutoffs should be in terms of alpha, and they should add up to 1.
+</details>
+
+<details>
+<summary>**Hint**</summary>
+To use `quantile()`, pass `stat` and th percentile cutoffs you calculated.
+</details>
+
+<!-- ```{r ex210-hint} -->
+<!-- - Calculate the confidence interval of `stat` inside a call to `summarize()`. -->
+<!-- - The `quantile()` function takes a vector and a value between zero and one as its arguments. -->
+<!-- ``` -->
 
 
-```{r ex210-hint}
-- Calculate the confidence interval of `stat` inside a call to `summarize()`.
-- The `quantile()` function takes a vector and a value between zero and one as its arguments.
-```
 
+<!-- ```{r ex210-solution} -->
+<!-- # Set alpha -->
+<!-- alpha <- 0.05 -->
 
+<!-- # Set the lower percentile -->
+<!-- p_lower <- alpha / 2 -->
 
-```{r ex210-solution}
-# Set alpha
-alpha <- 0.05
+<!-- # Set the upper percentile -->
+<!-- p_upper <- 1 - alpha / 2 -->
 
-# Set the lower percentile
-p_lower <- alpha / 2
-
-# Set the upper percentile
-p_upper <- 1 - alpha / 2
-
-# Create a confidence interval of stat using quantiles
-boot_slope |> 
-  summarize(
-    lower = quantile(stat, p_lower), 
-    upper = quantile(stat, p_upper)
-  )
-```
+<!-- # Create a confidence interval of stat using quantiles -->
+<!-- boot_slope |>  -->
+<!--   summarize( -->
+<!--     lower = quantile(stat, p_lower),  -->
+<!--     upper = quantile(stat, p_upper) -->
+<!--   ) -->
+<!-- ``` -->
 
 
 
