@@ -100,7 +100,7 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables interact with each other and the outcome of interest.
+Previously, you've learned how to perform multiple regression for inference and prediction. We will build on those skills in this tutorial, and in particular learn how to adapt models where two or more variables interact with each other and the outcome of interest.
 
 As a simple example, suppose we want to predict how much food cats will eat in a week. We have a sample of 16 pet cats, and have recorded their ages, weights, and body lengths, as well as how many grams of food they eat. Many of these variables are inter-correlated: kittens eat less than adult cats, and they are also smaller by weight and length. Similarly, many larger cats by length also weigh more (and eat more) than their shorter peers. In a situation like this, it's difficult to tease apart the relationships between the covariates and the outcome. We will learn how to address this below. 
 
