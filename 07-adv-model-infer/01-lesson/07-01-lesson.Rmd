@@ -132,7 +132,7 @@ ggplot(data=data, aes(y=income, x=experience, col=gender)) +
 ```
 
 
-### Linear model for the demographic data
+## Linear model for demographic data
 
 Let's fit a linear model to these data, using all the covariates we have: 
 
@@ -159,21 +159,23 @@ ggplot(data=data, aes(x=fitted, y=residuals)) +
   geom_hline(yintercept=0) +
   ggtitle('Residuals vs fitted values for model without interaction term')
 
-ggplot(data=data, aes(sample=income)) +
+ggplot(data=data, aes(sample=residuals)) +
   stat_qq() + 
   stat_qq_line() +
-  ggtitle('QQ plot for model without interaction term')
+  ggtitle('QQ plot for model without interaction term') +
+  ylab("residuals") +
+  xlab("quantiles")
 ```
 
 We can see from the plots above that key linearity assumptions are violated and the model doesn't fit very well:
 
 1. The variance of the residuals is non-constant (especially across the gender groups). More specifically, the residuals are larger for the male income values; and,
-2. The quantiles in the QQ plot deviate from the diagonal, indicating that the data are not normally distributed.
+2. The quantiles in the QQ plot deviate from the diagonal, indicating that the residuals are not normally distributed.
 
 This indicates that we might have to try something else!
 
 
-### Adding interactions to our model
+## Adding interactions to our model
 
 In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. Let's try it for our demographic data:
 
@@ -193,13 +195,15 @@ ggplot(data=data, aes(x=fitted, y=residuals)) +
   geom_hline(yintercept=0) +
   ggtitle('Residuals vs fitted values for model with interaction term')
 
-ggplot(data=data, aes(sample=income)) +
+ggplot(data=data, aes(sample=residuals)) +
   stat_qq() + 
   stat_qq_line() +
-  ggtitle('QQ Plot for model with interaction term')
+  ggtitle('QQ Plot for model with interaction term')  +
+  ylab("residuals") +
+  xlab("quantiles")
 ```
 
-This model is also not perfect, but let's see how the two compare. 
+This model is also not perfect (check: why?), but let's see how the two compare. 
 
 ### Comparing model fit
 
@@ -248,7 +252,7 @@ ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
 ```
 
 <details>
-<summary>**Hint 1**</summary>
+<summary>**Hint**</summary>
 Try `read.csv()` for loading the csv file.
 </details>
 
@@ -338,7 +342,30 @@ question("Given the measures of model fit above, which model do you think fits t
          allow_retry = TRUE)
 ```
 
-# Inference for interaction terms
+## Inference for interaction terms
+
+Now that we've added an interaction term to the model, we may ask whether it is meaningful or not. That is, we want to conduct the following (two-sided) hypothesis test:
+
+> H0: $\beta_{\rm price:income} = 0$
+
+> H1: $\beta_{\rm price:income} \neq 0$
+
+###
+
+Recall the model summary:
+
+```{r, include=TRUE}
+summary(m2)$coefficients
+```
+
+The final column, `Pr(>|t|)`, gives the probability of the interaction effect being at least as extreme as the one observed (i.e., $\mathbb{P}(\beta_{\rm price:income} \geq |4.26|)$) _assuming H0 is true_. In other words, this is exactly the p-value. 
+
+```{r mc3}
+question("Given the p-value of 0.02, is the interaction effect meaningful at confidence level alpha=0.05?",
+         answer("Yes, we can reject H0.", correct=TRUE, message="Right, but with a caveat. The p-value is only slighly less than 0.05, which suggests that the interaction term *might be* significant in this context. To be more sure, we would want to see a much smaller p-value."),
+         answer("No, we don't have enough evidence to reject H0.", message="Incorrect - check again. When would you reject H0?"),
+         allow_retry = TRUE)
+```
 
 ## Submit
 
