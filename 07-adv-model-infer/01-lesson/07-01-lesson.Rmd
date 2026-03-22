@@ -132,34 +132,78 @@ ggplot(data=data, aes(y=income, x=experience, col=gender)) +
 ```
 
 
-### Modeling the demographic data
+### Linear model for the demographic data
 
-Let's fit a linear model to these data, using all the covariates we have. 
+Let's fit a linear model to these data, using all the covariates we have: 
 
 ```{r, include=TRUE}
 m1 <- lm(data=data, income ~ .)
 summary(m1)
+
+# TODO: add plot and discuss deficiency
 ```
+
+The plots below show how well the model without an interaction term fits the data:
+
+```{r, include=TRUE}
+ggplot(data=data, aes(x=experience, y=income)) +
+  geom_point(aes(col=gender)) +
+  geom_smooth(method='lm', se=FALSE) +
+  ggtitle('Linear model without interaction term')
+
+data$residuals <- resid(m1)
+data$fitted <- fitted(m1)
+
+ggplot(data=data, aes(x=fitted, y=residuals)) +
+  geom_point(aes(col=gender)) +
+  geom_hline(yintercept=0) +
+  ggtitle('Residuals vs fitted values for model without interaction term')
+
+ggplot(data=data, aes(sample=income)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ plot for model without interaction term')
+```
+
+We can see from the plots above that key linearity assumptions are violated and the model doesn't fit very well:
+
+1. The variance of the residuals is non-constant (especially across the gender groups). More specifically, the residuals are larger for the male income values; and,
+2. The quantiles in the QQ plot deviate from the diagonal, indicating that the data are not normally distributed.
+
+This indicates that we might have to try something else!
 
 
 ### Adding interactions to our model
 
-In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. 
+In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. Let's try it for our demographic data:
 
 ```{r, include=TRUE}
 m2 <- lm(data=data, income ~ experience + gender + experience:gender)
 summary(m2)
 ```
 
+And now we have the following plots for `m2`:
 
-### Assessing model fit
+```{r, include=TRUE}
+data$residuals <- resid(m2)
+data$fitted <- fitted(m2)
+
+ggplot(data=data, aes(x=fitted, y=residuals)) +
+  geom_point(aes(col=gender)) +
+  geom_hline(yintercept=0) +
+  ggtitle('Residuals vs fitted values for model with interaction term')
+
+ggplot(data=data, aes(sample=income)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ Plot for model with interaction term')
+```
+
+This model is also not perfect, but let's see how the two compare. 
+
+### Comparing model fit
 
 ```{r, echo=FALSE}
-ggplot(data=data, aes(x=experience, y=income)) +
-  geom_point(aes(col=gender)) +
-  geom_smooth(method='lm', se=FALSE) +
-  ggtitle('Linear model without interaction term')
-  
 tab <- matrix(c(0.733, 0.692, 11.1, 0.833, 0.791, 9.1), ncol=3, byrow=TRUE)
 colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
 rownames(tab) <- c('m1', 'm2')
@@ -167,7 +211,7 @@ tab <- as.table(tab)
 print(tab)
 ```
 
-We can see that the model that includes an interaction term performs better by the measures of goodness of fit that we know: the $R^2$ and adjusted $R^2$ are higher, and the SE's are lower. 
+We can see that the model that includes an interaction term performs better according to adjusted $R^2$, which takes into account the complexity in the model that is added when we add a term.  
 
 
 ## Your turn!
@@ -203,31 +247,32 @@ ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
   geom_point()
 ```
 
-```{r ex1-hint-1}
-# Try the following command for loading the csv file:
-read.csv("data/icecream.csv")
-```
+<details>
+<summary>**Hint 1**</summary>
+Try `read.csv()` for loading the csv file.
+</details>
 
-```{r ex1-solution}
-# Solution
-icecream <- read.csv("data/icecream.csv")
+<!-- ```{r ex1-solution} -->
+<!-- # Solution -->
+<!-- icecream <- read.csv("data/icecream.csv") -->
 
-ggplot(data=icecream, aes(y=cons, x=temp)) +
-  geom_point()
+<!-- ggplot(data=icecream, aes(y=cons, x=temp)) + -->
+<!--   geom_point() -->
 
-ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
-  geom_point()
+<!-- ggplot(data=icecream, aes(y=cons, x=price, col=temp)) + -->
+<!--   geom_point() -->
 
-ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
-  geom_point()
-```
+<!-- ggplot(data=icecream, aes(y=cons, x=income, col=temp)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ```{r mc1}
 question("What is the relationship between ice cream consumption and temperature?",
          answer("Positive and somewhat linear", correct=TRUE),
-         answer("Positive and strongly linear"),
-         answer("Negative and non-linear"),
-         answer("There is no correlation"))
+         answer("Positive and strongly linear", message="Not quite. The relationship is positive, but check its strength again."),
+         answer("Negative and non-linear", message="Incorrect. Recall, what does it look like for two variables to be positive or negatively correlated?"),
+         answer("There is no correlation", message="Incorrect. There is clearly some correlation, check again to see what the correct description would be."),
+         allow_retry = TRUE)
 ```
 
 ### Modeling icecream consumption
@@ -246,12 +291,12 @@ m1 <- ____
 summary(m1)
 ```
 
-```{r ex2-solution}
-# Add the independent variables (covariates) after the ~ and separated by +
-m1 <- lm(data=icecream, cons ~ temp + price + income)
+<!-- ```{r ex2-solution} -->
+<!-- # Add the independent variables (covariates) after the ~ and separated by + -->
+<!-- m1 <- lm(data=icecream, cons ~ temp + price + income) -->
 
-summary(m1)
-```
+<!-- summary(m1) -->
+<!-- ``` -->
 
 
 ### Interactions between non-categorical variables
@@ -268,12 +313,12 @@ m2 <- ____
 summary(m2)
 ```
 
-```{r ex3-solution}
-# Add the independent variables (covariates) after the ~ and separated by +
-m2 <- lm(data=icecream, cons ~ temp + price + income + price:income)
+<!-- ```{r ex3-solution} -->
+<!-- # Add the independent variables (covariates) after the ~ and separated by + -->
+<!-- m2 <- lm(data=icecream, cons ~ temp + price + income + price:income) -->
 
-summary(m2)
-```
+<!-- summary(m2) -->
+<!-- ``` -->
 
 
 ### Assessing model fit
@@ -288,11 +333,12 @@ print(tab)
 
 ```{r mc2}
 question("Given the measures of model fit above, which model do you think fits the icecream consumption data better?",
-         answer("m1, linear model with no interactions"),
+         answer("m1, linear model with no interactions", message="Incorrect. Try checking the diagnostics again, especially the adjusted R^2."),
          answer("m2, linear model with interaction between price and income", correct=TRUE),
-         answer("Not sure"))
+         allow_retry = TRUE)
 ```
 
+# Inference for interaction terms
 
 ## Submit
 
