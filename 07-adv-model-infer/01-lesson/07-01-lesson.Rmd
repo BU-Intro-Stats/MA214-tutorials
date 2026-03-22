@@ -139,8 +139,6 @@ Let's fit a linear model to these data, using all the covariates we have:
 ```{r, include=TRUE}
 m1 <- lm(data=data, income ~ .)
 summary(m1)
-
-# TODO: add plot and discuss deficiency
 ```
 
 The plots below show how well the model without an interaction term fits the data:
@@ -229,6 +227,8 @@ Now we'll turn to a more interesting problem that does not have a categorical va
 - `income` - average neighborhood income
 - `price` - ice cream price
 
+**Exercise**
+
 To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the varables. 
 
 ```{r ex1, exercise = TRUE}
@@ -287,6 +287,8 @@ First, let's write a model for the data: if $y$ is consumption, then with the va
 
 $y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + residuals$
 
+**Exercise**
+
 Now, fit this model below:
 
 ```{r ex2, exercise = TRUE}
@@ -304,6 +306,8 @@ summary(m1)
 
 
 ### Interactions between non-categorical variables
+
+**Exercise**
 
 Now add the interaction term corresponding to the written model below: 
 
