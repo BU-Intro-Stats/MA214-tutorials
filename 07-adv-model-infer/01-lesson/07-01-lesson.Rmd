@@ -417,7 +417,8 @@ ggplot(data=data, aes(x=x, y=y)) +
 question("Is the relationship between x and y linear?",
          answer("Yes"),
          answer("No", correct=TRUE),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 ###
@@ -460,7 +461,8 @@ Does the relationship between x and y_ look linear?
 question("Is the relationship between x and y_ linear?",
          answer("Yes", correct=TRUE),
          answer("No"),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 
@@ -547,7 +549,8 @@ question("What relationship does MLB players' salary and RBI seem to have?",
          answer("Linear"),
          answer("Exponential", correct=TRUE),
          answer("Cubic"),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 
@@ -578,7 +581,8 @@ question("What inverse operation will you need to perform on the model for the c
          answer("(...)^2"),
          answer("exp(...) or e^(...)", correct=TRUE),
          answer("sqrt(...)"),
-         answer("1/(...)"))
+         answer("1/(...)"),
+         allow_retry = TRUE)
 ```
 
 

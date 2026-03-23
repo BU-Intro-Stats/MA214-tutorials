@@ -184,7 +184,8 @@ question("What is the expectation of Y_i as modeled above?",
          answer("0"),
          answer("p_i", correct=TRUE),
          answer("1-p_i"),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 ###
@@ -281,7 +282,8 @@ question("For p=0.4, what are the odds?",
          answer("0.67", correct=TRUE),
          answer("1.5"),
          answer("0.6"),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 ```{r mc-4}
@@ -289,7 +291,8 @@ question("For p=0.4, what are the log-odds?",
          answer("-0.22"),
          answer("0.17"),
          answer("-0.17", correct=TRUE),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 
@@ -328,7 +331,8 @@ question("According to our model, what are the odds of low birthweight for an in
          answer("The odds of low birthweight increased by a factor of 1.5 if the mother smoked during pregnancy."),
          answer("The odds of low birthweight decreased by a factor of 0.9 if the mother smoked during pregnancy."),
          answer("The odds of low birthweight increased by a factor of 4.5 if the mother smoked during pregnancy.", correct=TRUE),
-         answer("Not sure"))
+         answer("Not sure"),
+         allow_retry = TRUE)
 ```
 
 ###
