@@ -1,5 +1,5 @@
 ---
-title: "Advanced Inference: 1 - Interactions"
+title: "Advanced Inference: Addressing Nonlinearities"
 output:
   learnr::tutorial:
     progressive: true
@@ -100,10 +100,29 @@ hash_encoder_ui <- {
 
 ## Welcome
 
-In the previous tutorials, you've learned how to perform multiple regression for inference and prediction. We will build on these skills in this tutorial, and in particular learn how to adapt models where two or more variables interact with each other and the outcome of interest.
+Previously, you've learned how to perform multiple regression for inference and prediction. We will build on those skills in this tutorial, and in particular learn how to adapt models for data that have different types of nonlinearities. 
 
-As a simple example, suppose we want to predict how much food cats will eat in a week. We have a sample of 16 pet cats, and have recorded their ages, weights, and body lengths, as well as how many grams of food they eat. Many of these variables are inter-correlated: kittens eat less than adult cats, and they are also smaller by weight and length. Similarly, many larger cats by length also weigh more (and eat more) than their shorter peers. In a situation like this, it's difficult to tease apart the relationships between the covariates and the outcome. We will learn how to address this below. 
+## Nonlinearity 1: Interactions
 
+One form of nonlinearity occurs when two or more variables in a dataset interact with each other. As a simple example, suppose we want to predict how much food cats will eat in a week. We have a sample of 16 pet cats, and have recorded:
+
+- `food` - the amount of food eaten in grams
+- `weight` - their weight in grams
+- `adult` - an indicator variable for whether the cat is an adult (1) or a kitten (0) 
+
+###
+
+Consider a model without interaction, maybe something like:
+
+$${\rm food} = \beta_0 + \beta_1 \times {\rm weight} + \beta_2 \times {\rm adult} + residuals$$
+The challenge here is that the predictors are collinear: kittens eat less than adult cats, and they also tend to weigh less. In a situation like this, it's difficult to tease apart the relationships between the covariates and the outcome. 
+
+###
+
+Luckily, you already know how to add an interaction term:
+
+$${\rm food} = \beta_0 + \beta_1 \times {\rm weight} + \beta_2 \times {\rm adult} + \beta_3\times {\rm weight*adult} + residuals$$
+You can think of interactions as introducing _nonlinearity_ to the model. Let's explore this idea further below.
 
 ### Example: demographic data
 
@@ -132,34 +151,80 @@ ggplot(data=data, aes(y=income, x=experience, col=gender)) +
 ```
 
 
-### Modeling the demographic data
+### Linear model for demographic data
 
-Let's fit a linear model to these data, using all the covariates we have. 
+Let's fit a linear model to these data, using all the covariates we have: 
 
 ```{r, include=TRUE}
 m1 <- lm(data=data, income ~ .)
 summary(m1)
 ```
 
+The plots below show how well the simple linear model fits the data:
+
+```{r, include=TRUE}
+ggplot(data=data, aes(x=experience, y=income)) +
+  geom_point(aes(col=gender)) +
+  geom_smooth(method='lm', se=FALSE) +
+  ggtitle('Linear model without interaction term')
+
+data$residuals <- resid(m1)
+data$fitted <- fitted(m1)
+
+ggplot(data=data, aes(x=fitted, y=residuals)) +
+  geom_point(aes(col=gender)) +
+  geom_hline(yintercept=0) +
+  ggtitle('Residuals vs fitted values for model without interaction term')
+
+ggplot(data=data, aes(sample=residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ plot for model without interaction term') +
+  ylab("residuals") +
+  xlab("quantiles")
+```
+
+We can see from the plots above that key linearity assumptions are violated and the model doesn't fit very well:
+
+1. The variance of the residuals is non-constant (especially across the gender groups). More specifically, the residuals are larger for the male income values; and,
+2. The quantiles in the QQ plot deviate from the diagonal, indicating that the residuals are not normally distributed.
+
+Subjectively, too, we can also see from the first scatterplot that our model is missing some key information. Perhaps an interaction term can help?
+
 
 ### Adding interactions to our model
 
-In R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. 
+Recall that in R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. Let's try it for our demographic data:
 
 ```{r, include=TRUE}
 m2 <- lm(data=data, income ~ experience + gender + experience:gender)
 summary(m2)
 ```
 
+And now we have the following plots for `m2`:
 
-### Assessing model fit
+```{r, include=TRUE}
+data$residuals <- resid(m2)
+data$fitted <- fitted(m2)
+
+ggplot(data=data, aes(x=fitted, y=residuals)) +
+  geom_point(aes(col=gender)) +
+  geom_hline(yintercept=0) +
+  ggtitle('Residuals vs fitted values for model with interaction term')
+
+ggplot(data=data, aes(sample=residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ Plot for model with interaction term')  +
+  ylab("residuals") +
+  xlab("quantiles")
+```
+
+This model is also not perfect (check: why?), but let's see how the two compare directly.
+
+### Comparing model fit
 
 ```{r, echo=FALSE}
-ggplot(data=data, aes(x=experience, y=income)) +
-  geom_point(aes(col=gender)) +
-  geom_smooth(method='lm', se=FALSE) +
-  ggtitle('Linear model without interaction term')
-  
 tab <- matrix(c(0.733, 0.692, 11.1, 0.833, 0.791, 9.1), ncol=3, byrow=TRUE)
 colnames(tab) <- c('Multiple R-squared', 'Adjusted R-squared', 'Residual SE')
 rownames(tab) <- c('m1', 'm2')
@@ -167,7 +232,7 @@ tab <- as.table(tab)
 print(tab)
 ```
 
-We can see that the model that includes an interaction term performs better by the measures of goodness of fit that we know: the $R^2$ and adjusted $R^2$ are higher, and the SE's are lower. 
+We can see that the model that includes an interaction term performs better according to adjusted $R^2$, which takes into account the complexity in the model that is added when we add a term.  
 
 
 ## Your turn!
@@ -180,6 +245,8 @@ Now we'll turn to a more interesting problem that does not have a categorical va
 - `temp` - outdoor temperature
 - `income` - average neighborhood income
 - `price` - ice cream price
+
+**Exercise**
 
 To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the varables. 
 
@@ -203,31 +270,32 @@ ggplot(data=icecream, aes(y=_______, x=_______, col=_______)) +
   geom_point()
 ```
 
-```{r ex1-hint-1}
-# Try the following command for loading the csv file:
-read.csv("data/icecream.csv")
-```
+<details>
+<summary>**Hint**</summary>
+Try `read.csv()` for loading the csv file.
+</details>
 
-```{r ex1-solution}
-# Solution
-icecream <- read.csv("data/icecream.csv")
+<!-- ```{r ex1-solution} -->
+<!-- # Solution -->
+<!-- icecream <- read.csv("data/icecream.csv") -->
 
-ggplot(data=icecream, aes(y=cons, x=temp)) +
-  geom_point()
+<!-- ggplot(data=icecream, aes(y=cons, x=temp)) + -->
+<!--   geom_point() -->
 
-ggplot(data=icecream, aes(y=cons, x=price, col=temp)) +
-  geom_point()
+<!-- ggplot(data=icecream, aes(y=cons, x=price, col=temp)) + -->
+<!--   geom_point() -->
 
-ggplot(data=icecream, aes(y=cons, x=income, col=temp)) +
-  geom_point()
-```
+<!-- ggplot(data=icecream, aes(y=cons, x=income, col=temp)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 ```{r mc1}
 question("What is the relationship between ice cream consumption and temperature?",
          answer("Positive and somewhat linear", correct=TRUE),
-         answer("Positive and strongly linear"),
-         answer("Negative and non-linear"),
-         answer("There is no correlation"))
+         answer("Positive and strongly linear", message="Not quite. The relationship is positive, but check its strength again."),
+         answer("Negative and non-linear", message="Incorrect. Recall, what does it look like for two variables to be positive or negatively correlated?"),
+         answer("There is no correlation", message="Incorrect. There is clearly some correlation, check again to see what the correct description would be."),
+         allow_retry = TRUE)
 ```
 
 ### Modeling icecream consumption
@@ -238,6 +306,8 @@ First, let's write a model for the data: if $y$ is consumption, then with the va
 
 $y = \beta_0 + \beta_{\rm temp}x_{\rm temp} + \beta_{\rm price}x_{\rm price} + \beta_{\rm income}x_{\rm income} + residuals$
 
+**Exercise**
+
 Now, fit this model below:
 
 ```{r ex2, exercise = TRUE}
@@ -246,15 +316,17 @@ m1 <- ____
 summary(m1)
 ```
 
-```{r ex2-solution}
-# Add the independent variables (covariates) after the ~ and separated by +
-m1 <- lm(data=icecream, cons ~ temp + price + income)
+<!-- ```{r ex2-solution} -->
+<!-- # Add the independent variables (covariates) after the ~ and separated by + -->
+<!-- m1 <- lm(data=icecream, cons ~ temp + price + income) -->
 
-summary(m1)
-```
+<!-- summary(m1) -->
+<!-- ``` -->
 
 
 ### Interactions between non-categorical variables
+
+**Exercise**
 
 Now add the interaction term corresponding to the written model below: 
 
@@ -268,12 +340,12 @@ m2 <- ____
 summary(m2)
 ```
 
-```{r ex3-solution}
-# Add the independent variables (covariates) after the ~ and separated by +
-m2 <- lm(data=icecream, cons ~ temp + price + income + price:income)
+<!-- ```{r ex3-solution} -->
+<!-- # Add the independent variables (covariates) after the ~ and separated by + -->
+<!-- m2 <- lm(data=icecream, cons ~ temp + price + income + price:income) -->
 
-summary(m2)
-```
+<!-- summary(m2) -->
+<!-- ``` -->
 
 
 ### Assessing model fit
@@ -288,9 +360,323 @@ print(tab)
 
 ```{r mc2}
 question("Given the measures of model fit above, which model do you think fits the icecream consumption data better?",
-         answer("m1, linear model with no interactions"),
+         answer("m1, linear model with no interactions", message="Incorrect. Try checking the diagnostics again, especially the adjusted R^2."),
          answer("m2, linear model with interaction between price and income", correct=TRUE),
+         allow_retry = TRUE)
+```
+
+### Inference for interaction terms
+
+Now that we've added an interaction term to the model, we may ask whether it is meaningful or not. That is, we want to conduct the following (two-sided) hypothesis test:
+
+> H0: $\beta_{\rm price:income} = 0$
+
+> H1: $\beta_{\rm price:income} \neq 0$
+
+###
+
+Recall the model summary:
+
+```{r, include=TRUE}
+summary(m2)$coefficients
+```
+
+The final column, `Pr(>|t|)`, gives the probability of the interaction effect being at least as extreme as the one observed (i.e., $\mathbb{P}(\beta_{\rm price:income} \geq |4.26|)$) _assuming H0 is true_. In other words, this is exactly the p-value. 
+
+```{r mc3}
+question("Given the p-value of 0.02, is the interaction effect meaningful at confidence level alpha=0.05?",
+         answer("Yes, we can reject H0.", correct=TRUE, message="Right, but with a caveat. The p-value is only slighly less than 0.05, which suggests that the interaction term *might be* significant in this context. To be more sure, we would want to see a much smaller p-value."),
+         answer("No, we don't have enough evidence to reject H0.", message="Incorrect - check again. When would you reject H0?"),
+         allow_retry = TRUE)
+```
+
+
+## Nonlinearity 2: Transformations
+
+Another type of nonlinearity arises when the data itself does not follow a linear pattern. For example:
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)  
+library(ggplot2)
+
+# Simulate some data 
+x <- runif(n=100, min=0, max=10)
+epsilon <- rnorm(n=100, mean=0, sd=1)
+y <- 2*x**2 + epsilon*((1+x**2))
+
+data <- data.frame(x,y)
+head(data)
+```
+
+```{r}
+ggplot(data=data, aes(x=x, y=y)) +
+  geom_point()
+```
+
+```{r mc4, echo=FALSE}
+question("Is the relationship between x and y linear?",
+         answer("Yes"),
+         answer("No", correct=TRUE),
          answer("Not sure"))
+```
+
+###
+
+Now let's look at the histograms of x and y, below. Notice that x looks more or less uniformly distributed, but y is highly skewed. This is another clue that the relationship between the variables is not linear.
+
+```{r}
+ggplot(data=data, aes(x=x)) +
+  geom_histogram()
+
+ggplot(data=data, aes(x=y)) +
+  geom_histogram()
+```
+
+
+### Adding a transformation
+
+One thing we could try here is to _transform_ the data (i.e. apply a function to it), which will change its scale. Hopefully, the transformed variable will have a more linear relationship with the covariate(s).
+
+**Exercise**
+
+Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship between x and y_.
+
+```{r ex4, exercise=TRUE}
+data$y_ <- _____
+
+ggplot(data=data, aes(x=_____, y=_____)) +
+  geom_point()
+```
+
+<!-- ```{r ex2-solution} -->
+<!-- data$y_ = sqrt(data$y) -->
+
+<!-- ggplot(data=data, aes(x=x, y=y_)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
+
+Does the relationship between x and y_ look linear?
+```{r mc5, echo=FALSE}
+question("Is the relationship between x and y_ linear?",
+         answer("Yes", correct=TRUE),
+         answer("No"),
+         answer("Not sure"))
+```
+
+
+### Modeling the transformed data
+
+Great! Our transformation worked, and we can now model y_ and x using the familiar linear regression tools.
+
+**Exercise**
+
+Fit a linear model for x and y_. 
+
+```{r ex5, exercise=TRUE}
+model <- lm(______)
+summary(model)
+```
+
+<!-- ```{r ex3-solution} -->
+<!-- model <- lm(data=data, y_ ~ x) -->
+<!-- summary(model) -->
+<!-- ``` -->
+
+
+### Back-transformation
+
+In order to plot the best-fit line on the original (non-transformed) domain of y, we'll need to _back-transform_ the data. That is, we need to apply the inverse of the function we used before: 
+
+$y* = 0.557 + 1.268x + residuals$
+
+$\sqrt{y}= 0.557 + 1.268x + residuals$
+
+$y = (0.557 + 1.268x + residuals)^2$
+
+The model on the last line is shown below.
+
+```{r}
+ggplot(data=data, aes(x=x, y=y)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~poly(x,2), se=FALSE)
+```
+
+Note: after transforming the data, you will need to take care when interpreting the coefficients of the model. As we showed, we cannot describe changes in $y$ as linear with respect to changes in $x$. Instead, in this specific case the change in $y$ is *quadratic* with changes in $x$. 
+
+
+## Your turn!
+
+Now try repeating the same analysis on MLB salary data from the 1986 and 1987 seasons. Here's a preview of what the dataset, called `Hitters` ($N=263$),  looks like:
+
+```{r, echo=FALSE}
+library(ISLR2)
+library(dplyr)
+
+data(Hitters)
+
+Hitters <- Hitters %>% 
+  select(Salary, RBI) %>%
+  filter(!is.na(Salary)) %>%
+  filter(Salary > 0)
+
+head(Hitters)
+```
+
+We are interested in modeling these players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat. The units of the `Salary` column are in thousands of dollars.
+
+**Exercise**
+
+Create a scatterplot of players' salaries vs RBI. Check the linearity of the data with the scatterplot.
+
+```{r ex6, exercise=TRUE}
+```
+
+<!-- ```{r ex4-solution} -->
+<!-- ggplot(data=Hitters, aes(x=RBI, y=Salary)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
+
+###
+
+### A different transformation
+
+So the Salaries are not linear, and you'll have to transform them again. Take another look at the scatterplot above.
+
+```{r mc6, echo=FALSE}
+question("What relationship does MLB players' salary and RBI seem to have?",
+         answer("Linear"),
+         answer("Exponential", correct=TRUE),
+         answer("Cubic"),
+         answer("Not sure"))
+```
+
+
+### Modeling exponential data
+
+**Exercise**
+
+Perform a log transformation on the Salary variable, and add it to the dataframe. Then use the transformed variable in a linear model as you did with the quadratic example above.
+
+```{r ex7, exercise=TRUE}
+# Perform a log transformation on the salary variable
+Hitters$logSalary <- _____
+
+# Create a linear model of log-salary vs RBI
+m2 <- ____
+summary(m2)
+```
+
+<!-- ```{r ex5-solution} -->
+<!-- Hitters$logSalary <- log(Hitters$Salary) -->
+
+<!-- m2 <- lm(data=Hitters, logSalary ~ RBI) -->
+<!-- summary(m2) -->
+<!-- ``` -->
+
+```{r mc7, echo=FALSE}
+question("What inverse operation will you need to perform on the model for the correct back-transformation?",
+         answer("(...)^2"),
+         answer("exp(...) or e^(...)", correct=TRUE),
+         answer("sqrt(...)"),
+         answer("1/(...)"))
+```
+
+
+### Back transformation
+
+After back-transforming, your model will be:
+
+$y = e^{\beta_0 + \beta_1x_{RBI} + residuals}$
+
+### Assumptions and model diagnostics
+
+Ok, so now `logSalary` appears linear with `RBI`, at least visually. But, we still need to check our assumptions and diagnose the model fit. The only thing that changes now is that we're doing this with respect to the transformed variable.
+
+**Exercise**
+
+Using your `m2` object above, check how well your transformed model fits the data:
+
+1. Create a plot of the residuals vs the fitted values, with a y-intercept at 0
+2. Create a qq-plot of the residuals
+
+```{r ex8, exercise=TRUE}
+# Extract the residuals and fitted values from the m2 object
+Hitters$residuals <- ____
+Hitters$fitted <- ____
+
+# Plot residuals vs fitted values, with a yintercept at 0
+ggplot(data=Hitters, aes(x=____, y=____)) +
+  geom_hline(yintercept=____) +
+  ggtitle('Residuals vs fitted values for m2')
+
+# QQ-plot of residuals
+ggplot(data=Hitters, aes(sample=residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ Plot for m2')  +
+  ylab("residuals") +
+  xlab("quantiles")
+```
+
+<!-- ```{r ex6-solution} -->
+<!-- # Extract the residuals and fitted values from the m2 object -->
+<!-- Hitters$residuals <- resid(m2) -->
+<!-- Hitters$fitted <- fitted(m2) -->
+
+<!-- # Plot residuals vs fitted values, with a yintercept at 0 -->
+<!-- ggplot(data=Hitters, aes(x=fitted, y=residuals)) + -->
+<!--   geom_point() + -->
+<!--   geom_hline(yintercept=0) + -->
+<!--   ggtitle('Residuals vs fitted values for m2') -->
+
+<!-- # QQ-plot of residuals -->
+<!-- ggplot(data=Hitters, aes(sample=residuals)) + -->
+<!--   stat_qq() +  -->
+<!--   stat_qq_line() + -->
+<!--   ggtitle('QQ Plot for m2')  + -->
+<!--   ylab("residuals") + -->
+<!--   xlab("quantiles") -->
+<!-- ``` -->
+
+
+```{r mc8, echo=FALSE}
+question("Given the plots above, what assumptions (if any) are violated for modeling logSalary vs RBI using linear regression?",
+         answer("No assumptions are violated, everything looks good.", message="Try checking the plots again. What would you want to see in a graph of the residuals vs fitted values, and in a QQ plot?"),
+         answer("As fitted values increase, the values of the residuals decrease, indicating that they have a non-constant variance.", message="Yes, this is true. Does anything appear off about the QQ plot?"),
+         answer("The quantiles of the residuals do not follow the diagonal line, which indicates that they are not normally distributed.", message="Yes, this is true. Does anything appear off about the plot of residuals vs fitted values?"),
+         answer("The residuals seem to have a non-constant variance and they are not normally distributed.", correct=TRUE),
+         allow_retry = TRUE)
+```
+
+
+### Interpretation
+
+Now on a log scale, `logSalary` appears linear with RBI:
+
+```{r, include=FALSE}
+Hitters$logSalary <- log(Hitters$Salary)
+```
+
+```{r}
+ggplot(data=Hitters, aes(x=RBI, y=logSalary)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
+```
+
+Note the difference in the scales on the y-axis compared to the first scatterplot you made, because now we're on a log scale. 
+
+```{r mc9, echo=FALSE}
+question("Using the model summary below, how would you interpret the coefficient for RBI?",
+         answer("Every unit increase in RBI increases the players' salary by 0.01529 thousands of dollars (or $15.259).", message="This is an additive interpretation, which would be true if we were modeling Salary vs RBI - but recall that we used a log transformation. Try looking at the back-transformed model again."), # (0.015259*1000 =) $15.26.
+         answer("Every unit increase in RBI increases the players' salary by a factor of exp(0.015259) = 1.015.", correct=TRUE), # (exp(0.015259)*1000 = 1.015259*1000 =) $1015.38
+         answer("Every unit increase in RBI increases the players' salary by a factor of 0.015259.", message="Careful - the effect is multiplicative but be sure to double-check the scale."),
+         answer("Every unit increase in RBI increases the players' salary by a factor of 1.5259%.", message="Careful - the effect is multiplicative but recall that we need to use exp() to back-transform the model. Try computing exp(B1(x+1))/exp(B1x) and see what you get."),
+         allow_retry = TRUE)
+```
+
+```{r, include=FALSE}
+m2 <- lm(data=Hitters, logSalary ~ RBI)
+summary(m2)
 ```
 
 
