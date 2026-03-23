@@ -143,6 +143,8 @@ ggplot(data=data, aes(x=y)) +
 
 ### Adding a transformation
 
+**Exercise**
+
 Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship between x and y_.
 ```{r ex2, exercise=TRUE}
 data$y_ <- _____
@@ -151,12 +153,12 @@ ggplot(data=data, aes(x=_____, y=_____)) +
   geom_point()
 ```
 
-```{r ex2-solution}
-data$y_ = sqrt(data$y)
+<!-- ```{r ex2-solution} -->
+<!-- data$y_ = sqrt(data$y) -->
 
-ggplot(data=data, aes(x=x, y=y_)) +
-  geom_point()
-```
+<!-- ggplot(data=data, aes(x=x, y=y_)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 Does the relationship between x and y_ look linear?
 ```{r mc2, echo=FALSE}
@@ -169,6 +171,8 @@ question("Is the relationship between x and y_ linear?",
 
 ### Modeling the transformed data
 
+**Exercise**
+
 Now, fit a linear model for x and y_. 
 
 ```{r ex3, exercise=TRUE}
@@ -176,10 +180,10 @@ model <- lm(______)
 summary(model)
 ```
 
-```{r ex3-solution}
-model <- lm(data=data, y_ ~ x)
-summary(model)
-```
+<!-- ```{r ex3-solution} -->
+<!-- model <- lm(data=data, y_ ~ x) -->
+<!-- summary(model) -->
+<!-- ``` -->
 
 
 ### Back-transformation
@@ -206,28 +210,38 @@ Note: after transforming the data, you will need to take care when interpreting 
 
 ## Your turn!
 
-Now try repeating the same analysis on MLB salary data. Here's a preview of what the dataset, called `Hitters`,  looks like:
+Now try repeating the same analysis on MLB salary data, specifically for just the 1986 and 1987 seasons. Here's a preview of what the dataset, called `Hitters` ($N=263$),  looks like:
 
 ```{r, echo=FALSE}
 library(ISLR2)
+library(dplyr)
+
 data(Hitters)
+
+Hitters <- Hitters %>% 
+  select(Salary, RBI) %>%
+  filter(!is.na(Salary)) %>%
+  filter(Salary > 0)
 
 head(Hitters)
 ```
 
+We are interested in modeling these players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat.
 
-Create a scatterplot of players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat. Check the linearity of the data with the scatterplot.
+**Exercise**
+
+Create a scatterplot of players' salaries vs RBI. Check the linearity of the data with the scatterplot.
 
 ```{r ex4, exercise=TRUE}
 ```
 
-```{r ex4-solution}
-ggplot(data=Hitters, aes(x=RBI, y=Salary)) +
-  geom_point()
-```
+<!-- ```{r ex4-solution} -->
+<!-- ggplot(data=Hitters, aes(x=RBI, y=Salary)) + -->
+<!--   geom_point() -->
+<!-- ``` -->
 
 
-### A Different Transformation
+### A different transformation
 
 So the Salaries are not linear, and you'll have to transform them again. Take another look at the scatterplot above.
 
@@ -240,17 +254,27 @@ question("What relationship does MLB players' salary and RBI seem to have?",
 ```
 
 
-### Modeling Exponential Data
+### Modeling exponential data
+
+**Exercise**
 
 Perform a log transformation on the Salary variable, and add it to the dataframe. Then use the transformed variable in a linear model as you did with the quadratic example above.
 
 ```{r ex5, exercise=TRUE}
+# Perform a log transformation on the salary variable
 Hitters$logSalary <- _____
+
+# Create a linear model of log-salary vs RBI
+m2 <- ____
+summary(m2)
 ```
 
-```{r ex5-solution}
-Hitters$logSalary <- log(Hitters$Salary)
-```
+<!-- ```{r ex5-solution} -->
+<!-- Hitters$logSalary <- log(Hitters$Salary) -->
+
+<!-- m2 <- lm(data=Hitters, logSalary ~ RBI) -->
+<!-- summary(m2) -->
+<!-- ``` -->
 
 ```{r mc4, echo=FALSE}
 question("What inverse operation will you need to perform on the model for the correct back-transformation?",
@@ -261,7 +285,7 @@ question("What inverse operation will you need to perform on the model for the c
 ```
 
 
-### Back Transformation
+### Back transformation
 
 After back-transforming, your model will be:
 
@@ -283,6 +307,67 @@ ggplot(data=Hitters, aes(x=RBI, y=logSalary)) +
 ```
 
 Note the difference in the scales on the y-axis compared to the first scatterplot you made, because now we're on a log scale. 
+
+
+### Assumptions and model diagnostics
+
+Ok, so now `logSalary` appears linear with `RBI`, at least visually. But, we still need to check our assumptions and diagnose the model fit. The only thing that changes now is that we're doing this with respect to the transformed variable.
+
+**Exercise**
+
+Using your `m2` object above, check how well your transformed model fits the data:
+
+1. Create a plot of the residuals vs the fitted values, with a y-intercept at 0
+2. Create a qq-plot of the residuals
+
+```{r ex6, exercise=TRUE}
+# Extract the residuals and fitted values from the m2 object
+Hitters$residuals <- ____
+Hitters$fitted <- ____
+
+# Plot residuals vs fitted values, with a yintercept at 0
+ggplot(data=Hitters, aes(x=____, y=____)) +
+  geom_hline(yintercept=____) +
+  ggtitle('Residuals vs fitted values for m2')
+
+# QQ-plot of residuals
+ggplot(data=Hitters, aes(sample=residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ Plot for m2')  +
+  ylab("residuals") +
+  xlab("quantiles")
+```
+
+```{r ex6-solution}
+# Extract the residuals and fitted values from the m2 object
+Hitters$residuals <- resid(m2)
+Hitters$fitted <- fitted(m2)
+
+# Plot residuals vs fitted values, with a yintercept at 0
+ggplot(data=Hitters, aes(x=fitted, y=residuals)) +
+  geom_point() +
+  geom_hline(yintercept=0) +
+  ggtitle('Residuals vs fitted values for m2')
+
+# QQ-plot of residuals
+ggplot(data=Hitters, aes(sample=residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle('QQ Plot for m2')  +
+  ylab("residuals") +
+  xlab("quantiles")
+```
+
+
+```{r mc5, echo=FALSE}
+question("Given the plots above, what assumptions (if any) are violated for modeling logSalary vs RBI using linear regression?",
+         answer("No assumptions are violated, everything looks good.", message="Try checking the plots again. What would you want to see in a graph of the residuals vs fitted values, and in a QQ plot?"),
+         answer("As fitted values increase, the values of the residuals decrease, indicating that they have a non-constant variance.", message="Yes, this is true. Does anything appear off about the QQ plot?"),
+         answer("The quantiles of the residuals do not follow the diagonal line, which indicates that they are not normally distributed.", message="Yes, this is true. Does anything appear off about the plot of residuals vs fitted values?"),
+         answer("The residuals seem to have a non-constant variance and they are not normally distributed.", correct=TRUE),
+         allow_retry = TRUE)
+```
 
 
 ## Submit
