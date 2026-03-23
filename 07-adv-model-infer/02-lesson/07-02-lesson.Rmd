@@ -226,7 +226,7 @@ Hitters <- Hitters %>%
 head(Hitters)
 ```
 
-We are interested in modeling these players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat.
+We are interested in modeling these players' salaries vs RBI. RBI, coarsely speaking, measures how many points the team scores as a result of a player's at-bat. The units of the `Salary` column are in thousands of dollars.
 
 **Exercise**
 
@@ -240,6 +240,7 @@ Create a scatterplot of players' salaries vs RBI. Check the linearity of the dat
 <!--   geom_point() -->
 <!-- ``` -->
 
+###
 
 ### A different transformation
 
@@ -291,24 +292,6 @@ After back-transforming, your model will be:
 
 $y = e^{\beta_0 + \beta_1x_{RBI} + residuals}$
 
-
-### Interpretation
-
-Now on a log scale, `logSalary` appears linear with RBI:
-
-```{r, include=FALSE}
-Hitters$logSalary <- log(Hitters$Salary)
-```
-
-```{r}
-ggplot(data=Hitters, aes(x=RBI, y=logSalary)) +
-  geom_point() +
-  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
-```
-
-Note the difference in the scales on the y-axis compared to the first scatterplot you made, because now we're on a log scale. 
-
-
 ### Assumptions and model diagnostics
 
 Ok, so now `logSalary` appears linear with `RBI`, at least visually. But, we still need to check our assumptions and diagnose the model fit. The only thing that changes now is that we're doing this with respect to the transformed variable.
@@ -339,28 +322,28 @@ ggplot(data=Hitters, aes(sample=residuals)) +
   xlab("quantiles")
 ```
 
-```{r ex6-solution}
-# Extract the residuals and fitted values from the m2 object
-Hitters$residuals <- resid(m2)
-Hitters$fitted <- fitted(m2)
+<!-- ```{r ex6-solution} -->
+<!-- # Extract the residuals and fitted values from the m2 object -->
+<!-- Hitters$residuals <- resid(m2) -->
+<!-- Hitters$fitted <- fitted(m2) -->
 
-# Plot residuals vs fitted values, with a yintercept at 0
-ggplot(data=Hitters, aes(x=fitted, y=residuals)) +
-  geom_point() +
-  geom_hline(yintercept=0) +
-  ggtitle('Residuals vs fitted values for m2')
+<!-- # Plot residuals vs fitted values, with a yintercept at 0 -->
+<!-- ggplot(data=Hitters, aes(x=fitted, y=residuals)) + -->
+<!--   geom_point() + -->
+<!--   geom_hline(yintercept=0) + -->
+<!--   ggtitle('Residuals vs fitted values for m2') -->
 
-# QQ-plot of residuals
-ggplot(data=Hitters, aes(sample=residuals)) +
-  stat_qq() + 
-  stat_qq_line() +
-  ggtitle('QQ Plot for m2')  +
-  ylab("residuals") +
-  xlab("quantiles")
-```
+<!-- # QQ-plot of residuals -->
+<!-- ggplot(data=Hitters, aes(sample=residuals)) + -->
+<!--   stat_qq() +  -->
+<!--   stat_qq_line() + -->
+<!--   ggtitle('QQ Plot for m2')  + -->
+<!--   ylab("residuals") + -->
+<!--   xlab("quantiles") -->
+<!-- ``` -->
 
 
-```{r mc5, echo=FALSE}
+```{r mc6, echo=FALSE}
 question("Given the plots above, what assumptions (if any) are violated for modeling logSalary vs RBI using linear regression?",
          answer("No assumptions are violated, everything looks good.", message="Try checking the plots again. What would you want to see in a graph of the residuals vs fitted values, and in a QQ plot?"),
          answer("As fitted values increase, the values of the residuals decrease, indicating that they have a non-constant variance.", message="Yes, this is true. Does anything appear off about the QQ plot?"),
@@ -368,6 +351,39 @@ question("Given the plots above, what assumptions (if any) are violated for mode
          answer("The residuals seem to have a non-constant variance and they are not normally distributed.", correct=TRUE),
          allow_retry = TRUE)
 ```
+
+
+### Interpretation
+
+Now on a log scale, `logSalary` appears linear with RBI:
+
+```{r, include=FALSE}
+Hitters$logSalary <- log(Hitters$Salary)
+```
+
+```{r}
+ggplot(data=Hitters, aes(x=RBI, y=logSalary)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=(y~x), se=FALSE, color="blue")
+```
+
+Note the difference in the scales on the y-axis compared to the first scatterplot you made, because now we're on a log scale. 
+
+```{r mc5, echo=FALSE}
+question("Using the model summary below, how would you interpret the coefficient for RBI?",
+         answer("Every unit increase in RBI increases the players' salary by 0.01529 thousands of dollars (or $15.259).", message="This is an additive interpretation, which would be true if we were modeling Salary vs RBI - but recall that we used a log transformation. Try looking at the back-transformed model again."), # (0.015259*1000 =) $15.26.
+         answer("Every unit increase in RBI increases the players' salary by a factor of exp(0.015259) = 1.015.", correct=TRUE), # (exp(0.015259)*1000 = 1.015259*1000 =) $1015.38
+         answer("Every unit increase in RBI increases the players' salary by a factor of 0.015259.", message="Careful - the effect is multiplicative but be sure to double-check the scale."),
+         answer("Every unit increase in RBI increases the players' salary by a factor of 1.5259%.", message="Careful - the effect is multiplicative but recall that we need to use exp() to back-transform the model. Try computing exp(B1(x+1))/exp(B1x) and see what you get."),
+         allow_retry = TRUE)
+```
+
+```{r, include=FALSE}
+m2 <- lm(data=Hitters, logSalary ~ RBI)
+summary(m2)
+```
+
+
 
 
 ## Submit
