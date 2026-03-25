@@ -17,10 +17,7 @@ library(openintro)
 library(grid)
 library(png)
 library(ggplot2)
-
-# Download package with Hitters data
-install.packages("ISLR2")
-library(ISLR2)
+library(dplyr)
 #library(emo)
 
 knitr::opts_chunk$set(echo = FALSE,
@@ -100,6 +97,20 @@ hash_encoder_ui <- {
     input$caption
   }), )
 }
+
+
+# Prep hitters data globally
+install.packages("ISLR2")
+library(ISLR2)
+library(dplyr)
+
+data(Hitters)
+
+Hitters <- Hitters %>% 
+  select(Salary, RBI) %>%
+  filter(!is.na(Salary)) %>%
+  filter(Salary > 0)
+
 ```
 
 ## Welcome
@@ -252,7 +263,7 @@ Now we'll turn to a more interesting problem that does not have a categorical va
 
 **Exercise**
 
-To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the varables. 
+To start, load the `icecream.csv` data file into a DataFrame and create scatterplots to examine the relationships between the variables. 
 
 ```{r ex1, exercise = TRUE}
 # Load data
