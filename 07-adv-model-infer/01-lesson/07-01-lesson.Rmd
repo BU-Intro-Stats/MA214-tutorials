@@ -20,6 +20,7 @@ library(ggplot2)
 
 # Download package with Hitters data
 install.packages("ISLR2")
+library(ISLR2)
 #library(emo)
 
 knitr::opts_chunk$set(echo = FALSE,
