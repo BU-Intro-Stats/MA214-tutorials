@@ -12,10 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Lessons
 
-### 1 - [Addressing Nonlinearities](https://openintro.shinyapps.io/ims-07-adv-model-infer-01/)
+### 1 - [Addressing Nonlinearities](http://shiny.bu.edu:3838/MA214/07-adv-model-infer/01-lesson/)
 
-### 2 - [Cross-Validation](https://openintro.shinyapps.io/ims-07-adv-model-infer-02/)
+### 2 - [Cross-Validation](http://shiny.bu.edu:3838/MA214/07-adv-model-infer/02-lesson/)
 
-### 3 - [Inference and Prediction](https://openintro.shinyapps.io/ims-07-adv-model-infer-03/)
+### 3 - [Inference and Prediction](http://shiny.bu.edu:3838/MA214/07-adv-model-infer/03-lesson/)
 
-### 4 - [Case Study: Logistic Regression for Low Birthweights in Nepal](https://openintro.shinyapps.io/ims-07-adv-model-infer-04/)
+### 4 - [Case Study: Logistic Regression for Low Birthweights in Nepal](http://shiny.bu.edu:3838/MA214/07-adv-model-infer/04-lesson/)
