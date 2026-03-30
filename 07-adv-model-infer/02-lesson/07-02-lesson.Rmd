@@ -257,6 +257,8 @@ question("How many times will we repeat the cross-validation process until every
 
 ### Cross-validation on the icecream data
 
+**Exercise**
+
 Modify the following function to perform cross-validation on the icecream data, with the no-interaction and interaction models we recalled above.
 
 ```{r ex1, exercise=TRUE}
@@ -517,6 +519,8 @@ crossValIce <- function(dataset, k) {
   return(results)
 }
 ```
+
+**Exercise**
 
 Now run the function on the icecream data for $k=3$:
 
