@@ -98,6 +98,23 @@ hash_encoder_ui <- {
   }), )
 }
 
+# Prep demographics data globally
+inc <- c(43, 48, 52, 70, 61, 83, 96, 100,
+         36, 40, 39, 44, 46, 49, 50, 53) 
+exp <- c(1, 2, 4, 6, 5, 3, 8, 10,
+         1, 3, 2, 5, 8, 6, 7, 10)
+gen <- c("male", "male", "male", "male", "male", "male", "male", "male",
+         "female", "female", "female", "female", "female", "female", "female", 
+         "female")
+
+demographics <- data.frame(inc, exp, gen)
+colnames(demographics) <- c("income", "experience", "gender")
+
+# Prep nonlinear simulation data globally
+x <- runif(n=100, min=0, max=10)
+epsilon <- rnorm(n=100, mean=0, sd=1)
+y <- 2*x**2 + epsilon*((1+x**2))
+simul <- data.frame(x,y)
 
 # Prep hitters data globally
 install.packages("ISLR2")
@@ -141,7 +158,7 @@ You can think of interactions as introducing _nonlinearity_ to the model. Let's 
 
 ### Example: demographic data
 
-An academic advisor wants to study the career outcomes of former students under her mentorship. She collects the following data on 16 recent graduates: 
+An academic advisor wants to study the career outcomes of former students under her mentorship. She collects the following data on 16 recent graduates in a dataset called `demographics`: 
 
 - `income` - annual income, in tens of thousands of USD
 - `experience` - years of work experience
@@ -158,10 +175,10 @@ gen <- c("male", "male", "male", "male", "male", "male", "male", "male",
          "female", "female", "female", "female", "female", "female", "female", 
          "female")
 
-data <- data.frame(inc, exp, gen)
-colnames(data) <- c("income", "experience", "gender")
+demographics <- data.frame(inc, exp, gen)
+colnames(demographics) <- c("income", "experience", "gender")
 
-ggplot(data=data, aes(y=income, x=experience, col=gender)) +
+ggplot(data=demographics, aes(y=income, x=experience, col=gender)) +
   geom_point()
 ```
 
@@ -171,27 +188,27 @@ ggplot(data=data, aes(y=income, x=experience, col=gender)) +
 Let's fit a linear model to these data, using all the covariates we have: 
 
 ```{r, include=TRUE}
-m1 <- lm(data=data, income ~ .)
+m1 <- lm(data=demographics, income ~ .)
 summary(m1)
 ```
 
 The plots below show how well the simple linear model fits the data:
 
 ```{r, include=TRUE}
-ggplot(data=data, aes(x=experience, y=income)) +
+ggplot(data=demographics, aes(x=experience, y=income)) +
   geom_point(aes(col=gender)) +
   geom_smooth(method='lm', se=FALSE) +
   ggtitle('Linear model without interaction term')
 
-data$residuals <- resid(m1)
-data$fitted <- fitted(m1)
+demographics$residuals <- resid(m1)
+demographics$fitted <- fitted(m1)
 
-ggplot(data=data, aes(x=fitted, y=residuals)) +
+ggplot(data=demographics, aes(x=fitted, y=residuals)) +
   geom_point(aes(col=gender)) +
   geom_hline(yintercept=0) +
   ggtitle('Residuals vs fitted values for model without interaction term')
 
-ggplot(data=data, aes(sample=residuals)) +
+ggplot(data=demographics, aes(sample=residuals)) +
   stat_qq() + 
   stat_qq_line() +
   ggtitle('QQ plot for model without interaction term') +
@@ -212,22 +229,22 @@ Subjectively, too, we can also see from the first scatterplot that our model is 
 Recall that in R, the syntax for adding an interaction term within the linear model `lm()` is `lm(y ~ x1 + x2 + x1:x2)`, where $y$ is the dependent variable and $x_1, x_2$ are two covariates. Let's try it for our demographic data:
 
 ```{r, include=TRUE}
-m2 <- lm(data=data, income ~ experience + gender + experience:gender)
+m2 <- lm(data=demographics, income ~ experience + gender + experience:gender)
 summary(m2)
 ```
 
 And now we have the following plots for `m2`:
 
 ```{r, include=TRUE}
-data$residuals <- resid(m2)
-data$fitted <- fitted(m2)
+demographics$residuals <- resid(m2)
+demographics$fitted <- fitted(m2)
 
-ggplot(data=data, aes(x=fitted, y=residuals)) +
+ggplot(data=demographics, aes(x=fitted, y=residuals)) +
   geom_point(aes(col=gender)) +
   geom_hline(yintercept=0) +
   ggtitle('Residuals vs fitted values for model with interaction term')
 
-ggplot(data=data, aes(sample=residuals)) +
+ggplot(data=demographics, aes(sample=residuals)) +
   stat_qq() + 
   stat_qq_line() +
   ggtitle('QQ Plot for model with interaction term')  +
@@ -419,12 +436,12 @@ x <- runif(n=100, min=0, max=10)
 epsilon <- rnorm(n=100, mean=0, sd=1)
 y <- 2*x**2 + epsilon*((1+x**2))
 
-data <- data.frame(x,y)
-head(data)
+simul <- data.frame(x,y)
+head(simul)
 ```
 
 ```{r}
-ggplot(data=data, aes(x=x, y=y)) +
+ggplot(data=simul, aes(x=x, y=y)) +
   geom_point()
 ```
 
@@ -441,26 +458,27 @@ question("Is the relationship between x and y linear?",
 Now let's look at the histograms of x and y, below. Notice that x looks more or less uniformly distributed, but y is highly skewed. This is another clue that the relationship between the variables is not linear.
 
 ```{r}
-ggplot(data=data, aes(x=x)) +
+ggplot(data=simul, aes(x=x)) +
   geom_histogram()
 
-ggplot(data=data, aes(x=y)) +
+ggplot(data=simul, aes(x=y)) +
   geom_histogram()
 ```
 
 
 ### Adding a transformation
 
-One thing we could try here is to _transform_ the data (i.e. apply a function to it), which will change its scale. Hopefully, the transformed variable will have a more linear relationship with the covariate(s).
+One thing we could try here is to _transform_ the data (i.e. apply a function to it), which will change its scale. Hopefully, the transformed variable will have a more linear relationship with the covariate(s). 
 
 **Exercise**
 
-Compute y_ = sqrt(y) and add it to the dataframe. Then, plot the relationship between x and y_.
+Compute y_ = sqrt(y) and add it to the `simul` dataframe. Then, plot the relationship between x and y_.
 
 ```{r ex4, exercise=TRUE}
-data$y_ <- _____
+simul <- simul %>% 
+  mutate(y_ = ____)
 
-ggplot(data=data, aes(x=_____, y=_____)) +
+ggplot(data=simul, aes(x=_____, y=_____)) +
   geom_point()
 ```
 
@@ -489,6 +507,12 @@ Great! Our transformation worked, and we can now model y_ and x using the famili
 
 Fit a linear model for x and y_. 
 
+
+```{r include=FALSE, echo=FALSE}
+simul <- simul %>% 
+  mutate(y_ = sqrt(y))
+```
+
 ```{r ex5, exercise=TRUE}
 model <- lm(______)
 summary(model)
@@ -513,7 +537,7 @@ $y = (0.557 + 1.268x + residuals)^2$
 The model on the last line is shown below.
 
 ```{r}
-ggplot(data=data, aes(x=x, y=y)) +
+ggplot(data=simul, aes(x=x, y=y)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~poly(x,2), se=FALSE)
 ```
@@ -577,7 +601,8 @@ Perform a log transformation on the Salary variable, and add it to the dataframe
 
 ```{r ex7, exercise=TRUE}
 # Perform a log transformation on the salary variable
-Hitters$logSalary <- _____
+Hitters <- Hitters %>%
+  mutate(logSalary = ____) 
 
 # Create a linear model of log-salary vs RBI
 m2 <- ____
@@ -590,6 +615,16 @@ summary(m2)
 <!-- m2 <- lm(data=Hitters, logSalary ~ RBI) -->
 <!-- summary(m2) -->
 <!-- ``` -->
+
+```{r echo=FALSE, include=FALSE}
+# Perform a log transformation on the salary variable
+Hitters <- Hitters %>%
+  mutate(logSalary = log(Salary)) 
+
+# Create a linear model of log-salary vs RBI
+m2 <- lm(logSalary ~ RBI, data=Hitters)
+summary(m2)
+```
 
 ```{r mc7, echo=FALSE}
 question("What inverse operation will you need to perform on the model for the correct back-transformation?",
@@ -625,8 +660,11 @@ Hitters$fitted <- ____
 
 # Plot residuals vs fitted values, with a yintercept at 0
 ggplot(data=Hitters, aes(x=____, y=____)) +
+  geom_point() +
   geom_hline(yintercept=____) +
-  ggtitle('Residuals vs fitted values for m2')
+  ggtitle('Residuals vs fitted values for m2') +
+  ylab("residuals") +
+  xlab("fitted values")
 
 # QQ-plot of residuals
 ggplot(data=Hitters, aes(sample=residuals)) +
